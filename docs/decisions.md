@@ -28,6 +28,10 @@ Fallback audio is a reliability boundary. It allows the local radio path, status
 
 The demo manifest is not the long-term upstream model. It is the first concrete input that can be adapted into `BroadcastPlan`, while future text-flow work can produce the same plan through `RawTextItem`, `VillageSignal`, `ContextPacket`, and `TaskBrief` boundaries.
 
+## Keep text sanitization pure and upstream of planning
+
+The first text-flow implementation only converts `RawTextItem` values into `SanitizedTextItem` values. It filters empty text, deduplicates by `item_id`, redacts obvious sensitive fields, and marks sanitized metadata, but it does not read real data sources or generate `VillageSignal`, `ContextPacket`, `TaskBrief`, or `BroadcastPlan` objects.
+
 ## Integrate ACE-Step behind `MusicGenerator`
 
 ACE-Step must remain one music source implementation. Mixer, Player, status screen, and Hermes should not depend on ACE-Step details.

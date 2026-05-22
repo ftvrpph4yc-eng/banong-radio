@@ -77,7 +77,7 @@ Fallback generation uses FFmpeg synthetic tone/noise beds. These are not final c
 
 ## BroadcastPlan Boundary
 
-The current demo manifest is treated as one input format for `BroadcastPlan`. It is not a live upstream data source. Future village text-flow work should produce `RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief`, and only the confirmed radio task should become a `BroadcastPlan` for this runtime.
+The current demo manifest is treated as one input format for `BroadcastPlan`. It is not a live upstream data source. The first text-flow slice now sanitizes `RawTextItem -> SanitizedTextItem` with empty-text filtering, `item_id` deduplication, and sensitive-field redaction. Future village text-flow work should continue with `VillageSignal -> ContextPacket -> TaskBrief`, and only the confirmed radio task should become a `BroadcastPlan` for this runtime.
 
 Mixer and Player continue to receive local audio paths only.
 
