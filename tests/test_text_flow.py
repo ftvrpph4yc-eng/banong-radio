@@ -1,11 +1,14 @@
 from pathlib import Path
 
-from banong_radio.domain import RawTextItem, SanitizedTextItem
+from banong_radio.domain import ContextPacket, RawTextItem, SanitizedTextItem, TaskBrief, VillageSignal
 from banong_radio.text_flow import (
     CommunitySourceAdapter,
+    ContextBuilder,
     DemoVillageFeedAdapter,
     PublicNoticeSourceAdapter,
+    SignalExtractor,
     SourceAdapterNotConfigured,
+    TaskPlanner,
     VoiceTranscriptSourceAdapter,
     WeatherSourceAdapter,
     WeChatGroupSourceAdapter,
@@ -169,3 +172,78 @@ def test_real_source_adapter_stubs_can_return_explicit_fixture_items() -> None:
         adapter = adapter_class(fixture_items=fixture_items)
 
         assert adapter.fetch_items() == fixture_items
+
+
+def test_signal_extractor_turns_sanitized_demo_items_into_village_signals() -> None:
+    raw_items = DemoVillageFeedAdapter(DEMO_FEED_PATH).fetch_items()
+    sanitized = sanitize_text_items(raw_items)
+
+    signals = SignalExtractor().extract(sanitized)
+
+    assert len(signals) == 5
+    assert all(type(signal) is VillageSignal for signal in signals)
+    assert signals[0].signal_id == "signal:public-notice-001"
+    assert signals[0].title == "镇政府公开公告 synthetic fixture"
+    assert signals[0].summary == "今天上午村口道路养护，农产品运输车辆请从东侧便道绕行。"
+    assert "traffic" in signals[0].topics
+    assert signals[0].urgency == "high"
+    assert signals[0].metadata == {
+        "source": "public_notice",
+        "source_item_id": "public-notice-001",
+        "sanitized": True,
+    }
+
+
+def test_context_builder_groups_signals_without_generating_outputs() -> None:
+    raw_items = DemoVillageFeedAdapter(DEMO_FEED_PATH).fetch_items()
+    sanitized = sanitize_text_items(raw_items)
+    signals = SignalExtractor().extract(sanitized)
+
+    packet = ContextBuilder().build(
+        signals,
+        date="2026-05-23",
+        place="剪鸭村",
+        audience=("villagers", "operators"),
+    )
+
+    assert type(packet) is ContextPacket
+    assert packet.packet_id == "context:2026-05-23:剪鸭村"
+    assert packet.date == "2026-05-23"
+    assert packet.place == "剪鸭村"
+    assert packet.audience == ("villagers", "operators")
+    assert packet.signals == tuple(signals)
+    assert packet.metadata["signal_count"] == 5
+    assert "weather" in packet.metadata["topics"]
+    assert packet.metadata["urgency_counts"]["high"] >= 1
+
+
+def test_task_planner_creates_radio_brief_without_broadcast_plan() -> None:
+    raw_items = DemoVillageFeedAdapter(DEMO_FEED_PATH).fetch_items()
+    sanitized = sanitize_text_items(raw_items)
+    signals = SignalExtractor().extract(sanitized)
+    packet = ContextBuilder().build(signals, date="2026-05-23", place="剪鸭村")
+
+    brief = TaskPlanner().plan(packet, task="radio")
+
+    assert type(brief) is TaskBrief
+    assert brief.task == "radio"
+    assert brief.context_packet_id == "context:2026-05-23:剪鸭村"
+    assert brief.intent == "prepare a radio task brief from sanitized village signals"
+    assert brief.inputs == tuple(signal.signal_id for signal in signals)
+    assert brief.metadata["signal_count"] == 5
+    assert brief.metadata["next_step"] == "radio_planner"
+    assert "broadcast_plan" not in brief.metadata
+    assert "segments" not in brief.metadata
+
+
+def test_task_planner_rejects_empty_context() -> None:
+    packet = ContextBuilder().build([], date="2026-05-23", place="剪鸭村")
+
+    try:
+        TaskPlanner().plan(packet, task="radio")
+    except ValueError as exc:
+        message = str(exc)
+    else:
+        raise AssertionError("empty context produced a task brief")
+
+    assert "requires at least one village signal" in message

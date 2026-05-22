@@ -77,7 +77,7 @@ Fallback generation uses FFmpeg synthetic tone/noise beds. These are not final c
 
 ## BroadcastPlan Boundary
 
-The current demo manifest is treated as one input format for `BroadcastPlan`. It is not a live upstream data source. The first text-flow slice now sanitizes `RawTextItem -> SanitizedTextItem` with empty-text filtering, `item_id` deduplication, and sensitive-field redaction. Future village text-flow work should continue with `VillageSignal -> ContextPacket -> TaskBrief`, and only the confirmed radio task should become a `BroadcastPlan` for this runtime.
+The current demo manifest is treated as one input format for `BroadcastPlan`. It is not a live upstream data source. The text-flow chain can now produce `RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief`, and only a later confirmed radio planner should turn the task brief into a `BroadcastPlan` for this runtime.
 
 Mixer and Player continue to receive local audio paths only.
 
@@ -86,6 +86,12 @@ Mixer and Player continue to receive local audio paths only.
 `demo/village_feed.json` is a synthetic fixture for text-flow tests. `DemoVillageFeedAdapter` can read it and return `RawTextItem` values for public notice, weather, community, chat excerpt, and voice transcript examples.
 
 The real-source adapter stubs for WeChat group, weather, public notice, voice transcript, and community sources are not configured by default. They raise `SourceAdapterNotConfigured` unless explicit fixture items are supplied by a test or later approved task. They do not read chat exports, call weather APIs, scrape government websites, or load voice originals.
+
+## Text Flow Task Brief
+
+The deterministic text-flow chain can turn the demo feed into `RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief`. `SignalExtractor`, `ContextBuilder`, and `TaskPlanner` do not call an LLM, do not read real sources, and do not generate a `BroadcastPlan`.
+
+`TaskBrief.metadata["next_step"]` points to a later planner such as `radio_planner`. The current runtime still consumes only `BroadcastPlan` values loaded from the demo manifest until the R-10 planning slice is implemented.
 
 ## Verification
 

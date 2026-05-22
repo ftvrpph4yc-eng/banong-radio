@@ -19,7 +19,7 @@
 - CLI：`start-demo`、`status`、`stop`、`generate-segment`、`serve-status`、`preflight-ace`。
 - 播放计划边界：`demo/demo_manifest.json` 会先转换为 `BroadcastPlan`，再进入本地音频运行时。
 - 文字信息流入口：`SourceAdapter` 协议、`DemoVillageFeedAdapter` 和真实输入源 adapter stub；stub 默认未配置，不访问外部世界。
-- 文字清洗边界：`RawTextItem -> SanitizedTextItem` 的最小纯函数切片，包含空文本过滤、按 `item_id` 去重、手机号 / 身份证号 / 精确地址脱敏和 `sanitized=True` 元数据标记。
+- 文字处理链路：`RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief` 的最小确定性切片，不调用 LLM、不生成 `BroadcastPlan`。
 - 音乐来源边界：`MusicRequest` / `MusicResult` / `MusicGenerator`，支持 fallback 与显式 ACE-Step API 来源。
 - fallback 安全链路：ACE-Step 不可用时仍可准备可播放 mp3。
 - 中文 TTS：优先 `edge-tts`，本机不可用时降级到 macOS `say`。
@@ -30,7 +30,7 @@
 ## 当前边界
 
 - 当前版本用 manifest 代表已确认输入，不读取原始聊天记录、天气 API、政府网页或口播原文。
-- `banong_radio.domain` 已提供 `RawTextItem`、`SanitizedTextItem`、`VillageSignal`、`ContextPacket`、`TaskBrief`、`BroadcastPlan` 等上游文字信息流数据边界；`banong_radio.text_flow` 已实现 demo feed adapter 和最小 sanitizer，但真实 SourceAdapter 尚未接入。
+- `banong_radio.domain` 已提供 `RawTextItem`、`SanitizedTextItem`、`VillageSignal`、`ContextPacket`、`TaskBrief`、`BroadcastPlan` 等上游文字信息流数据边界；`banong_radio.text_flow` 已实现 demo feed adapter、sanitizer、signal extractor、context builder 和 task planner，但真实 SourceAdapter 尚未接入。
 - ACE-Step 单段 smoke 文件已经技术验证为非静音音频，但还需要人工听感确认。
 - 本机官方 API 曾把请求的 `acestep-5Hz-lm-1.7B` 自动降级为 `acestep-5Hz-lm-0.6B`；不要把当前结果宣传为 1.7B 已真实生成验证。
 - 本仓库不保存音频资产、模型权重、cache、日志或密钥。

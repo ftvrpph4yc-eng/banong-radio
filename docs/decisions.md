@@ -28,13 +28,17 @@ Fallback audio is a reliability boundary. It allows the local radio path, status
 
 The demo manifest is not the long-term upstream model. It is the first concrete input that can be adapted into `BroadcastPlan`, while future text-flow work can produce the same plan through `RawTextItem`, `VillageSignal`, `ContextPacket`, and `TaskBrief` boundaries.
 
-## Keep text sanitization pure and upstream of planning
+## Keep text sanitization pure and upstream of signal extraction
 
-The first text-flow implementation only converts `RawTextItem` values into `SanitizedTextItem` values. It filters empty text, deduplicates by `item_id`, redacts obvious sensitive fields, and marks sanitized metadata, but it does not read real data sources or generate `VillageSignal`, `ContextPacket`, `TaskBrief`, or `BroadcastPlan` objects.
+The sanitizer implementation only converts `RawTextItem` values into `SanitizedTextItem` values. It filters empty text, deduplicates by `item_id`, redacts obvious sensitive fields, and marks sanitized metadata, but it does not read real data sources or generate `VillageSignal`, `ContextPacket`, `TaskBrief`, or `BroadcastPlan` objects.
 
 ## Keep source adapters fixture-first
 
 `DemoVillageFeedAdapter` is the only source adapter that runs without extra configuration, and it only reads the synthetic `demo/village_feed.json` fixture. Real-source adapter classes exist to preserve the architecture boundary, but they default to `SourceAdapterNotConfigured` and may return only explicitly supplied fixture items until a separate source-specific task is approved.
+
+## Keep task planning deterministic before output generation
+
+`SignalExtractor`, `ContextBuilder`, and `TaskPlanner` use simple deterministic rules over sanitized demo text. They produce `VillageSignal`, `ContextPacket`, and `TaskBrief` objects, but they do not call an LLM, do not generate `BroadcastPlan`, and do not change the audio runtime. Radio output generation stays isolated for the next planner slice.
 
 ## Integrate ACE-Step behind `MusicGenerator`
 

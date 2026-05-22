@@ -8,11 +8,36 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any, Protocol
 
-from banong_radio.domain import RawTextItem, SanitizedTextItem
+from banong_radio.domain import ContextPacket, RawTextItem, SanitizedTextItem, TaskBrief, VillageSignal
 
 PHONE_PATTERN = re.compile(r"(?<!\d)1[3-9]\d{9}(?!\d)")
 ID_CARD_PATTERN = re.compile(r"(?<!\d)\d{17}[\dXx](?!\w)")
 PRECISE_ADDRESS_PATTERN = re.compile(r"(家庭住址|住址|地址|门牌)[:：]?[^，。；;\n]*")
+SOURCE_TOPIC_MAP = {
+    "public_notice": ("notice",),
+    "weather": ("weather",),
+    "community": ("community",),
+    "chat_excerpt": ("community",),
+    "voice_transcript": ("voice_transcript",),
+}
+KEYWORD_TOPIC_MAP = {
+    "道路": "traffic",
+    "绕行": "traffic",
+    "阵雨": "weather",
+    "防雨": "weather",
+    "谷物": "farming",
+    "农产品": "local_business",
+    "直播": "local_business",
+    "志愿": "volunteer",
+    "排班": "governance",
+}
+HIGH_URGENCY_KEYWORDS = ("预警", "紧急", "立即", "绕行", "防雨")
+TASK_INTENTS = {
+    "radio": "prepare a radio task brief from sanitized village signals",
+    "daily": "prepare a daily summary task brief from sanitized village signals",
+    "newspaper": "prepare a village newspaper task brief from sanitized village signals",
+    "alert": "prepare an alert task brief from sanitized village signals",
+}
 
 
 class SourceAdapter(Protocol):
@@ -194,3 +219,142 @@ def sanitize_text_items(raw_items: Iterable[RawTextItem]) -> list[SanitizedTextI
         )
 
     return sanitized_items
+
+
+def _deduplicate(values: Iterable[str]) -> tuple[str, ...]:
+    seen: set[str] = set()
+    result: list[str] = []
+    for value in values:
+        normalized = str(value).strip()
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        result.append(normalized)
+    return tuple(result)
+
+
+def _topics_for_item(item: SanitizedTextItem) -> tuple[str, ...]:
+    metadata_topic = item.metadata.get("topic")
+    metadata_topics = item.metadata.get("topics")
+    topics: list[str] = []
+    if isinstance(metadata_topic, str):
+        topics.append(metadata_topic)
+    if isinstance(metadata_topics, (list, tuple)):
+        topics.extend(str(topic) for topic in metadata_topics)
+    topics.extend(SOURCE_TOPIC_MAP.get(item.source, (item.source,)))
+    for keyword, topic in KEYWORD_TOPIC_MAP.items():
+        if keyword in item.text:
+            topics.append(topic)
+    return _deduplicate(topics)
+
+
+def _urgency_for_item(item: SanitizedTextItem) -> str:
+    if any(keyword in item.text for keyword in HIGH_URGENCY_KEYWORDS):
+        return "high"
+    return "normal"
+
+
+class SignalExtractor:
+    """Deterministic extractor for already-sanitized demo text."""
+
+    def extract(self, items: Iterable[SanitizedTextItem]) -> list[VillageSignal]:
+        signals: list[VillageSignal] = []
+        for item in items:
+            topics = _topics_for_item(item)
+            source_label = str(item.metadata.get("source_label", item.source))
+            signal = VillageSignal(
+                signal_id=f"signal:{item.item_id}",
+                title=source_label,
+                summary=item.text,
+                topics=topics,
+                urgency=_urgency_for_item(item),
+                confidence=0.9 if item.metadata.get("fixture") else 0.8,
+                metadata={
+                    "source": item.source,
+                    "source_item_id": item.metadata.get("source_item_id", item.item_id),
+                    "sanitized": item.metadata.get("sanitized") is True,
+                },
+            )
+            signals.append(signal)
+        return signals
+
+
+class ContextBuilder:
+    """Group village signals for one date/place/audience context packet."""
+
+    def build(
+        self,
+        signals: Iterable[VillageSignal],
+        *,
+        date: str | None = None,
+        place: str | None = None,
+        audience: Iterable[str] = ("villagers",),
+        packet_id: str | None = None,
+    ) -> ContextPacket:
+        signal_tuple = tuple(signals)
+        audience_tuple = tuple(audience)
+        topics = _deduplicate(
+            topic for signal in signal_tuple for topic in signal.topics
+        )
+        urgency_counts: dict[str, int] = {}
+        for signal in signal_tuple:
+            urgency_counts[signal.urgency] = urgency_counts.get(signal.urgency, 0) + 1
+
+        return ContextPacket(
+            packet_id=packet_id or _default_packet_id(date=date, place=place),
+            signals=signal_tuple,
+            date=date,
+            place=place,
+            audience=audience_tuple,
+            metadata={
+                "signal_count": len(signal_tuple),
+                "topics": topics,
+                "urgency_counts": urgency_counts,
+            },
+        )
+
+
+class TaskPlanner:
+    """Create task briefs from context without generating final outputs."""
+
+    def plan(self, context: ContextPacket, *, task: str = "radio") -> TaskBrief:
+        if not context.signals:
+            raise ValueError("task brief requires at least one village signal")
+
+        task_name = task.strip() or "radio"
+        signal_payloads = tuple(
+            {
+                "signal_id": signal.signal_id,
+                "title": signal.title,
+                "summary": signal.summary,
+                "topics": signal.topics,
+                "urgency": signal.urgency,
+            }
+            for signal in context.signals
+        )
+        return TaskBrief(
+            task=task_name,
+            context_packet_id=context.packet_id,
+            intent=TASK_INTENTS.get(
+                task_name,
+                f"prepare a {task_name} task brief from sanitized village signals",
+            ),
+            inputs=tuple(signal.signal_id for signal in context.signals),
+            metadata={
+                "signal_count": len(context.signals),
+                "topics": context.metadata.get("topics", ()),
+                "urgency_counts": context.metadata.get("urgency_counts", {}),
+                "date": context.date,
+                "place": context.place,
+                "audience": context.audience,
+                "signals": signal_payloads,
+                "next_step": f"{task_name}_planner",
+            },
+        )
+
+
+def _default_packet_id(*, date: str | None, place: str | None) -> str:
+    parts = ["context", date or "demo"]
+    if place:
+        parts.append(place)
+    return ":".join(parts)
