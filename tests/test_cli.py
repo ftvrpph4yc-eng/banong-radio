@@ -1,0 +1,69 @@
+import json
+
+from banong_radio import cli
+
+
+def test_cli_status_prints_json(monkeypatch, capsys) -> None:
+    monkeypatch.setattr("sys.argv", ["banong-radio", "status"])
+    monkeypatch.setattr(cli, "read_status", lambda: {"ok": True, "mode": "idle"})
+
+    cli.main()
+
+    parsed = json.loads(capsys.readouterr().out)
+    assert parsed == {"ok": True, "mode": "idle"}
+
+
+def test_cli_missing_required_argument_prints_json(monkeypatch, capsys) -> None:
+    monkeypatch.setattr("sys.argv", ["banong-radio", "generate-segment"])
+
+    try:
+        cli.main()
+    except SystemExit as exc:
+        assert exc.code == 2
+    else:
+        raise AssertionError("expected SystemExit")
+
+    parsed = json.loads(capsys.readouterr().out)
+    assert parsed["ok"] is False
+    assert parsed["error"] == "usage_error"
+    assert "--mood" in parsed["message"]
+    assert "usage:" in parsed["usage"]
+
+
+def test_cli_unknown_command_prints_json(monkeypatch, capsys) -> None:
+    monkeypatch.setattr("sys.argv", ["banong-radio", "not-a-command"])
+
+    try:
+        cli.main()
+    except SystemExit as exc:
+        assert exc.code == 2
+    else:
+        raise AssertionError("expected SystemExit")
+
+    parsed = json.loads(capsys.readouterr().out)
+    assert parsed["ok"] is False
+    assert parsed["error"] == "usage_error"
+    assert "invalid choice" in parsed["message"]
+
+
+def test_cli_runtime_error_prints_json(monkeypatch, capsys) -> None:
+    def fail_start_demo(manifest_path):
+        raise ValueError("broadcast plan has no segments: missing")
+
+    monkeypatch.setattr("sys.argv", ["banong-radio", "start-demo", "--manifest", "/tmp/missing.json"])
+    monkeypatch.setattr(cli, "start_demo", fail_start_demo)
+
+    try:
+        cli.main()
+    except SystemExit as exc:
+        assert exc.code == 1
+    else:
+        raise AssertionError("expected SystemExit")
+
+    parsed = json.loads(capsys.readouterr().out)
+    assert parsed == {
+        "ok": False,
+        "error": "runtime_error",
+        "error_type": "ValueError",
+        "message": "broadcast plan has no segments: missing",
+    }

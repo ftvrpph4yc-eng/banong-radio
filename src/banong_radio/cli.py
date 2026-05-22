@@ -19,9 +19,29 @@ from banong_radio.runtime import (
 from banong_radio.status_server import serve_status_screen
 
 
+class CliUsageError(Exception):
+    def __init__(self, message: str, usage: str) -> None:
+        super().__init__(message)
+        self.message = message
+        self.usage = usage.strip()
+
+
+class JsonArgumentParser(argparse.ArgumentParser):
+    def error(self, message: str) -> None:
+        raise CliUsageError(message, self.format_usage())
+
+
+def print_json(payload: dict[str, object]) -> None:
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser(prog="banong-radio")
-    sub = parser.add_subparsers(dest="command", required=True)
+    parser = JsonArgumentParser(prog="banong-radio")
+    sub = parser.add_subparsers(
+        dest="command",
+        parser_class=JsonArgumentParser,
+        required=True,
+    )
 
     start = sub.add_parser("start-demo", help="Start the local presentation radio loop.")
     start.add_argument("--manifest", default=str(PROJECT_ROOT / "demo/demo_manifest.json"))
@@ -38,9 +58,8 @@ def main() -> None:
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", default=8765, type=int)
 
-    args = parser.parse_args()
-
     try:
+        args = parser.parse_args()
         if args.command == "start-demo":
             result = start_demo(Path(args.manifest))
         elif args.command == "generate-segment":
@@ -57,6 +76,16 @@ def main() -> None:
         else:
             parser.error(f"unknown command: {args.command}")
             return
+    except CliUsageError as exc:
+        print_json(
+            {
+                "ok": False,
+                "error": "usage_error",
+                "message": exc.message,
+                "usage": exc.usage,
+            }
+        )
+        sys.exit(2)
     except subprocess.CalledProcessError as exc:
         result = {
             "ok": False,
@@ -64,10 +93,20 @@ def main() -> None:
             "cmd": exc.cmd,
             "stderr": exc.stderr,
         }
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        print_json(result)
+        sys.exit(1)
+    except Exception as exc:
+        print_json(
+            {
+                "ok": False,
+                "error": "runtime_error",
+                "error_type": exc.__class__.__name__,
+                "message": str(exc),
+            }
+        )
         sys.exit(1)
 
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+    print_json(result)
 
 
 if __name__ == "__main__":
