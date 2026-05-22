@@ -1,4 +1,4 @@
-"""Runtime helpers for the Banong Radio demo."""
+"""Runtime helpers for the Jianya local radio presentation path."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from banong_radio.domain import BroadcastPlan
 from banong_radio.music import (
     AceStepMusicGenerator,
     FallbackMusicGenerator,
@@ -67,6 +68,11 @@ def write_status(**updates: Any) -> dict[str, Any]:
     return status
 
 
+def load_broadcast_plan(manifest_path: Path) -> BroadcastPlan:
+    manifest = read_json(manifest_path, {"segments": []})
+    return BroadcastPlan.from_manifest_payload(manifest, plan_id=manifest_path.stem)
+
+
 def is_process_alive(pid: Any) -> bool:
     if not isinstance(pid, int) or pid <= 0:
         return False
@@ -78,10 +84,8 @@ def is_process_alive(pid: Any) -> bool:
 
 
 def ensure_fallback_assets(manifest_path: Path) -> list[dict[str, Any]]:
-    manifest = read_json(manifest_path, {"segments": []})
-    segments = manifest.get("segments", [])
-    if not segments:
-        raise ValueError(f"manifest has no segments: {manifest_path}")
+    plan = load_broadcast_plan(manifest_path)
+    segments = plan.to_runtime_segments()
 
     ASSET_ROOT.mkdir(parents=True, exist_ok=True)
     for folder in ["generated", "tts", "mixed", "fallback"]:
@@ -176,7 +180,7 @@ def start_demo(manifest_path: Path) -> dict[str, Any]:
         return {
             "ok": True,
             "mode": status.get("mode", "playing"),
-            "message": "demo already running",
+            "message": "radio loop already running",
             "pid": status["pid"],
             "status_path": str(STATUS_PATH),
         }
@@ -249,7 +253,7 @@ def generate_segment(mood: str, source: str) -> dict[str, Any]:
         requested_source=source,
         next_segment=mood,
         source="fallback",
-        note="Request recorded for Hermes-driven demo control; current playback loop stays conservative.",
+        note="Request recorded for Hermes-driven control; current playback loop stays conservative.",
     )
     return {
         "ok": True,

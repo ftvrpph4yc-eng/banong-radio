@@ -1,4 +1,4 @@
-"""Command line interface for the Banong Radio demo runtime."""
+"""Command line interface for the Jianya local radio runtime."""
 
 from __future__ import annotations
 
@@ -23,10 +23,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(prog="banong-radio")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    start = sub.add_parser("start-demo", help="Start the local fallback radio loop.")
+    start = sub.add_parser("start-demo", help="Start the local presentation radio loop.")
     start.add_argument("--manifest", default=str(PROJECT_ROOT / "demo/demo_manifest.json"))
 
-    gen = sub.add_parser("generate-segment", help="Queue a requested demo segment.")
+    gen = sub.add_parser("generate-segment", help="Queue a requested radio segment.")
     gen.add_argument("--mood", required=True, help="Target mood.")
     gen.add_argument("--source", default="", help="Content source label.")
 

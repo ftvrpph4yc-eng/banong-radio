@@ -1,4 +1,4 @@
-"""Music source contracts for the Banong Radio demo."""
+"""Music source contracts for the Jianya local radio runtime."""
 
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ class MusicResult:
 
 
 class MusicGenerator(Protocol):
-    """Generate or retrieve music for a demo segment."""
+    """Generate or retrieve music for a radio segment."""
 
     def generate(self, request: MusicRequest, index: int = 0) -> MusicResult:
         """Return a playable music result for the request."""
@@ -339,30 +339,32 @@ def ace_step_preflight() -> dict[str, Any]:
 
 
 def ace_step_recommendation() -> dict[str, Any]:
+    avoid_for_live = [
+        {
+            "model": "acestep-v15-xl-*",
+            "reason": "higher quality but official guidance says XL needs offload below 20GB, which is risky on a 16GB live presentation machine",
+        },
+        {
+            "model": "acestep-5Hz-lm-4B",
+            "reason": "best quality tier is aimed at >=24GB; use later only for offline A/B if needed",
+        },
+    ]
     return {
         "primary": {
             "runtime": "official ACE-Step 1.5 macOS MLX backend",
             "dit": "acestep-v15-turbo",
             "lm": "acestep-5Hz-lm-1.7B",
-            "reason": "best balance for Mac mini M4 16GB live demo: faster than sft/xl, still keeps the 1.7B planner for prompt structure",
+            "reason": "best balance for Mac mini M4 16GB live presentation: faster than sft/xl, still keeps the 1.7B planner for prompt structure",
         },
         "fallback": {
             "runtime": "existing local fallback mp3 assets",
             "reason": "must remain active until preflight ok=true and a generated segment passes listening test",
         },
-        "avoid_for_live_demo": [
-            {
-                "model": "acestep-v15-xl-*",
-                "reason": "higher quality but official guidance says XL needs offload below 20GB, which is risky on a 16GB live demo machine",
-            },
-            {
-                "model": "acestep-5Hz-lm-4B",
-                "reason": "best quality tier is aimed at >=24GB; use later only for offline A/B if needed",
-            },
-        ],
+        "avoid_for_live_demo": avoid_for_live,
+        "avoid_for_live_presentation": avoid_for_live,
         "optional_experiment": {
             "runtime": "mlx-community/ACE-Step1.5-MLX-4bit",
-            "reason": "compact 4-bit MLX weights are promising, but official ACE-Step macOS scripts/API are the primary integration path for this demo",
+            "reason": "compact 4-bit MLX weights are promising, but official ACE-Step macOS scripts/API are the primary integration path for this runtime",
         },
     }
 
@@ -453,7 +455,7 @@ def read_ace_step_env(path: Path) -> dict[str, str]:
 
 
 def inspect_ace_step_model_cache(checkouts: list[Path]) -> dict[str, Any]:
-    """Inspect model cache roots for the selected ACE-Step 1.5 live-demo models."""
+    """Inspect model cache roots for the selected ACE-Step 1.5 live presentation models."""
     roots: dict[str, Path] = {
         "ace_step": Path.home() / ".cache" / "ace-step" / "checkpoints",
         "huggingface": Path.home() / ".cache" / "huggingface",

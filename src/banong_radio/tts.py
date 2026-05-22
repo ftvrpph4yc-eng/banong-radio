@@ -1,4 +1,4 @@
-"""Speech synthesis adapters for the Banong Radio demo."""
+"""Speech synthesis adapters for the Jianya local radio runtime."""
 
 from __future__ import annotations
 

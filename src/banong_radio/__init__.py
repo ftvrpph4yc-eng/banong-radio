@@ -1,4 +1,4 @@
-"""Banong Radio demo runtime package."""
+"""Local AI radio runtime package for Jianya Village Media."""
 
 __all__ = ["__version__"]
 

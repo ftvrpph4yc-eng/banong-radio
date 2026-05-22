@@ -1,4 +1,4 @@
-"""FFmpeg mixing helpers for the Banong Radio demo."""
+"""FFmpeg mixing helpers for the Jianya local radio runtime."""
 
 from __future__ import annotations
 

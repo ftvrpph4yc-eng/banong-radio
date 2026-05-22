@@ -1,4 +1,4 @@
-"""Background fallback player for the Banong Radio demo."""
+"""Background fallback player for the Jianya local radio runtime."""
 
 from __future__ import annotations
 

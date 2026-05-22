@@ -1,4 +1,4 @@
-"""HTTP status screen for the Banong Radio demo."""
+"""HTTP status screen for the Jianya local radio runtime."""
 
 from __future__ import annotations
 

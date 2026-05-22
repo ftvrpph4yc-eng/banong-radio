@@ -1,0 +1,41 @@
+# Decisions
+
+## Use "Jianya Village Media" as the external project frame
+
+The external project is broader than one radio command-line tool. "Jianya Village Media" captures the product idea: village data can be processed once and expressed as radio, newspaper, web pages, and later video.
+
+The repository remains the local radio runtime, not the entire future platform.
+
+## Align with village economy and AI empowerment scoring
+
+The event rubric is balanced across innovation, rural fit, technical difficulty, completion, and market fit. Documentation and presentation should map every major claim to one of these criteria.
+
+The project should be framed as village information service and content workflow infrastructure, not only as a radio experience. The radio remains the first working output because it is the most rural-native interface.
+
+## Keep `banong_radio` and `banong-radio`
+
+The package name and CLI already work. Renaming them now would create avoidable breakage before submission. Product-facing copy can say "Jianya Media / Banong Radio Runtime" while code keeps stable names.
+
+## GitHub is the primary submission surface
+
+The code repository should show engineering quality directly: architecture, operation, decisions, tests, and limitations. Obsidian remains the internal brain for continuity and planning.
+
+## Keep fallback as the live path
+
+Fallback audio is a reliability boundary. It allows the local radio path, status screen, TTS, mixer, and player to keep working when ACE-Step is slow, unavailable, or unsuitable for live presentation.
+
+## Treat manifest as a BroadcastPlan input
+
+The demo manifest is not the long-term upstream model. It is the first concrete input that can be adapted into `BroadcastPlan`, while future text-flow work can produce the same plan through `RawTextItem`, `VillageSignal`, `ContextPacket`, and `TaskBrief` boundaries.
+
+## Integrate ACE-Step behind `MusicGenerator`
+
+ACE-Step must remain one music source implementation. Mixer, Player, status screen, and Hermes should not depend on ACE-Step details.
+
+## Treat ACE-Step 1.7B as recommended but not verified
+
+The recommended live configuration still points at `acestep-v15-turbo` and `acestep-5Hz-lm-1.7B`, but server logs showed automatic downgrade to `acestep-5Hz-lm-0.6B` on this machine. Submission material must preserve that caveat.
+
+## Use SDK vocabulary only for future agent orchestration
+
+If real external orchestration is added, use the official OpenAI Agents SDK concepts and package. Do not create a parallel local agent framework or new incompatible terminology.

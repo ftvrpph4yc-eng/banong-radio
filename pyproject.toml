@@ -1,7 +1,7 @@
 [project]
 name = "banong-radio"
 version = "0.1.0"
-description = "Hackathon demo runtime for a Hermes-directed rural AI radio."
+description = "Local AI radio runtime for Jianya Village Media."
 requires-python = ">=3.10"
 dependencies = []
 
