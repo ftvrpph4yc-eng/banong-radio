@@ -69,6 +69,22 @@ class AceStepApiError(RuntimeError):
     """Raised when the ACE-Step API cannot produce a usable audio file."""
 
 
+def music_error_metadata(exc: Exception) -> dict[str, str]:
+    if isinstance(exc, AceStepApiError):
+        return {
+            "fallback_reason": "ace-step-error",
+            "fallback_error_category": "ace-step-api",
+            "fallback_error_type": exc.__class__.__name__,
+            "fallback_error_message": str(exc),
+        }
+    return {
+        "fallback_reason": "music-generator-error",
+        "fallback_error_category": "music-generator",
+        "fallback_error_type": exc.__class__.__name__,
+        "fallback_error_message": str(exc),
+    }
+
+
 class AceStepApiClient:
     """Small client for the official ACE-Step REST API."""
 

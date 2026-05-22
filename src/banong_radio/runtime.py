@@ -18,6 +18,7 @@ from banong_radio.music import (
     MusicGenerator,
     MusicRequest,
     MusicResult,
+    music_error_metadata,
     music_request_from_segment,
 )
 from banong_radio.mixer import mix_voice_over_music
@@ -29,6 +30,14 @@ ASSET_ROOT = Path("/Users/detroxryo/Music/BanongRadio")
 CACHE_ROOT = Path("/Users/detroxryo/.cache/banong-radio")
 STATUS_PATH = CACHE_ROOT / "status.json"
 LOG_PATH = CACHE_ROOT / "logs/player.log"
+
+IDLE_PLAYBACK_FIELDS = {
+    "asset_error",
+    "current_path",
+    "music_prompt",
+    "playlist_index",
+    "tts_path",
+}
 
 
 def now_iso() -> str:
@@ -46,15 +55,30 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
 
 
+def normalize_status_payload(status: dict[str, Any]) -> dict[str, Any]:
+    status = dict(status)
+    if status.get("mode") == "idle":
+        for field in IDLE_PLAYBACK_FIELDS:
+            status.pop(field, None)
+        status["pid"] = None
+        status["current_segment"] = ""
+        status["next_segment"] = ""
+        status["source"] = ""
+    return status
+
+
 def read_status() -> dict[str, Any]:
     status = read_json(STATUS_PATH, {})
     if not status:
         return {
             "ok": True,
             "mode": "idle",
+            "pid": None,
             "status_path": str(STATUS_PATH),
             "updated_at": now_iso(),
+            "process_alive": False,
         }
+    status = normalize_status_payload(status)
     status["ok"] = True
     status["process_alive"] = is_process_alive(status.get("pid"))
     return status
@@ -63,6 +87,7 @@ def read_status() -> dict[str, Any]:
 def write_status(**updates: Any) -> dict[str, Any]:
     status = read_json(STATUS_PATH, {})
     status.update(updates)
+    status = normalize_status_payload(status)
     status["updated_at"] = now_iso()
     write_json(STATUS_PATH, status)
     return status
@@ -104,6 +129,13 @@ def ensure_fallback_assets(manifest_path: Path) -> list[dict[str, Any]]:
         segment["duration"] = music.duration
         segment["music_source"] = music.metadata["source"]
         segment["music_metadata"] = music.metadata
+        for field in [
+            "fallback_reason",
+            "fallback_error_category",
+            "fallback_error_type",
+        ]:
+            if field in music.metadata:
+                segment[field] = music.metadata[field]
         prepared_segments.append(segment)
     return prepared_segments
 
@@ -128,8 +160,8 @@ def generate_music_with_fallback(
             raise
         music = fallback.generate(request, index=index)
         metadata = dict(music.metadata)
-        metadata["ace_step_error"] = str(exc)
-        metadata["fallback_reason"] = "ace-step-error"
+        metadata.update(music_error_metadata(exc))
+        metadata["ace_step_error"] = metadata["fallback_error_message"]
         return MusicResult(
             song_path=music.song_path,
             prompt=music.prompt,
