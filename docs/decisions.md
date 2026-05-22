@@ -32,6 +32,10 @@ The demo manifest is not the long-term upstream model. It is the first concrete 
 
 The first text-flow implementation only converts `RawTextItem` values into `SanitizedTextItem` values. It filters empty text, deduplicates by `item_id`, redacts obvious sensitive fields, and marks sanitized metadata, but it does not read real data sources or generate `VillageSignal`, `ContextPacket`, `TaskBrief`, or `BroadcastPlan` objects.
 
+## Keep source adapters fixture-first
+
+`DemoVillageFeedAdapter` is the only source adapter that runs without extra configuration, and it only reads the synthetic `demo/village_feed.json` fixture. Real-source adapter classes exist to preserve the architecture boundary, but they default to `SourceAdapterNotConfigured` and may return only explicitly supplied fixture items until a separate source-specific task is approved.
+
 ## Integrate ACE-Step behind `MusicGenerator`
 
 ACE-Step must remain one music source implementation. Mixer, Player, status screen, and Hermes should not depend on ACE-Step details.

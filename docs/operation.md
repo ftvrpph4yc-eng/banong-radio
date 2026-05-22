@@ -81,6 +81,12 @@ The current demo manifest is treated as one input format for `BroadcastPlan`. It
 
 Mixer and Player continue to receive local audio paths only.
 
+## Village Feed Fixture
+
+`demo/village_feed.json` is a synthetic fixture for text-flow tests. `DemoVillageFeedAdapter` can read it and return `RawTextItem` values for public notice, weather, community, chat excerpt, and voice transcript examples.
+
+The real-source adapter stubs for WeChat group, weather, public notice, voice transcript, and community sources are not configured by default. They raise `SourceAdapterNotConfigured` unless explicit fixture items are supplied by a test or later approved task. They do not read chat exports, call weather APIs, scrape government websites, or load voice originals.
+
 ## Verification
 
 Compile:

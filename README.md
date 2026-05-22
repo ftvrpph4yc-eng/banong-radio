@@ -10,7 +10,7 @@
 | --- | --- |
 | 面向谁 | 村两委、村书记、老人、新村民、离乡青年、文旅 / 农产品运营者 |
 | 解决什么 | 把分散的村务通知、社区动态、农忙和在地内容组织成低门槛可听输出 |
-| 当前能演示什么 | 从 `demo/demo_manifest.json` 准备 3 个电台段落，生成或复用音乐，生成中文 TTS，FFmpeg 混音，本地播放，并通过状态大屏观察 |
+| 当前能演示什么 | 从 `demo/demo_manifest.json` 准备 3 个电台段落，生成或复用音乐，生成中文 TTS，FFmpeg 混音，本地播放，并通过状态大屏观察；`demo/village_feed.json` 可作为 synthetic 文字信息流入口转成 `RawTextItem` |
 | 当前不做什么 | 不接入真实微信群、天气 API、政府官网或口播转写；不实现完整 24 小时电台调度；不包含公网部署、小程序、数字村报或视频生成 |
 | 技术边界 | Runtime 只消费确认后的播放计划；音乐来源只通过 `MusicGenerator`；Mixer / Player 只处理本地音频路径 |
 
@@ -18,6 +18,7 @@
 
 - CLI：`start-demo`、`status`、`stop`、`generate-segment`、`serve-status`、`preflight-ace`。
 - 播放计划边界：`demo/demo_manifest.json` 会先转换为 `BroadcastPlan`，再进入本地音频运行时。
+- 文字信息流入口：`SourceAdapter` 协议、`DemoVillageFeedAdapter` 和真实输入源 adapter stub；stub 默认未配置，不访问外部世界。
 - 文字清洗边界：`RawTextItem -> SanitizedTextItem` 的最小纯函数切片，包含空文本过滤、按 `item_id` 去重、手机号 / 身份证号 / 精确地址脱敏和 `sanitized=True` 元数据标记。
 - 音乐来源边界：`MusicRequest` / `MusicResult` / `MusicGenerator`，支持 fallback 与显式 ACE-Step API 来源。
 - fallback 安全链路：ACE-Step 不可用时仍可准备可播放 mp3。
@@ -29,7 +30,7 @@
 ## 当前边界
 
 - 当前版本用 manifest 代表已确认输入，不读取原始聊天记录、天气 API、政府网页或口播原文。
-- `banong_radio.domain` 已提供 `RawTextItem`、`SanitizedTextItem`、`VillageSignal`、`ContextPacket`、`TaskBrief`、`BroadcastPlan` 等上游文字信息流数据边界；`banong_radio.text_flow` 已实现最小 sanitizer，但真实 SourceAdapter 尚未接入。
+- `banong_radio.domain` 已提供 `RawTextItem`、`SanitizedTextItem`、`VillageSignal`、`ContextPacket`、`TaskBrief`、`BroadcastPlan` 等上游文字信息流数据边界；`banong_radio.text_flow` 已实现 demo feed adapter 和最小 sanitizer，但真实 SourceAdapter 尚未接入。
 - ACE-Step 单段 smoke 文件已经技术验证为非静音音频，但还需要人工听感确认。
 - 本机官方 API 曾把请求的 `acestep-5Hz-lm-1.7B` 自动降级为 `acestep-5Hz-lm-0.6B`；不要把当前结果宣传为 1.7B 已真实生成验证。
 - 本仓库不保存音频资产、模型权重、cache、日志或密钥。
