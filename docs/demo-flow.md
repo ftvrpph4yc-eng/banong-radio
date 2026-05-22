@@ -12,9 +12,9 @@ Core sentence: use sound to turn village affairs, community dynamics, cultural t
 
 ## Judge-facing Frame
 
-The event asks for AI empowerment of village economies beyond basic informatization. Position the project as a village information-service workflow:
+The event asks for AI empowerment of village economies beyond basic informatization. Position the project as a village information-service workflow while separating product vision from current implementation:
 
-- LLM / Agent workflow processes village inputs.
+- The product architecture uses an LLM / Agent workflow to process village inputs, but the current repository only proves the local radio runtime and data boundaries.
 - Sound is the first output because it fits rural usage habits.
 - The same data loop can later support village newspaper, web pages, tourism content, agricultural product promotion, and governance summaries.
 
@@ -22,9 +22,9 @@ The event asks for AI empowerment of village economies beyond basic informatizat
 
 1. Problem: village information is fragmented across notices, group chats, oral updates, tourism resources, and agricultural operations.
 2. Medium choice: sound is zero-friction, ambient, emotional, and native to rural culture.
-3. Product: a village AI media workflow whose first output is a local radio stream.
-4. Technical proof: manifest input, local music/TTS/mix/playback, status screen, fallback, ACE-Step preflight and optional generator.
-5. Rubric proof: show innovation, rural fit, technical quality, completion, and market fit explicitly.
+3. Product: a village AI media workflow whose first demonstrable output is a local radio stream.
+4. Technical proof: manifest input, local music/TTS/mix/playback, status screen, fallback, ACE-Step preflight, and optional ACE-Step source behind `MusicGenerator`.
+5. Evidence organization: show innovation, rural fit, technical quality, completion, and market fit explicitly.
 6. Boundary: current repository proves the local radio runtime; full data source automation and other media outputs are roadmap items.
 
 ## Live Evidence
@@ -38,16 +38,18 @@ The event asks for AI empowerment of village economies beyond basic informatizat
 ## Suggested Talking Points
 
 - "We are not building another app for elders to learn. We are using the village's existing sound tradition."
-- "The radio is the first media output. The system boundary is village input data, AI processing, and reusable media output."
+- "The radio is the first media output. The product boundary is village input data, AI processing, and reusable media output; this repository proves the local radio runtime slice."
 - "The code is intentionally conservative: if model generation fails, the live radio path still works."
 - "The same data loop can later produce a digital village newspaper, but that is not claimed as implemented in this repository."
-- "For the scoring rubric: innovation is the voice-first workflow, rural fit is the village information scenario, technical difficulty is the local generation and fallback runtime, completion is the working CLI/status/audio path, and market fit is village governance plus local operations."
+- "For the submission evidence: innovation is the voice-first workflow, rural fit is the village information scenario, technical difficulty is the local generation and fallback runtime, completion is the working CLI/status/audio path, and market fit is village governance plus local operations."
 
-## Rubric Checklist
+## Evidence Checklist
 
-| Rubric | Say this briefly |
+Use these dimensions to organize presentation material. Do not present them as official scoring weights unless final official rules are available.
+
+| Dimension | Say this briefly |
 | --- | --- |
-| 创新性 | AI does not just summarize text; it turns village data into a living media service |
+| 创新性 | The product is designed to turn village data into a living media service, with radio as the first working output |
 | 乡村契合度 | Sound matches elders, village broadcasts, opera, farming routines, and low-friction information access |
 | 技术难度 | Local runtime, ACE-Step boundary, TTS, FFmpeg mixing, fallback, status observability |
 | 完成度 | Runnable commands, local playback, dashboard, documented verification, known limitations |
@@ -58,7 +60,9 @@ The event asks for AI empowerment of village economies beyond basic informatizat
 - Do not claim a complete 24-hour station is implemented.
 - Do not claim all three real data sources are fully automated.
 - Do not claim public deployment, mini-program listening, digital village newspaper, or video output is complete.
+- Do not claim spatial computing or complex-systems simulation is implemented.
 - Do not claim ACE-Step 1.7B real generation is verified on this machine.
+- Do not present original group-chat text as directly broadcastable content.
 - Do not say the project is "only a demo" in external-facing material; internally, keep implementation boundaries explicit.
 
 ## Acceptance Standard

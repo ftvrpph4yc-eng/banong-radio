@@ -65,9 +65,11 @@ Do not add a separate local agent framework, and do not let a broad "Audio Produ
 - Conflict mediation content should be transformed into anonymized stories or general guidance, not rebroadcast as the original dispute.
 - ACE-Step failures must degrade to fallback audio instead of blocking the live path.
 
-## Rubric Evidence
+## Submission Evidence
 
-| Rubric | Evidence in this repository |
+These dimensions organize submission material. They should not be presented as confirmed official scoring weights unless final official rules are available.
+
+| Dimension | Evidence in this repository |
 | --- | --- |
 | 创新性 | Voice-first AI media service instead of another village app or notice board |
 | 乡村契合度 | Built around elders, village notices, local opera/radio habits, community groups, and secretary announcements |

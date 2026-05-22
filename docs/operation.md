@@ -1,6 +1,6 @@
 # Operation
 
-This document describes the local runtime path used by the Jianya Village Media radio product line.
+This document describes the local runtime path used by the 剪鸭村融媒体 radio product line. "Jianya Village Media" is only an English translation when needed; the external project name is 剪鸭村融媒体.
 
 ## Paths
 
@@ -93,6 +93,35 @@ Run tests if available:
 
 ```bash
 PYTHONPATH=src python3 -m pytest
+```
+
+Install the optional test dependency only when a full local test run is needed:
+
+```bash
+python3 -m pip install -e ".[test]"
+```
+
+For submission prep on a machine without `pytest`, do not change runtime code just to satisfy the missing tool. The minimum acceptable verification is:
+
+1. `python3 -m compileall -q src tests`
+2. the direct documentation-boundary check below
+3. the direct fallback assertion below
+4. `PYTHONPATH=src python3 -m banong_radio.cli status`
+
+Direct documentation-boundary check when `pytest` is unavailable:
+
+```bash
+python3 - <<'PY'
+import runpy
+ns = runpy.run_path('tests/test_docs.py')
+for name in [
+    'test_docs_do_not_claim_unimplemented_capabilities',
+    'test_docs_keep_required_boundary_caveats',
+    'test_docs_keep_sdk_only_agent_boundary',
+]:
+    ns[name]()
+print({'docs_checks': 'pass', 'checked': 3})
+PY
 ```
 
 Direct fallback assertion when `pytest` is unavailable:

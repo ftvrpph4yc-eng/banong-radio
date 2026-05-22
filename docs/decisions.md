@@ -1,20 +1,20 @@
 # Decisions
 
-## Use "Jianya Village Media" as the external project frame
+## Use "剪鸭村融媒体" as the external project frame
 
-The external project is broader than one radio command-line tool. "Jianya Village Media" captures the product idea: village data can be processed once and expressed as radio, newspaper, web pages, and later video.
+The external project is broader than one radio command-line tool. "剪鸭村融媒体" captures the product idea: village information can be processed once and expressed as radio, newspaper, web pages, and later video. "Jianya Village Media" may be used as a plain English translation when needed, but it is not a separate product name.
 
 The repository remains the local radio runtime, not the entire future platform.
 
-## Align with village economy and AI empowerment scoring
+## Align with village economy and AI empowerment evidence
 
-The event rubric is balanced across innovation, rural fit, technical difficulty, completion, and market fit. Documentation and presentation should map every major claim to one of these criteria.
+Documentation and presentation should organize evidence across innovation, rural fit, technical difficulty, completion, and market fit. Unless a final official scoring rule is available, these dimensions are material organization language rather than confirmed official weights.
 
 The project should be framed as village information service and content workflow infrastructure, not only as a radio experience. The radio remains the first working output because it is the most rural-native interface.
 
 ## Keep `banong_radio` and `banong-radio`
 
-The package name and CLI already work. Renaming them now would create avoidable breakage before submission. Product-facing copy can say "Jianya Media / Banong Radio Runtime" while code keeps stable names.
+The package name and CLI already work. Renaming them now would create avoidable breakage before submission. Product-facing copy can say "剪鸭村融媒体 / 伴农电台本地运行时" while code keeps stable names.
 
 ## GitHub is the primary submission surface
 

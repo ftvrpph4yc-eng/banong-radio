@@ -5,6 +5,9 @@ description = "Local AI radio runtime for Jianya Village Media."
 requires-python = ">=3.10"
 dependencies = []
 
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
 [project.scripts]
 banong-radio = "banong_radio.cli:main"
 
