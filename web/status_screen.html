@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>伴农电台状态大屏</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #111315;
+        --panel: #1b1f20;
+        --panel-soft: #222829;
+        --text: #f4f0e7;
+        --muted: #a9b0a8;
+        --line: #39413e;
+        --accent: #f2c14e;
+        --good: #8bd17c;
+        --warn: #f08f4f;
+        --bad: #e36b6b;
+        --info: #79b8e8;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0;
+      }
+
+      main {
+        display: grid;
+        gap: 20px;
+        min-height: 100vh;
+        padding: 28px;
+        grid-template-rows: auto 1fr auto;
+      }
+
+      header,
+      footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        min-width: 0;
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(30px, 6vw, 76px);
+        font-weight: 760;
+      }
+
+      h2 {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 650;
+        text-transform: uppercase;
+      }
+
+      .clock {
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        min-height: 36px;
+        padding: 8px 14px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--panel);
+        color: var(--text);
+        font-weight: 680;
+        white-space: nowrap;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--muted);
+      }
+
+      .mode-playing .dot,
+      .mode-ok .dot {
+        background: var(--good);
+      }
+
+      .mode-idle .dot {
+        background: var(--warn);
+      }
+
+      .mode-error .dot {
+        background: var(--bad);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.9fr);
+        gap: 20px;
+        min-height: 0;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        min-width: 0;
+      }
+
+      .hero-panel {
+        display: grid;
+        align-content: space-between;
+        gap: 28px;
+        padding: 28px;
+      }
+
+      .segment-label {
+        margin-top: 14px;
+        color: var(--accent);
+        font-size: clamp(38px, 8vw, 100px);
+        font-weight: 820;
+        line-height: 1.04;
+        overflow-wrap: anywhere;
+      }
+
+      .next-line {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 18px;
+        color: var(--muted);
+        font-size: clamp(17px, 2vw, 26px);
+      }
+
+      .prompt {
+        display: block;
+        margin-top: 10px;
+        color: var(--text);
+        font-size: clamp(18px, 2.2vw, 30px);
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+      }
+
+      .side {
+        display: grid;
+        gap: 20px;
+        grid-template-rows: auto 1fr;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1px;
+        overflow: hidden;
+      }
+
+      .metric {
+        padding: 20px;
+        background: var(--panel-soft);
+        min-width: 0;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 10px;
+        color: var(--text);
+        font-size: 20px;
+        overflow-wrap: anywhere;
+      }
+
+      .details {
+        padding: 22px;
+        overflow: hidden;
+      }
+
+      .rows {
+        display: grid;
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 118px minmax(0, 1fr);
+        gap: 14px;
+        align-items: baseline;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .row:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .key {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .value {
+        min-width: 0;
+        overflow-wrap: anywhere;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .value.path {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .footer-note {
+        color: var(--muted);
+        font-size: 13px;
+        overflow-wrap: anywhere;
+      }
+
+      @media (max-width: 900px) {
+        main {
+          padding: 18px;
+        }
+
+        header,
+        footer {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .grid,
+        .side {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto;
+        }
+
+        .metrics {
+          grid-template-columns: 1fr;
+        }
+
+        .row {
+          grid-template-columns: 1fr;
+          gap: 4px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>伴农电台</h1>
+          <p class="footer-note">乡村黑客松现场广播状态</p>
+        </div>
+        <div class="clock">
+          <div id="clock">--:--:--</div>
+          <div id="updated">等待状态</div>
+        </div>
+      </header>
+
+      <section class="grid" aria-live="polite">
+        <article class="panel hero-panel">
+          <div>
+            <h2>当前段落</h2>
+            <p class="segment-label" id="currentSegment">等待启动</p>
+          </div>
+          <div>
+            <p class="next-line">
+              <span>下一段</span>
+              <strong id="nextSegment">--</strong>
+            </p>
+            <span class="prompt" id="musicPrompt">--</span>
+          </div>
+        </article>
+
+        <aside class="side">
+          <section class="panel metrics">
+            <div class="metric">
+              <h2>运行模式</h2>
+              <strong class="status-pill mode-idle" id="modePill"><span class="dot"></span><span id="mode">idle</span></strong>
+            </div>
+            <div class="metric">
+              <h2>音频来源</h2>
+              <strong id="source">--</strong>
+            </div>
+            <div class="metric">
+              <h2>播放队列</h2>
+              <strong id="playlist">--</strong>
+            </div>
+            <div class="metric">
+              <h2>进程</h2>
+              <strong id="process">--</strong>
+            </div>
+          </section>
+
+          <section class="panel details">
+            <h2>链路证据</h2>
+            <div class="rows">
+              <div class="row">
+                <span class="key">当前音频</span>
+                <span class="value path" id="currentPath">--</span>
+              </div>
+              <div class="row">
+                <span class="key">TTS 路径</span>
+                <span class="value path" id="ttsPath">--</span>
+              </div>
+              <div class="row">
+                <span class="key">请求情绪</span>
+                <span class="value" id="requestedMood">--</span>
+              </div>
+              <div class="row">
+                <span class="key">素材来源</span>
+                <span class="value" id="requestedSource">--</span>
+              </div>
+              <div class="row">
+                <span class="key">错误</span>
+                <span class="value" id="error">--</span>
+              </div>
+            </div>
+          </section>
+        </aside>
+      </section>
+
+      <footer>
+        <span class="footer-note" id="statusPath">/Users/detroxryo/.cache/banong-radio/status.json</span>
+        <span class="footer-note" id="pollState">每 1 秒刷新</span>
+      </footer>
+    </main>
+
+    <script>
+      const fields = {
+        currentSegment: document.getElementById("currentSegment"),
+        nextSegment: document.getElementById("nextSegment"),
+        musicPrompt: document.getElementById("musicPrompt"),
+        mode: document.getElementById("mode"),
+        modePill: document.getElementById("modePill"),
+        source: document.getElementById("source"),
+        playlist: document.getElementById("playlist"),
+        process: document.getElementById("process"),
+        currentPath: document.getElementById("currentPath"),
+        ttsPath: document.getElementById("ttsPath"),
+        requestedMood: document.getElementById("requestedMood"),
+        requestedSource: document.getElementById("requestedSource"),
+        error: document.getElementById("error"),
+        statusPath: document.getElementById("statusPath"),
+        pollState: document.getElementById("pollState"),
+        updated: document.getElementById("updated"),
+        clock: document.getElementById("clock"),
+      };
+
+      function text(value, fallback = "--") {
+        if (value === undefined || value === null || value === "") {
+          return fallback;
+        }
+        return String(value);
+      }
+
+      function render(status) {
+        const mode = text(status.mode, "idle");
+        fields.currentSegment.textContent = text(status.current_segment, mode === "idle" ? "等待启动" : "--");
+        fields.nextSegment.textContent = text(status.next_segment);
+        fields.musicPrompt.textContent = text(status.music_prompt);
+        fields.mode.textContent = mode;
+        fields.modePill.className = `status-pill mode-${mode}`;
+        fields.source.textContent = text(status.source);
+        fields.currentPath.textContent = text(status.current_path);
+        fields.ttsPath.textContent = text(status.tts_path);
+        fields.requestedMood.textContent = text(status.requested_mood);
+        fields.requestedSource.textContent = text(status.requested_source);
+        fields.error.textContent = text(status.error || status.asset_error);
+        fields.statusPath.textContent = text(status.status_path, "/Users/detroxryo/.cache/banong-radio/status.json");
+        fields.updated.textContent = status.updated_at ? `更新 ${status.updated_at}` : "等待状态";
+
+        const index = Number.isInteger(status.playlist_index) ? status.playlist_index + 1 : null;
+        const total = Number.isInteger(status.playlist_total) ? status.playlist_total : null;
+        fields.playlist.textContent = index && total ? `${index} / ${total}` : text(total);
+
+        if (status.pid) {
+          fields.process.textContent = status.process_alive ? `PID ${status.pid} 活跃` : `PID ${status.pid} 不活跃`;
+        } else {
+          fields.process.textContent = "无后台播放器";
+        }
+      }
+
+      async function refresh() {
+        try {
+          const response = await fetch(`/status.json?t=${Date.now()}`, { cache: "no-store" });
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          const status = await response.json();
+          render(status);
+          fields.pollState.textContent = "每 1 秒刷新";
+        } catch (error) {
+          fields.pollState.textContent = `读取失败：${error.message}`;
+          fields.modePill.className = "status-pill mode-error";
+          fields.mode.textContent = "error";
+        }
+      }
+
+      function tickClock() {
+        fields.clock.textContent = new Intl.DateTimeFormat("zh-CN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        }).format(new Date());
+      }
+
+      tickClock();
+      refresh();
+      setInterval(tickClock, 1000);
+      setInterval(refresh, 1000);
+    </script>
+  </body>
+</html>

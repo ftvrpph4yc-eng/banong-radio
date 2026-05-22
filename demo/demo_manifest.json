@@ -1,0 +1,28 @@
+{
+  "segments": [
+    {
+      "id": "longtan_morning",
+      "label": "龙潭清晨",
+      "music_prompt": "peaceful morning, guzheng, birdsong ambient, gentle countryside",
+      "intro_text": "这里是伴农电台。早上好，龙潭的山雾还没散，今天我们从一段安静的田野声音开始。",
+      "duration": 18,
+      "fallback_path": "/Users/detroxryo/Music/BanongRadio/fallback/longtan_morning.mp3"
+    },
+    {
+      "id": "siping_night",
+      "label": "四坪夜晚",
+      "music_prompt": "night cricket ambient, minimal piano, mountain night, serene",
+      "intro_text": "现在切到四坪的夜晚。把节奏放慢一点，像在石巷里听见虫鸣，也听见大家白天留下的讨论。",
+      "duration": 18,
+      "fallback_path": "/Users/detroxryo/Music/BanongRadio/fallback/siping_night.mp3"
+    },
+    {
+      "id": "field_future",
+      "label": "田野未来主义",
+      "music_prompt": "pastoral electronic, soft pulse, field recording texture, warm future",
+      "intro_text": "接下来这一段更像田野里的未来主义。不是城市把技术带到乡村，而是乡村自己发出新的节拍。",
+      "duration": 18,
+      "fallback_path": "/Users/detroxryo/Music/BanongRadio/fallback/field_future.mp3"
+    }
+  ]
+}
