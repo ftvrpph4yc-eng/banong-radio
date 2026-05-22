@@ -1,7 +1,16 @@
+from tempfile import TemporaryDirectory
 from pathlib import Path
 
-from banong_radio.domain import ContextPacket, RawTextItem, SanitizedTextItem, TaskBrief, VillageSignal
+from banong_radio.domain import (
+    BroadcastPlan,
+    ContextPacket,
+    RawTextItem,
+    SanitizedTextItem,
+    TaskBrief,
+    VillageSignal,
+)
 from banong_radio.text_flow import (
+    RadioPlanner,
     CommunitySourceAdapter,
     ContextBuilder,
     DemoVillageFeedAdapter,
@@ -12,8 +21,11 @@ from banong_radio.text_flow import (
     VoiceTranscriptSourceAdapter,
     WeatherSourceAdapter,
     WeChatGroupSourceAdapter,
+    broadcast_plan_to_manifest_payload,
+    build_demo_feed_broadcast_plan,
     load_village_feed,
     sanitize_text_items,
+    write_broadcast_plan_manifest,
 )
 
 
@@ -247,3 +259,66 @@ def test_task_planner_rejects_empty_context() -> None:
         raise AssertionError("empty context produced a task brief")
 
     assert "requires at least one village signal" in message
+
+
+def test_radio_planner_generates_broadcast_plan_from_task_brief() -> None:
+    raw_items = DemoVillageFeedAdapter(DEMO_FEED_PATH).fetch_items()
+    sanitized = sanitize_text_items(raw_items)
+    signals = SignalExtractor().extract(sanitized)
+    packet = ContextBuilder().build(signals, date="2026-05-23", place="剪鸭村")
+    brief = TaskPlanner().plan(packet, task="radio")
+
+    with TemporaryDirectory() as tmpdir:
+        fallback_root = Path(tmpdir) / "fallback"
+        plan = RadioPlanner(fallback_root=fallback_root).generate(brief)
+
+        assert type(plan) is BroadcastPlan
+        assert plan.plan_id == "radio:context:2026-05-23:剪鸭村"
+        assert plan.source == "task_brief"
+        assert len(plan.segments) == 5
+        first = plan.segments[0]
+        assert first.segment_id == "radio-public-notice-001"
+        assert first.label.startswith("村口道路")
+        assert "道路养护" in first.intro_text
+        assert "slightly urgent but calm" in first.music_prompt
+        assert first.fallback_path == fallback_root / "radio-public-notice-001.mp3"
+        assert first.metadata["source_signal_id"] == "signal:public-notice-001"
+
+
+def test_radio_planner_rejects_non_radio_task() -> None:
+    brief = TaskBrief(
+        task="daily",
+        context_packet_id="context:demo",
+        intent="daily",
+        inputs=("signal:1",),
+        metadata={"signals": ({"signal_id": "signal:1", "summary": "x"},)},
+    )
+
+    try:
+        RadioPlanner(fallback_root=Path("/tmp")).generate(brief)
+    except ValueError as exc:
+        message = str(exc)
+    else:
+        raise AssertionError("non-radio task produced a broadcast plan")
+
+    assert "requires task='radio'" in message
+
+
+def test_demo_feed_broadcast_plan_can_be_written_as_runtime_manifest() -> None:
+    with TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+        output_path = tmp_path / "demo_feed_manifest.json"
+
+        plan = build_demo_feed_broadcast_plan(
+            DEMO_FEED_PATH,
+            date="2026-05-23",
+            place="剪鸭村",
+            fallback_root=tmp_path / "fallback",
+        )
+        written_path = write_broadcast_plan_manifest(plan, output_path)
+        payload = broadcast_plan_to_manifest_payload(plan)
+
+        assert written_path == output_path
+        assert payload["source"] == "task_brief"
+        assert len(payload["segments"]) == 5
+        assert output_path.exists()

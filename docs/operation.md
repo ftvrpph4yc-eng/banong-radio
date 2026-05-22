@@ -77,7 +77,7 @@ Fallback generation uses FFmpeg synthetic tone/noise beds. These are not final c
 
 ## BroadcastPlan Boundary
 
-The current demo manifest is treated as one input format for `BroadcastPlan`. It is not a live upstream data source. The text-flow chain can now produce `RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief`, and only a later confirmed radio planner should turn the task brief into a `BroadcastPlan` for this runtime.
+The current demo manifest is treated as one input format for `BroadcastPlan`. It is not a live upstream data source. The text-flow chain can now produce `RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief -> BroadcastPlan`, and that plan can be written as a manifest for the existing runtime.
 
 Mixer and Player continue to receive local audio paths only.
 
@@ -89,9 +89,14 @@ The real-source adapter stubs for WeChat group, weather, public notice, voice tr
 
 ## Text Flow Task Brief
 
-The deterministic text-flow chain can turn the demo feed into `RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief`. `SignalExtractor`, `ContextBuilder`, and `TaskPlanner` do not call an LLM, do not read real sources, and do not generate a `BroadcastPlan`.
+The deterministic text-flow chain can turn the demo feed into `RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief -> BroadcastPlan`. `SignalExtractor`, `ContextBuilder`, `TaskPlanner`, and `RadioPlanner` do not call an LLM and do not read real sources.
 
-`TaskBrief.metadata["next_step"]` points to a later planner such as `radio_planner`. The current runtime still consumes only `BroadcastPlan` values loaded from the demo manifest until the R-10 planning slice is implemented.
+`plan-demo-feed` writes the generated `BroadcastPlan` as a manifest so the existing runtime can load it through the same `start-demo --manifest` path:
+
+```bash
+PYTHONPATH=src python3 -m banong_radio.cli plan-demo-feed
+PYTHONPATH=src python3 -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json
+```
 
 ## Verification
 

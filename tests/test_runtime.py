@@ -1,11 +1,13 @@
 from banong_radio.runtime import (
     is_process_alive,
+    ensure_fallback_assets,
     load_broadcast_plan,
     read_json,
     read_status,
     write_json,
     write_status,
 )
+from banong_radio.text_flow import build_demo_feed_broadcast_plan, write_broadcast_plan_manifest
 
 
 def test_is_process_alive_rejects_empty_pid() -> None:
@@ -186,3 +188,39 @@ def test_runtime_segment_exposes_stable_fallback_error_fields(monkeypatch, tmp_p
     assert segments[0]["fallback_error_category"] == "ace-step-api"
     assert segments[0]["fallback_error_type"] == "AceStepApiError"
     assert segments[0]["music_metadata"]["fallback_error_message"] == "server unavailable"
+
+
+def test_generated_demo_feed_manifest_enters_runtime_fallback(monkeypatch, tmp_path) -> None:
+    from banong_radio import runtime
+    from banong_radio.music import FallbackMusicGenerator
+
+    plan = build_demo_feed_broadcast_plan(
+        "demo/village_feed.json",
+        date="2026-05-23",
+        fallback_root=tmp_path / "fallback",
+    )
+    manifest = write_broadcast_plan_manifest(plan, tmp_path / "demo_feed_manifest.json")
+
+    monkeypatch.setattr(
+        FallbackMusicGenerator,
+        "generate",
+        lambda self, request, index=0: runtime.MusicResult(
+            song_path=request.fallback_path,
+            prompt=request.prompt,
+            duration=request.duration,
+            metadata={
+                "source": "fallback",
+                "mood": request.mood,
+                "segment_id": request.segment_id,
+            },
+        ),
+    )
+
+    loaded = load_broadcast_plan(manifest)
+    segments = ensure_fallback_assets(manifest)
+
+    assert loaded.source == "manifest"
+    assert loaded.metadata["generated_by"] == "RadioPlanner"
+    assert len(segments) == 5
+    assert sorted({segment["music_source"] for segment in segments}) == ["fallback"]
+    assert segments[0]["id"] == "radio-public-notice-001"

@@ -18,7 +18,7 @@
 | Layer | Role | Current Repository Boundary |
 | --- | --- | --- |
 | 感知层 | 接收天气、政务、群聊、口述等输入，清洗为结构化上下文 | 已实现 `SourceAdapter` 协议、`DemoVillageFeedAdapter` 和 `RawTextItem -> SanitizedTextItem` 最小纯函数清洗，不接真实数据源 |
-| 合成层 | 把结构化内容改写为乡土语境播报稿、摘要、故事或说和内容 | 已实现确定性 `VillageSignal -> ContextPacket -> TaskBrief` 最小链路；Radio 计划仍由 manifest 代替 |
+| 合成层 | 把结构化内容改写为乡土语境播报稿、摘要、故事或说和内容 | 已实现确定性 `VillageSignal -> ContextPacket -> TaskBrief -> BroadcastPlan` 最小 Radio 链路 |
 | 生成层 | 生成或读取音乐，生成中文 TTS | 已实现 `MusicGenerator`、fallback、ACE-Step API adapter、TTS adapter |
 | 调度层 | 组织播放计划、混音、播放、状态展示 | 已实现 `BroadcastPlan` manifest adapter、CLI、FFmpeg mixer、afplay worker、status screen |
 
@@ -35,6 +35,7 @@
 | SignalExtractor | `SanitizedTextItem` list | `VillageSignal` list | Extract deterministic topics, urgency, summaries, and source references |
 | ContextBuilder | `VillageSignal` list | `ContextPacket` | Group signals by date, place, audience, topics, and urgency counts |
 | TaskPlanner | `ContextPacket` | `TaskBrief` | Prepare task input for a later output planner without generating final media |
+| RadioPlanner | `TaskBrief` | `BroadcastPlan` | Convert a radio brief into runtime-compatible segments without touching Mixer or Player |
 | Runtime | `BroadcastPlan`, env, status | prepared segments, status JSON | Orchestrate local playback preparation |
 | MusicGenerator | `MusicRequest` | `MusicResult` | Generate or retrieve music from fallback or ACE-Step |
 | SpeechSynthesizer | text, voice | mp3 path | Generate voice with `edge-tts` or macOS fallback |

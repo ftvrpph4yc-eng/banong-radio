@@ -8,7 +8,15 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any, Protocol
 
-from banong_radio.domain import ContextPacket, RawTextItem, SanitizedTextItem, TaskBrief, VillageSignal
+from banong_radio.domain import (
+    BroadcastPlan,
+    ContextPacket,
+    MediaSegment,
+    RawTextItem,
+    SanitizedTextItem,
+    TaskBrief,
+    VillageSignal,
+)
 
 PHONE_PATTERN = re.compile(r"(?<!\d)1[3-9]\d{9}(?!\d)")
 ID_CARD_PATTERN = re.compile(r"(?<!\d)\d{17}[\dXx](?!\w)")
@@ -37,6 +45,30 @@ TASK_INTENTS = {
     "daily": "prepare a daily summary task brief from sanitized village signals",
     "newspaper": "prepare a village newspaper task brief from sanitized village signals",
     "alert": "prepare an alert task brief from sanitized village signals",
+}
+DEFAULT_FALLBACK_ROOT = Path("/Users/detroxryo/Music/BanongRadio/fallback")
+DEFAULT_SEGMENT_DURATION = 18
+TOPIC_MOOD_MAP = {
+    "weather": "雨天提醒",
+    "traffic": "村口道路",
+    "farming": "农忙田野",
+    "local_business": "农产集市",
+    "volunteer": "志愿服务",
+    "governance": "村务讨论",
+    "voice_transcript": "书记口播",
+    "community": "社区动态",
+    "notice": "村务公告",
+}
+TOPIC_PROMPT_MAP = {
+    "weather": "gentle rainy village radio bed, soft guzheng, calm reminder",
+    "traffic": "steady village road bulletin bed, light percussion, practical",
+    "farming": "warm field recording texture, acoustic folk, harvest morning",
+    "local_business": "bright rural market groove, light electronic folk, upbeat",
+    "volunteer": "warm community service theme, soft piano, hopeful",
+    "governance": "clear public announcement bed, calm strings, trustworthy",
+    "voice_transcript": "spoken village bulletin bed, warm ambient, grounded",
+    "community": "friendly community radio bed, acoustic guitar, warm",
+    "notice": "clear village notice bed, guzheng, light pulse",
 }
 
 
@@ -353,8 +385,153 @@ class TaskPlanner:
         )
 
 
+class RadioPlanner:
+    """Turn a radio task brief into a BroadcastPlan without touching runtime."""
+
+    def __init__(
+        self,
+        *,
+        fallback_root: Path | str = DEFAULT_FALLBACK_ROOT,
+        segment_duration: int = DEFAULT_SEGMENT_DURATION,
+    ) -> None:
+        self.fallback_root = Path(fallback_root)
+        self.segment_duration = segment_duration
+
+    def generate(self, brief: TaskBrief) -> BroadcastPlan:
+        if brief.task != "radio":
+            raise ValueError(f"radio planner requires task='radio': {brief.task}")
+
+        signal_payloads = brief.metadata.get("signals", ())
+        if not isinstance(signal_payloads, (list, tuple)) or not signal_payloads:
+            raise ValueError("radio planner requires task brief signal payloads")
+
+        segments = tuple(
+            self._segment_from_signal(signal, index=index)
+            for index, signal in enumerate(signal_payloads)
+            if isinstance(signal, dict)
+        )
+        if not segments:
+            raise ValueError("radio planner produced no segments")
+
+        return BroadcastPlan(
+            plan_id=f"radio:{brief.context_packet_id}",
+            title="剪鸭村融媒体 Demo Feed 电台",
+            source="task_brief",
+            segments=segments,
+            metadata={
+                "context_packet_id": brief.context_packet_id,
+                "task": brief.task,
+                "signal_count": brief.metadata.get("signal_count", len(segments)),
+                "topics": brief.metadata.get("topics", ()),
+                "generated_by": "RadioPlanner",
+            },
+        )
+
+    def _segment_from_signal(
+        self,
+        signal_payload: dict[str, Any],
+        *,
+        index: int,
+    ) -> MediaSegment:
+        signal_id = str(signal_payload.get("signal_id", f"signal:{index + 1}"))
+        topics = _deduplicate(str(topic) for topic in signal_payload.get("topics", ()))
+        primary_topic = topics[0] if topics else "community"
+        segment_id = f"radio-{_safe_segment_id(signal_id)}"
+        title = str(signal_payload.get("title", f"村庄信号 {index + 1}"))
+        summary = str(signal_payload.get("summary", ""))
+        urgency = str(signal_payload.get("urgency", "normal"))
+
+        return MediaSegment(
+            segment_id=segment_id,
+            label=_label_for_topic(primary_topic, title),
+            intro_text=_intro_text(title=title, summary=summary, urgency=urgency),
+            music_prompt=_music_prompt_for_topic(primary_topic, urgency=urgency),
+            duration=self.segment_duration,
+            fallback_path=self.fallback_root / f"{segment_id}.mp3",
+            source_label=title,
+            metadata={
+                "source_signal_id": signal_id,
+                "topics": topics,
+                "urgency": urgency,
+                "generated_from": "task_brief",
+            },
+        )
+
+
+def build_demo_feed_broadcast_plan(
+    feed_path: Path | str,
+    *,
+    date: str | None = None,
+    place: str | None = "剪鸭村",
+    audience: Iterable[str] = ("villagers",),
+    fallback_root: Path | str = DEFAULT_FALLBACK_ROOT,
+) -> BroadcastPlan:
+    raw_items = DemoVillageFeedAdapter(feed_path).fetch_items()
+    sanitized_items = sanitize_text_items(raw_items)
+    signals = SignalExtractor().extract(sanitized_items)
+    context = ContextBuilder().build(
+        signals,
+        date=date,
+        place=place,
+        audience=audience,
+    )
+    brief = TaskPlanner().plan(context, task="radio")
+    return RadioPlanner(fallback_root=fallback_root).generate(brief)
+
+
+def broadcast_plan_to_manifest_payload(plan: BroadcastPlan) -> dict[str, Any]:
+    return {
+        "id": plan.plan_id,
+        "title": plan.title,
+        "source": plan.source,
+        "metadata": dict(plan.metadata),
+        "segments": plan.to_runtime_segments(),
+    }
+
+
+def write_broadcast_plan_manifest(plan: BroadcastPlan, output_path: Path | str) -> Path:
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(
+        json.dumps(broadcast_plan_to_manifest_payload(plan), ensure_ascii=False, indent=2)
+        + "\n",
+        encoding="utf-8",
+    )
+    return output
+
+
 def _default_packet_id(*, date: str | None, place: str | None) -> str:
     parts = ["context", date or "demo"]
     if place:
         parts.append(place)
     return ":".join(parts)
+
+
+def _safe_segment_id(value: str) -> str:
+    cleaned = re.sub(r"[^A-Za-z0-9_-]+", "-", value).strip("-").lower()
+    if cleaned.startswith("signal-"):
+        cleaned = cleaned.removeprefix("signal-")
+    return cleaned or "segment"
+
+
+def _label_for_topic(topic: str, title: str) -> str:
+    mood = TOPIC_MOOD_MAP.get(topic, "社区动态")
+    if title and title != topic:
+        return f"{mood}：{title}"
+    return mood
+
+
+def _music_prompt_for_topic(topic: str, *, urgency: str) -> str:
+    prompt = TOPIC_PROMPT_MAP.get(
+        topic,
+        "warm village radio bed, soft acoustic texture, community bulletin",
+    )
+    if urgency == "high":
+        return f"{prompt}, slightly urgent but calm"
+    return prompt
+
+
+def _intro_text(*, title: str, summary: str, urgency: str) -> str:
+    prefix = "这里是剪鸭村融媒体。"
+    urgency_text = "这是一条需要优先注意的提醒。" if urgency == "high" else ""
+    return f"{prefix}{urgency_text}{title}：{summary}"

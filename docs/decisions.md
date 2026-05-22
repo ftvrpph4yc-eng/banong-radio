@@ -38,7 +38,11 @@ The sanitizer implementation only converts `RawTextItem` values into `SanitizedT
 
 ## Keep task planning deterministic before output generation
 
-`SignalExtractor`, `ContextBuilder`, and `TaskPlanner` use simple deterministic rules over sanitized demo text. They produce `VillageSignal`, `ContextPacket`, and `TaskBrief` objects, but they do not call an LLM, do not generate `BroadcastPlan`, and do not change the audio runtime. Radio output generation stays isolated for the next planner slice.
+`SignalExtractor`, `ContextBuilder`, and `TaskPlanner` use simple deterministic rules over sanitized demo text. They produce `VillageSignal`, `ContextPacket`, and `TaskBrief` objects, but they do not call an LLM and do not change the audio runtime. Radio output generation stays isolated in `RadioPlanner`.
+
+## Generate radio plans through a manifest handoff
+
+`RadioPlanner` converts a radio `TaskBrief` into a `BroadcastPlan` with runtime-compatible media segments, then the CLI can write that plan as a manifest. The runtime still enters through `start-demo --manifest`, so Mixer and Player continue to see only local audio segment paths and never upstream text-flow objects.
 
 ## Integrate ACE-Step behind `MusicGenerator`
 

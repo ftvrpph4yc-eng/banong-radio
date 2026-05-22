@@ -10,6 +10,7 @@ from pathlib import Path
 
 from banong_radio.music import ace_step_preflight
 from banong_radio.runtime import (
+    CACHE_ROOT,
     PROJECT_ROOT,
     generate_segment,
     read_status,
@@ -17,6 +18,10 @@ from banong_radio.runtime import (
     stop_demo,
 )
 from banong_radio.status_server import serve_status_screen
+from banong_radio.text_flow import (
+    build_demo_feed_broadcast_plan,
+    write_broadcast_plan_manifest,
+)
 
 
 class CliUsageError(Exception):
@@ -58,6 +63,18 @@ def main() -> None:
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", default=8765, type=int)
 
+    plan_feed = sub.add_parser(
+        "plan-demo-feed",
+        help="Generate a runtime manifest from the synthetic village feed.",
+    )
+    plan_feed.add_argument("--feed", default=str(PROJECT_ROOT / "demo/village_feed.json"))
+    plan_feed.add_argument(
+        "--output",
+        default=str(CACHE_ROOT / "demo_feed_manifest.json"),
+    )
+    plan_feed.add_argument("--date", default="")
+    plan_feed.add_argument("--place", default="剪鸭村")
+
     try:
         args = parser.parse_args()
         if args.command == "start-demo":
@@ -73,6 +90,20 @@ def main() -> None:
         elif args.command == "serve-status":
             serve_status_screen(args.host, args.port)
             return
+        elif args.command == "plan-demo-feed":
+            plan = build_demo_feed_broadcast_plan(
+                Path(args.feed),
+                date=args.date or None,
+                place=args.place or None,
+            )
+            output_path = write_broadcast_plan_manifest(plan, Path(args.output))
+            result = {
+                "ok": True,
+                "manifest_path": str(output_path),
+                "plan_id": plan.plan_id,
+                "source": plan.source,
+                "segments": len(plan.segments),
+            }
         else:
             parser.error(f"unknown command: {args.command}")
             return
