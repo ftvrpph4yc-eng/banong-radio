@@ -18,7 +18,7 @@
 | Layer | Role | Current Repository Boundary |
 | --- | --- | --- |
 | 感知层 | 接收天气、政务、群聊、口述等输入，清洗为结构化上下文 | 已实现 `SourceAdapter` 协议、`DemoVillageFeedAdapter`、real-source adapter registry 和 `RawTextItem -> SanitizedTextItem` 最小纯函数清洗，不接真实数据源 |
-| 合成层 | 把结构化内容改写为乡土语境播报稿、摘要、故事或说和内容 | 已实现确定性 `VillageSignal -> ContextPacket -> TaskBrief -> BroadcastProgram -> BroadcastPlan` Radio 链路，并新增日报、数字村报草稿和通知 text output pack |
+| 合成层 | 把结构化内容改写为乡土语境播报稿、摘要、故事或说和内容 | 已实现确定性 `VillageSignal -> ContextPacket -> TaskBrief -> BroadcastProgram -> BroadcastPlan` Radio 链路，并新增日报、数字村报草稿、通知 text output pack 和 `daily_12h` 节目单 |
 | 生成层 | 生成或读取音乐，生成中文 TTS | 已实现 `MusicGenerator`、fallback、ACE-Step API adapter、TTS adapter |
 | 调度层 | 组织播放计划、混音、播放、状态展示 | 已实现 `BroadcastPlan` manifest adapter、CLI、FFmpeg mixer、afplay worker、status screen |
 
@@ -37,6 +37,8 @@
 | TaskPlanner | `ContextPacket` | `TaskBrief` | Prepare task input for a later output planner without generating final media |
 | ProgramPreset | product mode | duration budget and rundown | Keep `trailer_45s`, `briefing_3m`, and `show_2h` as presets rather than hard-coded system limits |
 | BroadcastProgram | `TaskBrief`, `ProgramPreset` | product-level program plan | Represent a normal AI broadcast program before runtime manifest handoff |
+| DailySchedule | date, place, provider policy | `ProgramSlot` list and preview manifest | Plan a 07:00-19:00 MVP schedule without calling external APIs |
+| ProgramSlot / ContentAsset | schedule template, provider availability | authorized or fallback slot asset | Keep podcast, TTS, music, opera, and audiobook sources behind provider contracts |
 | RadioPlanner | `TaskBrief` | `BroadcastPlan` | Convert a radio brief into runtime-compatible segments without touching Mixer or Player |
 | Agent SDK workflow | `--orchestrator sdk` | `BroadcastProgram`, `TextOutputPack`, structured report | Use official OpenAI Agents SDK manager orchestration without touching audio runtime |
 | TextOutput generators | `TaskBrief` | `DailyReport`, `VillageNewspaper`, `VillageNotice` | Produce deterministic text outputs from shared context without touching audio runtime |
@@ -64,8 +66,11 @@ Mixer and Player consume file paths only. They do not know whether music came fr
 - `trailer_45s`: short preview format, usually between 45 and 60 seconds.
 - `briefing_3m`: compact village briefing.
 - `show_2h`: future long-form show skeleton.
+- `daily_12h`: 07:00-19:00 schedule preset that writes a `DailySchedule` plus a short renderable preview manifest, not one 12-hour audio file.
 
 The preset changes time budgets and sequence expectations only. Mixer and Player still receive a `BroadcastPlan` manifest, so a short preview cannot accidentally become the whole system's maximum duration.
+
+`daily_12h` uses provider keys rather than direct SDK calls: `podcast_api`, `tts_api`, `music_catalog`, `opera_catalog`, `audiobook_catalog`, and `local_fallback`. Long-form music, opera, and audiobook slots require authorized catalog/API assets before they can enter a runtime manifest; otherwise the slot falls back to local safe audio.
 
 ## SDK-only Agent Boundary
 

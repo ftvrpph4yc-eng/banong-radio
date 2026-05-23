@@ -94,6 +94,7 @@ Mixer and Player continue to receive local audio paths only.
 - `trailer_45s`: short preview asset, normally 45 to 60 seconds
 - `briefing_3m`: three minute local briefing
 - `show_2h`: long-form show skeleton
+- `daily_12h`: 07:00-19:00 MVP schedule with provider contracts, cache keys, fallback slots, and a 3-segment preview manifest
 
 Generate a product broadcast manifest:
 
@@ -113,6 +114,24 @@ Start the prepared product broadcast:
 ```bash
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-broadcast --manifest /Users/detroxryo/.cache/banong-radio/broadcast_manifest.json
 ```
+
+Generate the 12 hour schedule without calling external APIs. If `--date` is omitted, the planner uses the current local date for same-day cache keys:
+
+```bash
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-daily-schedule --date 2026-05-24
+```
+
+This writes `/Users/detroxryo/.cache/banong-radio/daily_schedule.json` and `/Users/detroxryo/.cache/banong-radio/daily_schedule_preview_manifest.json`. The schedule covers 07:00-19:00, prefetches by 2-hour windows, and keeps external providers as contracts: `podcast_api`, `tts_api`, `music_catalog`, `opera_catalog`, `audiobook_catalog`, and `local_fallback`.
+
+Prepare playable assets for the preview manifest only:
+
+```bash
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli render-daily-schedule --date 2026-05-24
+```
+
+`render-daily-schedule` does not generate 12 hours of audio. It renders representative schedule blocks and carries slot title, provider, and cache metadata through the normal runtime manifest path.
 
 ## Village Feed Fixture
 

@@ -103,7 +103,9 @@ def test_docs_describe_variable_program_presets() -> None:
     operation = Path("docs/operation.md").read_text()
     decisions = Path("docs/decisions.md").read_text()
 
-    assert "`ProgramPreset` 支持 `trailer_45s`、`briefing_3m`、`show_2h`" in readme
+    assert "`ProgramPreset` 支持 `trailer_45s`、`briefing_3m`、`show_2h`、`daily_12h`" in readme
     assert "短预告只是节目 preset，不是系统上限" in readme
     assert "plan-broadcast --preset trailer_45s" in operation
+    assert "plan-daily-schedule --date 2026-05-24" in operation
+    assert "DailySchedule -> ProgramSlot -> ContentAsset" in decisions
     assert "The short preview is therefore one program shape" in decisions

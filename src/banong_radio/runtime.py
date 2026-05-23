@@ -33,9 +33,13 @@ LOG_PATH = CACHE_ROOT / "logs/player.log"
 
 IDLE_PLAYBACK_FIELDS = {
     "asset_error",
+    "cache_key",
+    "content_provider",
     "current_path",
     "music_prompt",
     "playlist_index",
+    "requested_source",
+    "slot_type",
     "tts_path",
 }
 

@@ -18,6 +18,7 @@ def test_status_screen_keeps_live_dashboard_contract() -> None:
         "playlistProgress",
         "modePill",
         "requestedSource",
+        "cacheKey",
         "statusPath",
         "pollState",
     ]:

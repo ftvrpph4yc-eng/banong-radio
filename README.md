@@ -12,14 +12,15 @@
 | --- | --- |
 | 面向谁 | 村两委、村书记、老人、新村民、离乡青年、文旅 / 农产品运营者 |
 | 解决什么 | 把分散的村务通知、社区动态、农忙和在地内容组织成低门槛可听输出 |
-| 当前能运行什么 | 从已确认的村庄信息 feed 生成可变时长 `BroadcastProgram`，再转为 runtime 可消费的电台 manifest；同一上下文也可生成日报、数字村报草稿和村务通知 text output pack；本地链路支持 TTS、音乐、FFmpeg 混音、播放和状态大屏 |
-| 当前不做什么 | 不接入真实微信群、天气 API、政府官网或口播转写；不实现完整 24 小时电台调度；不包含公网部署、小程序或视频生成 |
+| 当前能运行什么 | 从已确认的村庄信息 feed 生成可变时长 `BroadcastProgram`，也可生成 07:00-19:00 的 `daily_12h` 节目单和 3 段可渲染预览 manifest；同一上下文还可生成日报、数字村报草稿和村务通知 text output pack；本地链路支持 TTS、音乐、FFmpeg 混音、播放和状态大屏 |
+| 当前不做什么 | 不接入真实微信群、天气 API、政府官网或口播转写；不实现完整 24 小时电台调度；不把 `daily_12h` 写成真实 12 小时全量音频或已接真实外部内容 API；不包含公网部署、小程序或视频生成 |
 | 技术边界 | Runtime 只消费确认后的播放计划；音乐来源只通过 `MusicGenerator`；Mixer / Player 只处理本地音频路径 |
 
 ## 已实现
 
-- CLI：`plan-broadcast`、`render-program`、`plan-workflow`、`start-broadcast`、`status`、`stop`、`generate-segment`、`serve-status`、`preflight-ace`；旧 `start-demo` / `plan-demo-feed` 入口保留兼容。
-- 可变节目编排：`ProgramPreset` 支持 `trailer_45s`、`briefing_3m`、`show_2h`，短预告只是节目 preset，不是系统上限。
+- CLI：`plan-broadcast`、`render-program`、`plan-workflow`、`plan-daily-schedule`、`render-daily-schedule`、`start-broadcast`、`status`、`stop`、`generate-segment`、`serve-status`、`preflight-ace`；旧 `start-demo` / `plan-demo-feed` 入口保留兼容。
+- 可变节目编排：`ProgramPreset` 支持 `trailer_45s`、`briefing_3m`、`show_2h`、`daily_12h`，短预告只是节目 preset，不是系统上限。
+- 十二小时节目单：`daily_12h` 输出 `DailySchedule`、`ProgramSlot`、`ContentAsset` JSON 和 3 段 preview manifest；长内容只走授权库存 / API contract 或本地 fallback，不直接生成 12 小时全量音频。
 - 播放计划边界：`demo/demo_manifest.json` 会先转换为 `BroadcastPlan`，再进入本地音频运行时。
 - 文字信息流入口：`SourceAdapter` 协议、`DemoVillageFeedAdapter`、真实输入源 adapter registry 和 adapter stub；stub 默认未配置，不访问外部世界。
 - 文字处理链路：`RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief -> BroadcastProgram -> BroadcastPlan` 的最小确定性切片，不调用 LLM。
@@ -36,7 +37,7 @@
 
 - 当前版本用 manifest / `BroadcastProgram` 代表已确认输入，不读取原始聊天记录、天气 API、政府网页或口播原文。
 - `banong_radio.domain` 已提供 `RawTextItem`、`SanitizedTextItem`、`VillageSignal`、`ContextPacket`、`TaskBrief`、`BroadcastPlan` 等上游文字信息流数据边界；`banong_radio.text_flow` 已实现 demo feed adapter、real-source adapter registry、sanitizer、signal extractor、context builder、task planner 和 radio planner，但真实 SourceAdapter 尚未接入。
-- `banong_radio.program` 已提供可变时长节目层；`banong_radio.agent_contracts` 和 `banong_radio.sdk_workflow` 提供官方 OpenAI Agents SDK 的 opt-in 多 Agent 编排层。它不是自研 agent 框架；SDK 路径需要 `OPENAI_API_KEY`，并且失败时返回结构化错误，不自动伪装成本地成功。
+- `banong_radio.program` 已提供可变时长节目层；`banong_radio.schedule` 已提供 07:00-19:00 的 MVP 节目单层；`banong_radio.agent_contracts` 和 `banong_radio.sdk_workflow` 提供官方 OpenAI Agents SDK 的 opt-in 多 Agent 编排层。它不是自研 agent 框架；SDK 路径需要 `OPENAI_API_KEY`，并且失败时返回结构化错误，不自动伪装成本地成功。
 - 当前本地播放链路的 TTS 与音乐听感已在 2026-05-23 由用户人工确认通过；ACE-Step 1.7B 真实生成仍不在已验证范围内。
 - 本机官方 API 曾把请求的 `acestep-5Hz-lm-1.7B` 自动降级为 `acestep-5Hz-lm-0.6B`；不要把当前结果宣传为 1.7B 已真实生成验证。
 - 本仓库不保存音频资产、模型权重、cache、日志或密钥。
@@ -51,6 +52,7 @@ BANONG_PY=/Users/detroxryo/.local/bin/python3.11
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli status
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-broadcast --preset trailer_45s
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli render-program --preset trailer_45s
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-daily-schedule
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-broadcast --manifest /Users/detroxryo/.cache/banong-radio/broadcast_manifest.json
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli stop
 ```
@@ -96,7 +98,16 @@ PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli render-program --preset trailer_
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-broadcast --manifest /Users/detroxryo/.cache/banong-radio/broadcast_manifest.json
 ```
 
-`trailer_45s`、`briefing_3m`、`show_2h` 共享同一套节目抽象；切换 preset 改的是节目时长预算和结构，不会把系统锁死在 45 秒。
+`trailer_45s`、`briefing_3m`、`show_2h` 共享同一套节目抽象；切换 preset 改的是节目时长预算和结构，不会把系统锁死在 45 秒。`daily_12h` 是 schedule preset：它生成 07:00-19:00 节目单和预览 manifest，不要求一次性生成 12 小时音频。
+
+生成 12 小时节目单和 3 段可渲染预览；不传 `--date` 时默认使用当天日期生成缓存键：
+
+```bash
+cd /Users/detroxryo/Dev/Sandbox/banong-radio
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-daily-schedule --date 2026-05-24
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli render-daily-schedule --date 2026-05-24
+```
 
 显式启用 ACE-Step 音乐来源前，需要先启动官方 API。否则运行时会记录 fallback reason 并继续使用本地音频：
 

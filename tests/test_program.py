@@ -44,6 +44,7 @@ def test_program_presets_have_independent_time_budgets() -> None:
     assert briefing.metadata["play_mode"] == "loop"
     assert show.target_duration == 7200
     assert show.actual_duration == 7200
+    assert get_program_preset("daily_12h").target_duration == 43200
 
 
 def test_program_manifest_remains_runtime_compatible(tmp_path) -> None:
@@ -137,3 +138,15 @@ def test_program_title_uses_product_language() -> None:
 
     assert "Demo" not in program.title
     assert "预告片" in program.title
+
+
+def test_daily_schedule_preset_is_not_rendered_as_one_broadcast_program() -> None:
+    try:
+        build_broadcast_program_from_feed(
+            DEMO_FEED_PATH,
+            preset_name="daily_12h",
+        )
+    except ValueError as exc:
+        assert "use plan-daily-schedule" in str(exc)
+    else:
+        raise AssertionError("expected ValueError")

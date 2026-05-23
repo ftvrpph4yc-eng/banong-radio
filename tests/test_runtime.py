@@ -85,6 +85,10 @@ def test_idle_status_drops_stale_playback_evidence(tmp_path, monkeypatch) -> Non
         source="mixed:macos-say",
         current_path="/tmp/longtan_morning.mp3",
         tts_path="/tmp/longtan_morning_tts.mp3",
+        requested_source="tts_api:generated:daily:2026-05-24:剪鸭村:opening-briefing:tts_api",
+        cache_key="daily:2026-05-24:剪鸭村:opening-briefing:tts_api",
+        content_provider="tts_api",
+        slot_type="village_info",
         asset_error="",
         status_path=str(status_path),
     )
@@ -103,6 +107,10 @@ def test_idle_status_drops_stale_playback_evidence(tmp_path, monkeypatch) -> Non
     assert "music_prompt" not in idle
     assert "asset_error" not in idle
     assert "playlist_index" not in idle
+    assert "requested_source" not in idle
+    assert "cache_key" not in idle
+    assert "content_provider" not in idle
+    assert "slot_type" not in idle
 
 
 def test_read_status_normalizes_existing_idle_payload(tmp_path, monkeypatch) -> None:
@@ -118,6 +126,10 @@ def test_read_status_normalizes_existing_idle_payload(tmp_path, monkeypatch) -> 
             "music_prompt": "peaceful morning",
             "current_path": "/tmp/longtan_morning.mp3",
             "tts_path": "/tmp/longtan_morning_tts.mp3",
+            "requested_source": "podcast_api:generated:daily:2026-05-24:剪鸭村:village-podcast:podcast_api",
+            "cache_key": "daily:2026-05-24:剪鸭村:village-podcast:podcast_api",
+            "content_provider": "podcast_api",
+            "slot_type": "podcast",
         },
     )
 
@@ -132,6 +144,10 @@ def test_read_status_normalizes_existing_idle_payload(tmp_path, monkeypatch) -> 
     assert "current_path" not in status
     assert "tts_path" not in status
     assert "music_prompt" not in status
+    assert "requested_source" not in status
+    assert "cache_key" not in status
+    assert "content_provider" not in status
+    assert "slot_type" not in status
 
 
 def test_read_write_json_round_trip(tmp_path) -> None:

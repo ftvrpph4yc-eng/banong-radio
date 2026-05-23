@@ -48,9 +48,15 @@ The preserved real-source adapter registry is intentionally explicit: `wechat_gr
 
 ## Add BroadcastProgram presets above BroadcastPlan
 
-`BroadcastProgram` is the product-level program plan. `ProgramPreset` makes duration a preset decision, not a fixed system limit. The first presets are `trailer_45s`, `briefing_3m`, and `show_2h`; each can produce a runtime-compatible `BroadcastPlan` without changing Mixer or Player.
+`BroadcastProgram` is the product-level program plan. `ProgramPreset` makes duration a preset decision, not a fixed system limit. The first broadcast presets are `trailer_45s`, `briefing_3m`, and `show_2h`; each can produce a runtime-compatible `BroadcastPlan` without changing Mixer or Player.
 
 The short preview is therefore one program shape, not the maximum length of the station or future schedule. Its exact duration can stretch toward a minute when the music intro, host read, lift, and ending stinger need room.
+
+## Add `daily_12h` as a schedule preset, not a 12-hour audio file
+
+The 07:00-19:00 station day is represented as `DailySchedule -> ProgramSlot -> ContentAsset`. It records the program clock, provider contract, cache key, authorization status, and fallback policy for each slot.
+
+`daily_12h` writes a schedule JSON and a small preview manifest. It does not call external content APIs, does not generate twelve hours of audio, and does not let provider SDK details reach Mixer or Player. Music, opera, and audiobook slots require authorized catalog/API assets before they can enter a runtime manifest; unavailable or unauthorized providers fall back to `local_fallback`.
 
 ## Generate multi-output text packs without touching audio runtime
 

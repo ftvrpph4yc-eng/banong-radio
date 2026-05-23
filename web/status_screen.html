@@ -802,6 +802,10 @@
                 <span class="value" id="requestedMood">--</span>
               </div>
               <div class="row">
+                <span class="key">缓存</span>
+                <span class="value path" id="cacheKey">--</span>
+              </div>
+              <div class="row">
                 <span class="key">错误</span>
                 <span class="value" id="error">--</span>
               </div>
@@ -854,6 +858,7 @@
         ttsPath: document.getElementById("ttsPath"),
         requestedMood: document.getElementById("requestedMood"),
         requestedSource: document.getElementById("requestedSource"),
+        cacheKey: document.getElementById("cacheKey"),
         error: document.getElementById("error"),
         statusPath: document.getElementById("statusPath"),
         pollState: document.getElementById("pollState"),
@@ -946,7 +951,8 @@
         fields.currentPath.textContent = text(status.current_path);
         fields.ttsPath.textContent = text(status.tts_path);
         fields.requestedMood.textContent = text(status.requested_mood);
-        fields.requestedSource.textContent = text(status.requested_source);
+        fields.requestedSource.textContent = text(status.content_provider || status.requested_source);
+        fields.cacheKey.textContent = text(status.cache_key);
         fields.error.textContent = text(status.error || status.asset_error);
         fields.statusPath.textContent = text(status.status_path, STATUS_PATH_FALLBACK);
         fields.updated.textContent = status.preview ? "本地设计预览" : formatUpdatedAt(status.updated_at);

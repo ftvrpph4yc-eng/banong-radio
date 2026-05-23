@@ -22,6 +22,11 @@ from banong_radio.runtime import (
     start_demo,
     stop_demo,
 )
+from banong_radio.schedule import (
+    build_daily_schedule,
+    write_daily_schedule,
+    write_daily_schedule_preview_manifest,
+)
 from banong_radio.status_server import serve_status_screen
 from banong_radio.text_flow import (
     build_demo_feed_broadcast_plan,
@@ -170,6 +175,44 @@ def main() -> None:
     plan_workflow.add_argument("--place", default="剪鸭村")
     plan_workflow.add_argument("--orchestrator", choices=("local", "sdk"), default="local")
 
+    plan_schedule = sub.add_parser(
+        "plan-daily-schedule",
+        help="Generate the 07:00-19:00 MVP radio schedule and preview manifest.",
+    )
+    plan_schedule.add_argument("--output", default=str(CACHE_ROOT / "daily_schedule.json"))
+    plan_schedule.add_argument(
+        "--preview-manifest-output",
+        default=str(CACHE_ROOT / "daily_schedule_preview_manifest.json"),
+    )
+    plan_schedule.add_argument("--date", default="")
+    plan_schedule.add_argument("--place", default="剪鸭村")
+    plan_schedule.add_argument("--refresh-token", default="")
+    plan_schedule.add_argument(
+        "--unavailable-provider",
+        action="append",
+        default=[],
+        help="Mark a content provider unavailable so the schedule uses local fallback.",
+    )
+
+    render_schedule = sub.add_parser(
+        "render-daily-schedule",
+        help="Generate the daily schedule and prepare playable preview assets.",
+    )
+    render_schedule.add_argument("--output", default=str(CACHE_ROOT / "daily_schedule.json"))
+    render_schedule.add_argument(
+        "--preview-manifest-output",
+        default=str(CACHE_ROOT / "daily_schedule_preview_manifest.json"),
+    )
+    render_schedule.add_argument("--date", default="")
+    render_schedule.add_argument("--place", default="剪鸭村")
+    render_schedule.add_argument("--refresh-token", default="")
+    render_schedule.add_argument(
+        "--unavailable-provider",
+        action="append",
+        default=[],
+        help="Mark a content provider unavailable so the schedule uses local fallback.",
+    )
+
     try:
         args = parser.parse_args()
         if args.command == "start-demo":
@@ -290,6 +333,33 @@ def main() -> None:
                 "newspaper_pages": len(artifacts.text_outputs.village_newspaper.pages),
                 "notices": len(artifacts.text_outputs.notices),
             }
+        elif args.command in {"plan-daily-schedule", "render-daily-schedule"}:
+            schedule = build_daily_schedule(
+                date=args.date or None,
+                place=args.place,
+                unavailable_providers=args.unavailable_provider,
+                refresh_token=args.refresh_token or None,
+            )
+            schedule_path = write_daily_schedule(schedule, Path(args.output))
+            preview_path = write_daily_schedule_preview_manifest(
+                schedule,
+                Path(args.preview_manifest_output),
+            )
+            result = {
+                "ok": True,
+                "schedule_path": str(schedule_path),
+                "preview_manifest_path": str(preview_path),
+                "preset": schedule.preset,
+                "start_time": schedule.start_time,
+                "end_time": schedule.end_time,
+                "total_duration": schedule.total_duration,
+                "slots": len(schedule.slots),
+                "prefetch_window_minutes": schedule.prefetch_window_minutes,
+                "fallback_slots": schedule.fallback_slot_count,
+            }
+            if args.command == "render-daily-schedule":
+                playable_segments = ensure_playable_assets(preview_path)
+                result["playable_segments"] = len(playable_segments)
         else:
             parser.error(f"unknown command: {args.command}")
             return

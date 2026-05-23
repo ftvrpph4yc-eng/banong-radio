@@ -32,6 +32,7 @@ def play_manifest(manifest_path: Path, *, once: bool = False) -> None:
     index = 0
     while RUNNING and (not once or index < len(segments)):
         segment = segments[index % len(segments)]
+        segment_metadata = segment.get("metadata", {})
         current_label = segment.get("label", segment.get("id", "unknown"))
         next_segment = segments[(index + 1) % len(segments)]
         next_label = next_segment.get("label", next_segment.get("id", "unknown"))
@@ -47,6 +48,10 @@ def play_manifest(manifest_path: Path, *, once: bool = False) -> None:
             source=segment.get("playback_source", "fallback"),
             current_path=str(playback_path),
             tts_path=segment.get("tts_path", ""),
+            requested_source=segment.get("source", ""),
+            cache_key=segment_metadata.get("cache_key", ""),
+            content_provider=segment_metadata.get("provider", ""),
+            slot_type=segment_metadata.get("slot_type", ""),
             asset_error=segment.get("asset_error", ""),
         )
 

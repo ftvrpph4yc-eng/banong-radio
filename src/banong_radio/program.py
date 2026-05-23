@@ -127,6 +127,13 @@ PROGRAM_PRESETS: tuple[ProgramPreset, ...] = (
         description="Long-form village radio show skeleton for future scheduling.",
         rundown=("opening", "news", "field_service", "community", "features", "rotation"),
     ),
+    ProgramPreset(
+        name="daily_12h",
+        title="伴农电台十二小时节目单",
+        target_duration=43200,
+        description="Daily schedule preset that writes a schedule plus preview manifest.",
+        rundown=("schedule", "prefetch", "preview", "fallback"),
+    ),
 )
 
 
@@ -160,6 +167,8 @@ def build_broadcast_program_from_feed(
         audience=audience,
     )
     preset = get_program_preset(preset_name)
+    if preset.name == "daily_12h":
+        raise ValueError("daily_12h is a schedule preset; use plan-daily-schedule")
     brief = TaskPlanner().plan(context, task="radio")
     if preset.name == "trailer_45s":
         program_segments = (

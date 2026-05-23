@@ -218,6 +218,78 @@ def test_cli_plan_workflow_writes_all_outputs(monkeypatch, capsys, tmp_path) -> 
     assert report_output.exists()
 
 
+def test_cli_plan_daily_schedule_writes_schedule_and_preview(
+    monkeypatch,
+    capsys,
+    tmp_path,
+) -> None:
+    schedule_output = tmp_path / "daily_schedule.json"
+    preview_output = tmp_path / "preview_manifest.json"
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "banong-radio",
+            "plan-daily-schedule",
+            "--output",
+            str(schedule_output),
+            "--preview-manifest-output",
+            str(preview_output),
+            "--date",
+            "2026-05-24",
+            "--unavailable-provider",
+            "opera_catalog",
+        ],
+    )
+
+    cli.main()
+
+    parsed = json.loads(capsys.readouterr().out)
+    assert parsed["ok"] is True
+    assert parsed["schedule_path"] == str(schedule_output)
+    assert parsed["preview_manifest_path"] == str(preview_output)
+    assert parsed["preset"] == "daily_12h"
+    assert parsed["total_duration"] == 12 * 60 * 60
+    assert parsed["slots"] == 19
+    assert parsed["fallback_slots"] > 0
+    assert schedule_output.exists()
+    assert preview_output.exists()
+
+
+def test_cli_render_daily_schedule_prepares_preview_assets(
+    monkeypatch,
+    capsys,
+    tmp_path,
+) -> None:
+    schedule_output = tmp_path / "daily_schedule.json"
+    preview_output = tmp_path / "preview_manifest.json"
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "banong-radio",
+            "render-daily-schedule",
+            "--output",
+            str(schedule_output),
+            "--preview-manifest-output",
+            str(preview_output),
+            "--date",
+            "2026-05-24",
+        ],
+    )
+    monkeypatch.setattr(
+        cli,
+        "ensure_playable_assets",
+        lambda manifest_path: [{"id": "opening"}, {"id": "podcast"}, {"id": "opera"}],
+    )
+
+    cli.main()
+
+    parsed = json.loads(capsys.readouterr().out)
+    assert parsed["ok"] is True
+    assert parsed["playable_segments"] == 3
+    assert schedule_output.exists()
+    assert preview_output.exists()
+
+
 def test_cli_sdk_failure_prints_structured_error(monkeypatch, capsys, tmp_path) -> None:
     def fail_sdk(*args, **kwargs):
         raise SDKConfigurationError("OPENAI_API_KEY is required for --orchestrator sdk.")
