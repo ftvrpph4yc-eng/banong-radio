@@ -135,7 +135,7 @@ def test_demo_village_feed_adapter_loads_raw_items() -> None:
     assert items[0].item_id == "public-notice-001"
     assert items[0].observed_at == "2026-05-23T07:30:00+08:00"
     assert items[0].metadata["feed_id"] == "jianya-demo-feed"
-    assert items[0].metadata["source_label"] == "镇政府公开公告 synthetic fixture"
+    assert items[0].metadata["source_label"] == "镇政府公开公告"
 
 
 def test_demo_village_feed_can_enter_sanitizer() -> None:
@@ -254,7 +254,7 @@ def test_signal_extractor_turns_sanitized_demo_items_into_village_signals() -> N
     assert len(signals) == 5
     assert all(type(signal) is VillageSignal for signal in signals)
     assert signals[0].signal_id == "signal:public-notice-001"
-    assert signals[0].title == "镇政府公开公告 synthetic fixture"
+    assert signals[0].title == "镇政府公开公告"
     assert signals[0].summary == "今天上午村口道路养护，农产品运输车辆请从东侧便道绕行。"
     assert "traffic" in signals[0].topics
     assert signals[0].urgency == "high"

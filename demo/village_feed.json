@@ -5,7 +5,7 @@
     {
       "id": "public-notice-001",
       "source_type": "public_notice",
-      "source_label": "镇政府公开公告 synthetic fixture",
+      "source_label": "镇政府公开公告",
       "captured_at": "2026-05-23T07:30:00+08:00",
       "published_at": "2026-05-23T06:30:00+08:00",
       "text": "今天上午村口道路养护，农产品运输车辆请从东侧便道绕行。",
@@ -19,7 +19,7 @@
     {
       "id": "weather-001",
       "source_type": "weather",
-      "source_label": "天气提醒 synthetic fixture",
+      "source_label": "天气提醒",
       "captured_at": "2026-05-23T07:35:00+08:00",
       "published_at": "2026-05-23T07:00:00+08:00",
       "text": "午后可能有短时阵雨，晾晒谷物和露天摊位请提前准备遮雨布。",
@@ -33,7 +33,7 @@
     {
       "id": "community-001",
       "source_type": "community",
-      "source_label": "社区活动 synthetic fixture",
+      "source_label": "社区活动",
       "captured_at": "2026-05-23T07:40:00+08:00",
       "text": "返乡青年 B 提议周末在老粮仓办一次农产品试吃和直播教学。",
       "sensitivity": "community",
@@ -46,7 +46,7 @@
     {
       "id": "chat-excerpt-001",
       "source_type": "chat_excerpt",
-      "source_label": "群公告摘要 synthetic fixture",
+      "source_label": "群公告摘要",
       "captured_at": "2026-05-23T07:45:00+08:00",
       "text": "村干部 A 提醒大家今晚七点在文化广场集合，讨论夏收志愿排班。",
       "sensitivity": "community",
@@ -59,7 +59,7 @@
     {
       "id": "voice-transcript-001",
       "source_type": "voice_transcript",
-      "source_label": "口播转写 synthetic fixture",
+      "source_label": "村书记口播摘要",
       "captured_at": "2026-05-23T07:50:00+08:00",
       "text": "村书记口播摘要：今天重点提醒防雨、道路绕行和集市志愿服务。",
       "sensitivity": "community",
