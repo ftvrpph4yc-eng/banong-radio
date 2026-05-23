@@ -141,6 +141,7 @@ PY
 - [Architecture](docs/architecture.md)
 - [Operation](docs/operation.md)
 - [Presentation Flow](docs/demo-flow.md)
+- [Final Acceptance](docs/final-acceptance.md)
 - [Decisions](docs/decisions.md)
 
 内部 Obsidian 项目脑：

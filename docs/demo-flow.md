@@ -23,13 +23,15 @@ The event asks for AI empowerment of village economies beyond basic informatizat
 1. Problem: village information is fragmented across notices, group chats, oral updates, tourism resources, and agricultural operations.
 2. Medium choice: sound is zero-friction, ambient, emotional, and native to rural culture.
 3. Product: a village AI media workflow whose first demonstrable output is a local radio stream.
-4. Technical proof: manifest input, local music/TTS/mix/playback, status screen, fallback, ACE-Step preflight, and optional ACE-Step source behind `MusicGenerator`.
-5. Evidence organization: show innovation, rural fit, technical quality, completion, and market fit explicitly.
-6. Boundary: current repository proves the local radio runtime; full data source automation and other media outputs are roadmap items.
+4. Demo loop: synthetic village feed becomes `RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief -> BroadcastPlan`, then enters the existing runtime through a manifest.
+5. Technical proof: local music/TTS/mix/playback, status screen, fallback, ACE-Step preflight, and optional ACE-Step source behind `MusicGenerator`.
+6. Evidence organization: show innovation, rural fit, technical quality, completion, and market fit explicitly.
+7. Boundary: current repository proves the local radio runtime and preserves real-source interfaces; full data source automation and other media outputs are roadmap items.
 
 ## Live Evidence
 
-- Start the local radio loop with `banong-radio start-demo` or `PYTHONPATH=src python3 -m banong_radio.cli start-demo`.
+- Generate the demo feed manifest with `PYTHONPATH=src python3 -m banong_radio.cli plan-demo-feed`.
+- Start the local radio loop with `PYTHONPATH=src python3 -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json`.
 - Show status JSON through the status screen.
 - Show how a mood/source command updates requested fields.
 - Mention that audio generation is isolated behind `MusicGenerator`.
@@ -72,3 +74,5 @@ The presentation should make the product feel complete enough to evaluate while 
 - Implemented in this repository.
 - Locally demonstrable with current assets.
 - Product roadmap, not yet implemented.
+
+Use [Final Acceptance](final-acceptance.md) as the submission checklist before presenting.

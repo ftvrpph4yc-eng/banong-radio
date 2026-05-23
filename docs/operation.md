@@ -100,6 +100,8 @@ PYTHONPATH=src python3 -m banong_radio.cli start-demo --manifest /Users/detroxry
 
 ## Verification
 
+The R-11 submission checklist lives in [Final Acceptance](final-acceptance.md). The commands below are the local verification gates behind that checklist.
+
 Compile:
 
 ```bash
