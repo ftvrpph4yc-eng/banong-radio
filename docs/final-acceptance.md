@@ -87,7 +87,7 @@ Use these exact claim states:
 
 - Implemented: local CLI, demo feed planning, `BroadcastPlan` manifest handoff, TTS, FFmpeg mix, playback, fallback, status JSON, status dashboard, docs and tests.
 - Demonstrable: synthetic village feed to playable local radio loop through the fallback-safe runtime.
-- Preserved interface: WeChat group, weather, public notice, voice transcript, and community source adapter boundaries.
+- Preserved interface: WeChat group, weather API, government website, voice transcript, and community source adapter boundaries.
 - Roadmap: real private data ingestion, full daily scheduling, public deployment, mini-program, digital village newspaper, and video output.
 
 ## Do Not Claim

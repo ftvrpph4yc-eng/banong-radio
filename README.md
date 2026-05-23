@@ -18,7 +18,7 @@
 
 - CLI：`start-demo`、`status`、`stop`、`generate-segment`、`serve-status`、`preflight-ace`。
 - 播放计划边界：`demo/demo_manifest.json` 会先转换为 `BroadcastPlan`，再进入本地音频运行时。
-- 文字信息流入口：`SourceAdapter` 协议、`DemoVillageFeedAdapter` 和真实输入源 adapter stub；stub 默认未配置，不访问外部世界。
+- 文字信息流入口：`SourceAdapter` 协议、`DemoVillageFeedAdapter`、真实输入源 adapter registry 和 adapter stub；stub 默认未配置，不访问外部世界。
 - 文字处理链路：`RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief -> BroadcastPlan` 的最小确定性切片，不调用 LLM。
 - 音乐来源边界：`MusicRequest` / `MusicResult` / `MusicGenerator`，支持 fallback 与显式 ACE-Step API 来源。
 - fallback 安全链路：ACE-Step 不可用时仍可准备可播放 mp3。
@@ -30,7 +30,7 @@
 ## 当前边界
 
 - 当前版本用 manifest 代表已确认输入，不读取原始聊天记录、天气 API、政府网页或口播原文。
-- `banong_radio.domain` 已提供 `RawTextItem`、`SanitizedTextItem`、`VillageSignal`、`ContextPacket`、`TaskBrief`、`BroadcastPlan` 等上游文字信息流数据边界；`banong_radio.text_flow` 已实现 demo feed adapter、sanitizer、signal extractor、context builder、task planner 和 radio planner，但真实 SourceAdapter 尚未接入。
+- `banong_radio.domain` 已提供 `RawTextItem`、`SanitizedTextItem`、`VillageSignal`、`ContextPacket`、`TaskBrief`、`BroadcastPlan` 等上游文字信息流数据边界；`banong_radio.text_flow` 已实现 demo feed adapter、real-source adapter registry、sanitizer、signal extractor、context builder、task planner 和 radio planner，但真实 SourceAdapter 尚未接入。
 - 当前 demo 的 TTS 与音乐听感已在 2026-05-23 由用户人工确认通过；ACE-Step 1.7B 真实生成仍不在已验证范围内。
 - 本机官方 API 曾把请求的 `acestep-5Hz-lm-1.7B` 自动降级为 `acestep-5Hz-lm-0.6B`；不要把当前结果宣传为 1.7B 已真实生成验证。
 - 本仓库不保存音频资产、模型权重、cache、日志或密钥。

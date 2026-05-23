@@ -79,7 +79,7 @@ Expected live evidence:
 4. The radio runtime consumes only the final manifest, so upstream text flow stays separate from Mixer and Player.
 5. The live path uses TTS, music, FFmpeg mixing, local playback, and a read-only status screen.
 6. Fallback is intentional reliability, not a failed model path.
-7. Real WeChat group, weather API, government website, voice-source ingestion, public deployment, mini-program, digital newspaper, video, and full 24-hour scheduling are roadmap items.
+7. Real WeChat group, weather API, government website, voice-source ingestion, public deployment, mini-program, digital newspaper, video, and full 24-hour scheduling are roadmap items. The source interfaces are preserved so approved sources can be connected later.
 
 ## Accepted Demo Quality
 

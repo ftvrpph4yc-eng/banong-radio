@@ -36,6 +36,8 @@ The sanitizer implementation only converts `RawTextItem` values into `SanitizedT
 
 `DemoVillageFeedAdapter` is the only source adapter that runs without extra configuration, and it only reads the synthetic `demo/village_feed.json` fixture. Real-source adapter classes exist to preserve the architecture boundary, but they default to `SourceAdapterNotConfigured` and may return only explicitly supplied fixture items until a separate source-specific task is approved.
 
+The preserved real-source adapter registry is intentionally explicit: `wechat_group`, `weather_api`, `government_website`, `voice_transcript`, and `community_source`. This lets a later task connect one approved source without deleting the other source interfaces or widening the live demo path.
+
 ## Keep task planning deterministic before output generation
 
 `SignalExtractor`, `ContextBuilder`, and `TaskPlanner` use simple deterministic rules over sanitized demo text. They produce `VillageSignal`, `ContextPacket`, and `TaskBrief` objects, but they do not call an LLM and do not change the audio runtime. Radio output generation stays isolated in `RadioPlanner`.

@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -86,6 +87,17 @@ class SourceAdapterNotConfigured(RuntimeError):
     """Raised when a real-source adapter has no explicit safe configuration."""
 
 
+@dataclass(frozen=True)
+class SourceAdapterRegistration:
+    """Auditable registry entry for a future real-source adapter boundary."""
+
+    key: str
+    source_type: str
+    adapter_class: type[Any]
+    status: str
+    boundary: str
+
+
 def raw_text_item_from_mapping(
     payload: dict[str, Any],
     *,
@@ -161,7 +173,7 @@ class _FixtureBackedSourceAdapter:
         if self._fixture_items is not None:
             return list(self._fixture_items)
         raise SourceAdapterNotConfigured(
-            f"{type(self).__name__} is not configured; R-08 does not access "
+            f"{type(self).__name__} is not configured; this demo does not access "
             "external data sources by default."
         )
 
@@ -178,12 +190,80 @@ class PublicNoticeSourceAdapter(_FixtureBackedSourceAdapter):
     source_type = "public_notice"
 
 
+class GovernmentWebsiteSourceAdapter(PublicNoticeSourceAdapter):
+    """Future government-website adapter boundary that yields public notices."""
+
+
 class VoiceTranscriptSourceAdapter(_FixtureBackedSourceAdapter):
     source_type = "voice_transcript"
 
 
 class CommunitySourceAdapter(_FixtureBackedSourceAdapter):
     source_type = "community"
+
+
+REAL_SOURCE_ADAPTER_REGISTRY: tuple[SourceAdapterRegistration, ...] = (
+    SourceAdapterRegistration(
+        key="wechat_group",
+        source_type=WeChatGroupSourceAdapter.source_type,
+        adapter_class=WeChatGroupSourceAdapter,
+        status="fixture_only",
+        boundary="does not read chat exports or live WeChat data without an approved task",
+    ),
+    SourceAdapterRegistration(
+        key="weather_api",
+        source_type=WeatherSourceAdapter.source_type,
+        adapter_class=WeatherSourceAdapter,
+        status="fixture_only",
+        boundary="does not call weather APIs without credentials and approval",
+    ),
+    SourceAdapterRegistration(
+        key="government_website",
+        source_type=GovernmentWebsiteSourceAdapter.source_type,
+        adapter_class=GovernmentWebsiteSourceAdapter,
+        status="fixture_only",
+        boundary="does not scrape or fetch government websites without approval",
+    ),
+    SourceAdapterRegistration(
+        key="voice_transcript",
+        source_type=VoiceTranscriptSourceAdapter.source_type,
+        adapter_class=VoiceTranscriptSourceAdapter,
+        status="fixture_only",
+        boundary="does not load voice originals or transcripts without approval",
+    ),
+    SourceAdapterRegistration(
+        key="community_source",
+        source_type=CommunitySourceAdapter.source_type,
+        adapter_class=CommunitySourceAdapter,
+        status="fixture_only",
+        boundary="does not read private community sources without approval",
+    ),
+)
+
+
+def get_real_source_adapter_registry() -> tuple[SourceAdapterRegistration, ...]:
+    """Return the stable real-source interfaces preserved for future rollout."""
+
+    return REAL_SOURCE_ADAPTER_REGISTRY
+
+
+def build_real_source_adapters(
+    fixture_items_by_key: Mapping[str, Iterable[RawTextItem]] | None = None,
+) -> dict[str, SourceAdapter]:
+    """Build fixture-backed real-source adapters without touching external data."""
+
+    fixtures = dict(fixture_items_by_key or {})
+    known_keys = {registration.key for registration in REAL_SOURCE_ADAPTER_REGISTRY}
+    unknown_keys = sorted(set(fixtures) - known_keys)
+    if unknown_keys:
+        raise ValueError(f"unknown real source adapter key: {', '.join(unknown_keys)}")
+
+    adapters: dict[str, SourceAdapter] = {}
+    for registration in REAL_SOURCE_ADAPTER_REGISTRY:
+        adapters[registration.key] = registration.adapter_class(
+            fixture_items=fixtures.get(registration.key)
+        )
+    return adapters
 
 
 def normalize_whitespace(text: str) -> str:

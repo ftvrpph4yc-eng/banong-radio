@@ -11,9 +11,12 @@ from banong_radio.domain import (
 )
 from banong_radio.text_flow import (
     RadioPlanner,
+    build_real_source_adapters,
     CommunitySourceAdapter,
     ContextBuilder,
     DemoVillageFeedAdapter,
+    get_real_source_adapter_registry,
+    GovernmentWebsiteSourceAdapter,
     PublicNoticeSourceAdapter,
     SignalExtractor,
     SourceAdapterNotConfigured,
@@ -150,6 +153,7 @@ def test_real_source_adapter_stubs_are_not_configured_by_default() -> None:
         WeChatGroupSourceAdapter,
         WeatherSourceAdapter,
         PublicNoticeSourceAdapter,
+        GovernmentWebsiteSourceAdapter,
         VoiceTranscriptSourceAdapter,
         CommunitySourceAdapter,
     ):
@@ -170,6 +174,7 @@ def test_real_source_adapter_stubs_can_return_explicit_fixture_items() -> None:
         WeChatGroupSourceAdapter,
         WeatherSourceAdapter,
         PublicNoticeSourceAdapter,
+        GovernmentWebsiteSourceAdapter,
         VoiceTranscriptSourceAdapter,
         CommunitySourceAdapter,
     ):
@@ -184,6 +189,60 @@ def test_real_source_adapter_stubs_can_return_explicit_fixture_items() -> None:
         adapter = adapter_class(fixture_items=fixture_items)
 
         assert adapter.fetch_items() == fixture_items
+
+
+def test_real_source_adapter_registry_preserves_target_interfaces() -> None:
+    registry = get_real_source_adapter_registry()
+
+    assert [(entry.key, entry.source_type, entry.adapter_class) for entry in registry] == [
+        ("wechat_group", "chat_excerpt", WeChatGroupSourceAdapter),
+        ("weather_api", "weather", WeatherSourceAdapter),
+        ("government_website", "public_notice", GovernmentWebsiteSourceAdapter),
+        ("voice_transcript", "voice_transcript", VoiceTranscriptSourceAdapter),
+        ("community_source", "community", CommunitySourceAdapter),
+    ]
+    assert all(entry.status == "fixture_only" for entry in registry)
+    assert all("without" in entry.boundary for entry in registry)
+
+
+def test_build_real_source_adapters_allows_partial_fixture_configuration() -> None:
+    weather_items = [
+        RawTextItem(
+            item_id="weather-fixture-1",
+            source="weather",
+            text="午后短时阵雨，注意晾晒。",
+            metadata={"fixture": True},
+        )
+    ]
+
+    adapters = build_real_source_adapters({"weather_api": weather_items})
+
+    assert set(adapters) == {
+        "wechat_group",
+        "weather_api",
+        "government_website",
+        "voice_transcript",
+        "community_source",
+    }
+    assert adapters["weather_api"].fetch_items() == weather_items
+
+    try:
+        adapters["wechat_group"].fetch_items()
+    except SourceAdapterNotConfigured:
+        pass
+    else:
+        raise AssertionError("unconfigured source adapter returned data")
+
+
+def test_build_real_source_adapters_rejects_unknown_keys() -> None:
+    try:
+        build_real_source_adapters({"unknown_source": []})
+    except ValueError as exc:
+        message = str(exc)
+    else:
+        raise AssertionError("unknown real source key was accepted")
+
+    assert "unknown real source adapter key: unknown_source" == message
 
 
 def test_signal_extractor_turns_sanitized_demo_items_into_village_signals() -> None:
