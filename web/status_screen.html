@@ -951,7 +951,7 @@
         fields.currentPath.textContent = text(status.current_path);
         fields.ttsPath.textContent = text(status.tts_path);
         fields.requestedMood.textContent = text(status.requested_mood);
-        fields.requestedSource.textContent = text(status.content_provider || status.requested_source);
+        fields.requestedSource.textContent = text(status.content_provider || status.content_source || status.requested_source);
         fields.cacheKey.textContent = text(status.cache_key);
         fields.error.textContent = text(status.error || status.asset_error);
         fields.statusPath.textContent = text(status.status_path, STATUS_PATH_FALLBACK);

@@ -34,11 +34,11 @@ LOG_PATH = CACHE_ROOT / "logs/player.log"
 IDLE_PLAYBACK_FIELDS = {
     "asset_error",
     "cache_key",
+    "content_source",
     "content_provider",
     "current_path",
     "music_prompt",
     "playlist_index",
-    "requested_source",
     "slot_type",
     "tts_path",
 }
@@ -69,8 +69,14 @@ def audio_file_ready(path: Path) -> bool:
 def normalize_status_payload(status: dict[str, Any]) -> dict[str, Any]:
     status = dict(status)
     if status.get("mode") == "idle":
+        had_playback_source = any(
+            status.get(field)
+            for field in ("cache_key", "content_provider", "content_source", "slot_type")
+        )
         for field in IDLE_PLAYBACK_FIELDS:
             status.pop(field, None)
+        if had_playback_source:
+            status.pop("requested_source", None)
         status["pid"] = None
         status["current_segment"] = ""
         status["next_segment"] = ""

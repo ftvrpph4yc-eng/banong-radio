@@ -4,6 +4,7 @@ from pathlib import Path
 from banong_radio.runtime import (
     is_process_alive,
     ensure_fallback_assets,
+    generate_segment,
     load_broadcast_plan,
     read_json,
     read_status,
@@ -85,7 +86,8 @@ def test_idle_status_drops_stale_playback_evidence(tmp_path, monkeypatch) -> Non
         source="mixed:macos-say",
         current_path="/tmp/longtan_morning.mp3",
         tts_path="/tmp/longtan_morning_tts.mp3",
-        requested_source="tts_api:generated:daily:2026-05-24:剪鸭村:opening-briefing:tts_api",
+        content_source="tts_api:generated:daily:2026-05-24:剪鸭村:opening-briefing:tts_api",
+        requested_source="stale-playback-source",
         cache_key="daily:2026-05-24:剪鸭村:opening-briefing:tts_api",
         content_provider="tts_api",
         slot_type="village_info",
@@ -107,6 +109,7 @@ def test_idle_status_drops_stale_playback_evidence(tmp_path, monkeypatch) -> Non
     assert "music_prompt" not in idle
     assert "asset_error" not in idle
     assert "playlist_index" not in idle
+    assert "content_source" not in idle
     assert "requested_source" not in idle
     assert "cache_key" not in idle
     assert "content_provider" not in idle
@@ -126,7 +129,8 @@ def test_read_status_normalizes_existing_idle_payload(tmp_path, monkeypatch) -> 
             "music_prompt": "peaceful morning",
             "current_path": "/tmp/longtan_morning.mp3",
             "tts_path": "/tmp/longtan_morning_tts.mp3",
-            "requested_source": "podcast_api:generated:daily:2026-05-24:剪鸭村:village-podcast:podcast_api",
+            "content_source": "podcast_api:generated:daily:2026-05-24:剪鸭村:village-podcast:podcast_api",
+            "requested_source": "stale-playback-source",
             "cache_key": "daily:2026-05-24:剪鸭村:village-podcast:podcast_api",
             "content_provider": "podcast_api",
             "slot_type": "podcast",
@@ -144,10 +148,23 @@ def test_read_status_normalizes_existing_idle_payload(tmp_path, monkeypatch) -> 
     assert "current_path" not in status
     assert "tts_path" not in status
     assert "music_prompt" not in status
+    assert "content_source" not in status
     assert "requested_source" not in status
     assert "cache_key" not in status
     assert "content_provider" not in status
     assert "slot_type" not in status
+
+
+def test_generate_segment_preserves_requested_source_when_idle(tmp_path, monkeypatch) -> None:
+    status_path = tmp_path / "status.json"
+    monkeypatch.setattr("banong_radio.runtime.STATUS_PATH", status_path)
+    write_status(mode="idle")
+
+    queued = generate_segment("四坪夜晚", "群聊吐槽日报")
+
+    assert queued["status"]["mode"] == "idle"
+    assert queued["status"]["requested_mood"] == "四坪夜晚"
+    assert queued["status"]["requested_source"] == "群聊吐槽日报"
 
 
 def test_read_write_json_round_trip(tmp_path) -> None:
