@@ -20,11 +20,14 @@ Run from the repository root:
 ```bash
 BANONG_PY=/Users/detroxryo/.local/bin/python3.11
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli status
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-broadcast --preset trailer_45s
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli render-program --preset trailer_45s
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-broadcast --manifest /Users/detroxryo/.cache/banong-radio/broadcast_manifest.json
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli stop
 ```
 
-`start-demo` is retained as the existing CLI name. In product language it starts the local presentation radio loop.
+`start-demo` and `plan-demo-feed` are retained as existing compatibility names. Product-facing flows should prefer `plan-broadcast`, `render-program`, and `start-broadcast`.
 
 Queue a requested segment from Hermes or a local operator:
 
@@ -80,11 +83,36 @@ At least these files should be available or generatable under `/Users/detroxryo/
 
 Fallback generation uses FFmpeg synthetic tone/noise beds. These are not final creative assets; they keep the runtime path testable when model generation is unavailable.
 
-## BroadcastPlan Boundary
+## Program Preset and BroadcastPlan Boundary
 
-The current demo manifest is treated as one input format for `BroadcastPlan`. It is not a live upstream data source. The text-flow chain can now produce `RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief -> BroadcastPlan`, and that plan can be written as a manifest for the existing runtime.
+The current manifest is treated as one input format for `BroadcastPlan`. It is not a live upstream data source. The text-flow chain can now produce `RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief -> BroadcastProgram -> BroadcastPlan`, and that plan can be written as a manifest for the existing runtime.
 
 Mixer and Player continue to receive local audio paths only.
+
+`ProgramPreset` controls time budget and rundown shape:
+
+- `trailer_45s`: short preview asset, normally 45 to 60 seconds
+- `briefing_3m`: three minute local briefing
+- `show_2h`: long-form show skeleton
+
+Generate a product broadcast manifest:
+
+```bash
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-broadcast --preset trailer_45s
+```
+
+Prepare playable assets without starting playback:
+
+```bash
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli render-program --preset trailer_45s
+```
+
+Start the prepared product broadcast:
+
+```bash
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-broadcast --manifest /Users/detroxryo/.cache/banong-radio/broadcast_manifest.json
+```
 
 ## Village Feed Fixture
 
@@ -94,7 +122,7 @@ The real-source adapter registry preserves the future connection keys `wechat_gr
 
 ## Text Flow Task Brief
 
-The deterministic text-flow chain can turn the demo feed into `RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief -> BroadcastPlan`. `SignalExtractor`, `ContextBuilder`, `TaskPlanner`, and `RadioPlanner` do not call an LLM and do not read real sources.
+The deterministic text-flow chain can turn the demo feed into `RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief -> BroadcastProgram -> BroadcastPlan`. `SignalExtractor`, `ContextBuilder`, `TaskPlanner`, `RadioPlanner`, and `ProgramPreset` do not call an LLM and do not read real sources.
 
 `plan-demo-feed` writes the generated `BroadcastPlan` as a manifest so the existing runtime can load it through the same `start-demo --manifest` path:
 
@@ -103,6 +131,20 @@ BANONG_PY=/Users/detroxryo/.local/bin/python3.11
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-feed
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json
 ```
+
+## OpenAI Agents SDK Workflow
+
+`banong_radio.agent_contracts` defines the stable role and guardrail contracts. `banong_radio.sdk_workflow` uses the official `openai-agents` package when the operator explicitly requests SDK orchestration:
+
+```bash
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-workflow --orchestrator sdk --preset trailer_45s
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli render-program --orchestrator sdk --preset trailer_45s
+```
+
+The SDK path runs `VillageMediaOrchestrator` as the manager agent and exposes specialist agents as tools. It requires `OPENAI_API_KEY`, writes an agent workflow report, and fails explicitly with `sdk_configuration_error`, `sdk_guardrail_failed`, or `sdk_orchestration_failed` rather than silently falling back to local output.
+
+Default commands without `--orchestrator sdk` still use deterministic local planners and do not call an external model.
 
 ## Text Output Pack
 

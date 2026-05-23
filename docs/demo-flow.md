@@ -14,7 +14,7 @@ Core sentence: use sound to turn village affairs, community dynamics, cultural t
 
 The event asks for AI empowerment of village economies beyond basic informatization. Position the project as a village information-service workflow while separating product vision from current implementation:
 
-- The product architecture uses an LLM / Agent workflow to process village inputs, but the current repository only proves the local radio runtime and data boundaries.
+- The product architecture uses an LLM / Agent workflow to process village inputs. The current repository proves the local radio runtime, variable program presets, data boundaries, and an explicit OpenAI Agents SDK manager workflow behind `--orchestrator sdk`.
 - Sound is the first output because it fits rural usage habits.
 - The same data loop can later support village newspaper, web pages, tourism content, agricultural product promotion, and governance summaries.
 
@@ -23,7 +23,7 @@ The event asks for AI empowerment of village economies beyond basic informatizat
 1. Problem: village information is fragmented across notices, group chats, oral updates, tourism resources, and agricultural operations.
 2. Medium choice: sound is zero-friction, ambient, emotional, and native to rural culture.
 3. Product: a village AI media workflow whose first demonstrable output is a local radio stream.
-4. Demo loop: synthetic village feed becomes `RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief -> BroadcastPlan`, then enters the existing runtime through a manifest.
+4. Broadcast loop: synthetic village feed becomes `RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief -> BroadcastProgram -> BroadcastPlan`, then enters the existing runtime through a manifest.
 5. Multi-output proof: the same `ContextPacket` can also generate a daily report, digital village newspaper draft, and short notices as a local text output pack.
 6. Technical proof: local music/TTS/mix/playback, status screen, fallback, ACE-Step preflight, and optional ACE-Step source behind `MusicGenerator`.
 7. Evidence organization: show innovation, rural fit, technical quality, completion, and market fit explicitly.
@@ -32,9 +32,11 @@ The event asks for AI empowerment of village economies beyond basic informatizat
 ## Live Evidence
 
 - Set `BANONG_PY=/Users/detroxryo/.local/bin/python3.11` for final verification and live commands on this machine.
-- Generate the demo feed manifest with `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-feed`.
+- Generate the product broadcast manifest with `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-broadcast --preset trailer_45s`.
+- Prepare playable program assets with `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli render-program --preset trailer_45s`.
 - Generate the text output pack with `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-outputs`.
-- Start the local radio loop with `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json`.
+- When `OPENAI_API_KEY` is configured, run the real multi-agent path with `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-workflow --orchestrator sdk --preset trailer_45s`.
+- Start the local radio loop with `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-broadcast --manifest /Users/detroxryo/.cache/banong-radio/broadcast_manifest.json`.
 - Show status JSON through the status screen.
 - Show how a mood/source command updates requested fields.
 - Mention that audio generation is isolated behind `MusicGenerator`.

@@ -311,18 +311,22 @@ def start_demo(manifest_path: Path) -> dict[str, Any]:
             "status_path": str(STATUS_PATH),
         }
 
+    plan = load_broadcast_plan(manifest_path)
     segments = ensure_playable_assets(manifest_path)
+    command = [
+        sys.executable,
+        "-m",
+        "banong_radio.player_worker",
+        "--manifest",
+        str(manifest_path),
+    ]
+    if plan.metadata.get("play_mode") == "once":
+        command.append("--once")
     CACHE_ROOT.mkdir(parents=True, exist_ok=True)
     LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
     log = LOG_PATH.open("a")
     proc = subprocess.Popen(
-        [
-            sys.executable,
-            "-m",
-            "banong_radio.player_worker",
-            "--manifest",
-            str(manifest_path),
-        ],
+        command,
         cwd=str(PROJECT_ROOT),
         stdout=log,
         stderr=subprocess.STDOUT,

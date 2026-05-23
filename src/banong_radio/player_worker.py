@@ -23,14 +23,14 @@ def handle_signal(signum: int, frame: object) -> None:
     RUNNING = False
 
 
-def play_manifest(manifest_path: Path) -> None:
+def play_manifest(manifest_path: Path, *, once: bool = False) -> None:
     segments = ensure_playable_assets(manifest_path)
     if not segments:
         write_status(mode="idle", error="empty manifest", stopped_at=now_iso())
         return
 
     index = 0
-    while RUNNING:
+    while RUNNING and (not once or index < len(segments)):
         segment = segments[index % len(segments)]
         current_label = segment.get("label", segment.get("id", "unknown"))
         next_segment = segments[(index + 1) % len(segments)]
@@ -73,10 +73,11 @@ def main() -> None:
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest", required=True)
+    parser.add_argument("--once", action="store_true")
     args = parser.parse_args()
 
     try:
-        play_manifest(Path(args.manifest))
+        play_manifest(Path(args.manifest), once=args.once)
     except Exception as exc:
         write_status(mode="error", error=str(exc), stopped_at=now_iso())
         raise

@@ -3,18 +3,29 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
 
 
 DEFAULT_VOICE = "zh-CN-YunJianNeural"
+DEFAULT_SAY_VOICE = "Tingting"
+DEFAULT_SAY_RATE = "170"
 
 
 def synthesize(text: str, output_path: Path, voice: str = DEFAULT_VOICE) -> tuple[Path | None, str]:
     """Generate speech audio, preferring edge-tts and falling back to macOS say."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    if _audio_file_ready(output_path) and _cache_matches(output_path, text=text, voice=voice):
+    say_voice = os.environ.get("BANONG_SAY_VOICE", DEFAULT_SAY_VOICE)
+    say_rate = os.environ.get("BANONG_SAY_RATE", DEFAULT_SAY_RATE)
+    if _audio_file_ready(output_path) and _cache_matches(
+        output_path,
+        text=text,
+        voice=voice,
+        say_voice=say_voice,
+        say_rate=say_rate,
+    ):
         return output_path, "cache"
     output_path.unlink(missing_ok=True)
     _cache_path(output_path).unlink(missing_ok=True)
@@ -44,7 +55,16 @@ def synthesize(text: str, output_path: Path, voice: str = DEFAULT_VOICE) -> tupl
 
     aiff_path = output_path.with_suffix(".aiff")
     subprocess.run(
-        [say_path, "-o", str(aiff_path), text],
+        [
+            say_path,
+            "-v",
+            say_voice,
+            "-r",
+            say_rate,
+            "-o",
+            str(aiff_path),
+            text,
+        ],
         check=True,
         capture_output=True,
         text=True,
@@ -68,7 +88,14 @@ def synthesize(text: str, output_path: Path, voice: str = DEFAULT_VOICE) -> tupl
         timeout=60,
     )
     aiff_path.unlink(missing_ok=True)
-    _write_cache(output_path, text=text, voice=voice, source="macos-say")
+    _write_cache(
+        output_path,
+        text=text,
+        voice=voice,
+        source="macos-say",
+        say_voice=say_voice,
+        say_rate=say_rate,
+    )
     return output_path, "macos-say"
 
 
@@ -83,21 +110,44 @@ def _cache_path(output_path: Path) -> Path:
     return output_path.with_suffix(".json")
 
 
-def _cache_matches(output_path: Path, *, text: str, voice: str) -> bool:
+def _cache_matches(
+    output_path: Path,
+    *,
+    text: str,
+    voice: str,
+    say_voice: str,
+    say_rate: str,
+) -> bool:
     try:
         payload = json.loads(_cache_path(output_path).read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return False
-    return payload.get("text") == text and payload.get("voice") == voice
+    if payload.get("text") != text or payload.get("voice") != voice:
+        return False
+    if payload.get("source") == "edge-tts":
+        return True
+    if payload.get("source") == "macos-say":
+        return payload.get("say_voice") == say_voice and payload.get("say_rate") == say_rate
+    return False
 
 
-def _write_cache(output_path: Path, *, text: str, voice: str, source: str) -> None:
+def _write_cache(
+    output_path: Path,
+    *,
+    text: str,
+    voice: str,
+    source: str,
+    say_voice: str = "",
+    say_rate: str = "",
+) -> None:
     _cache_path(output_path).write_text(
         json.dumps(
             {
                 "text": text,
                 "voice": voice,
                 "source": source,
+                "say_voice": say_voice,
+                "say_rate": say_rate,
             },
             ensure_ascii=False,
             indent=2,

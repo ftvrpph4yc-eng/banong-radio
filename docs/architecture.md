@@ -18,7 +18,7 @@
 | Layer | Role | Current Repository Boundary |
 | --- | --- | --- |
 | 感知层 | 接收天气、政务、群聊、口述等输入，清洗为结构化上下文 | 已实现 `SourceAdapter` 协议、`DemoVillageFeedAdapter`、real-source adapter registry 和 `RawTextItem -> SanitizedTextItem` 最小纯函数清洗，不接真实数据源 |
-| 合成层 | 把结构化内容改写为乡土语境播报稿、摘要、故事或说和内容 | 已实现确定性 `VillageSignal -> ContextPacket -> TaskBrief -> BroadcastPlan` Radio 链路，并新增日报、数字村报草稿和通知 text output pack |
+| 合成层 | 把结构化内容改写为乡土语境播报稿、摘要、故事或说和内容 | 已实现确定性 `VillageSignal -> ContextPacket -> TaskBrief -> BroadcastProgram -> BroadcastPlan` Radio 链路，并新增日报、数字村报草稿和通知 text output pack |
 | 生成层 | 生成或读取音乐，生成中文 TTS | 已实现 `MusicGenerator`、fallback、ACE-Step API adapter、TTS adapter |
 | 调度层 | 组织播放计划、混音、播放、状态展示 | 已实现 `BroadcastPlan` manifest adapter、CLI、FFmpeg mixer、afplay worker、status screen |
 
@@ -35,7 +35,10 @@
 | SignalExtractor | `SanitizedTextItem` list | `VillageSignal` list | Extract deterministic topics, urgency, summaries, and source references |
 | ContextBuilder | `VillageSignal` list | `ContextPacket` | Group signals by date, place, audience, topics, and urgency counts |
 | TaskPlanner | `ContextPacket` | `TaskBrief` | Prepare task input for a later output planner without generating final media |
+| ProgramPreset | product mode | duration budget and rundown | Keep `trailer_45s`, `briefing_3m`, and `show_2h` as presets rather than hard-coded system limits |
+| BroadcastProgram | `TaskBrief`, `ProgramPreset` | product-level program plan | Represent a normal AI broadcast program before runtime manifest handoff |
 | RadioPlanner | `TaskBrief` | `BroadcastPlan` | Convert a radio brief into runtime-compatible segments without touching Mixer or Player |
+| Agent SDK workflow | `--orchestrator sdk` | `BroadcastProgram`, `TextOutputPack`, structured report | Use official OpenAI Agents SDK manager orchestration without touching audio runtime |
 | TextOutput generators | `TaskBrief` | `DailyReport`, `VillageNewspaper`, `VillageNotice` | Produce deterministic text outputs from shared context without touching audio runtime |
 | Runtime | `BroadcastPlan`, env, status | prepared segments, status JSON | Orchestrate local playback preparation |
 | MusicGenerator | `MusicRequest` | `MusicResult` | Generate or retrieve music from fallback or ACE-Step |
@@ -54,16 +57,35 @@ Mixer and Player consume file paths only. They do not know whether music came fr
 - Interface Segregation: Hermes needs CLI commands and status only; the status page reads status only; audio code does not know group-chat internals.
 - Dependency Inversion: high-level orchestration depends on stable request/result objects and CLI contracts, not concrete model APIs.
 
+## Program Presets
+
+`BroadcastProgram` is the product-level program plan. `ProgramPreset` controls duration and rundown shape:
+
+- `trailer_45s`: short preview format, usually between 45 and 60 seconds.
+- `briefing_3m`: compact village briefing.
+- `show_2h`: future long-form show skeleton.
+
+The preset changes time budgets and sequence expectations only. Mixer and Player still receive a `BroadcastPlan` manifest, so a short preview cannot accidentally become the whole system's maximum duration.
+
 ## SDK-only Agent Boundary
 
-The project documentation uses the OpenAI Agents SDK vocabulary as the only external architecture reference. If a real external orchestrator is added later, use the official `openai-agents` package and keep roles narrow:
+The project uses OpenAI Agents SDK vocabulary as the only external architecture reference. The repository has two paths:
 
-- `RadioDirector`: chooses the next segment from current state and sanitized context.
-- `PromptComposer`: turns segment intent into music prompts and generation settings.
-- `Scriptwriter`: writes short host scripts and anonymized summaries.
+- default `local` orchestration: deterministic planners, no external model call.
+- explicit `--orchestrator sdk`: real `openai-agents` manager orchestration with specialist agents exposed as tools.
+
+The SDK path keeps roles narrow:
+
+- `VillageMediaOrchestrator`: main manager that coordinates specialists and owns final review.
+- `VillageSignalCollectorAgent`: reviews approved sanitized source/context coverage.
+- `RadioDirectorAgent`: reviews `BroadcastProgram` and manifest shape.
+- `PromptComposerAgent`: reviews music prompt and duration intent.
+- `ScriptwriterAgent`: reviews Chinese host scripts and privacy boundaries.
+- `TextOutputEditorAgent`: reviews daily report, digital newspaper draft, and notices.
+- `WorkflowReviewerAgent`: reviews guardrail status and remaining risks.
 - `RuntimeOperator`: invokes this repository's CLI and reports status.
 
-Do not add a separate local agent framework, and do not let a broad "Audio Producer" role absorb generation, TTS, mixing, and playback responsibilities.
+Do not add a separate local agent framework, and do not let a broad "Audio Producer" role absorb generation, TTS, mixing, and playback responsibilities. The official SDK concepts remain: Agent, Runner, handoffs, guardrails, and structured outputs.
 
 ## Safety and Privacy Boundaries
 

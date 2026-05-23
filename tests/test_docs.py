@@ -89,7 +89,21 @@ def test_docs_keep_required_boundary_caveats() -> None:
 def test_docs_keep_sdk_only_agent_boundary() -> None:
     architecture = Path("docs/architecture.md").read_text()
     decisions = Path("docs/decisions.md").read_text()
+    readme = Path("README.md").read_text()
 
     assert "OpenAI Agents SDK" in architecture
     assert "Do not add a separate local agent framework" in architecture
     assert "Do not create a parallel local agent framework" in decisions
+    assert "`--orchestrator sdk` 显式启用 `openai-agents`" in readme
+    assert "默认 local 路径仍不调用外部模型" in readme
+
+
+def test_docs_describe_variable_program_presets() -> None:
+    readme = Path("README.md").read_text()
+    operation = Path("docs/operation.md").read_text()
+    decisions = Path("docs/decisions.md").read_text()
+
+    assert "`ProgramPreset` 支持 `trailer_45s`、`briefing_3m`、`show_2h`" in readme
+    assert "短预告只是节目 preset，不是系统上限" in readme
+    assert "plan-broadcast --preset trailer_45s" in operation
+    assert "The short preview is therefore one program shape" in decisions

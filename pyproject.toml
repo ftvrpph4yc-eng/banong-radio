@@ -3,7 +3,7 @@ name = "banong-radio"
 version = "0.1.0"
 description = "Local AI radio runtime for Jianya Village Media."
 requires-python = ">=3.10"
-dependencies = []
+dependencies = ["openai-agents>=0.14.0"]
 
 [project.optional-dependencies]
 test = ["pytest>=8"]

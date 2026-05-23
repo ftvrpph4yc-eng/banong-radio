@@ -1,12 +1,12 @@
 # Final Acceptance
 
-This document is the R-11 submission and acceptance checklist for 剪鸭村融媒体. It turns the implemented demo loop into judge-facing evidence without expanding the product claim beyond the current repository.
+This document is the R-11 submission and acceptance checklist for 剪鸭村融媒体. It turns the implemented local broadcast loop into judge-facing evidence without expanding the product claim beyond the current repository.
 
 ## Submission Claim
 
 The repository implements the first runnable product line: a local AI radio runtime for village information service.
 
-The complete demo loop is:
+The complete local broadcast loop is:
 
 ```text
 demo/village_feed.json
@@ -16,6 +16,7 @@ demo/village_feed.json
   -> VillageSignal
   -> ContextPacket
   -> TaskBrief
+  -> BroadcastProgram preset
   -> RadioPlanner
   -> BroadcastPlan manifest
   -> local runtime
@@ -48,9 +49,10 @@ cd /Users/detroxryo/Dev/Sandbox/banong-radio
 BANONG_PY=/Users/detroxryo/.local/bin/python3.11
 "$BANONG_PY" -m compileall -q src tests
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli preflight-ace
-PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-feed
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-broadcast --preset trailer_45s
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli render-program --preset trailer_45s
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-outputs
-PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-broadcast --manifest /Users/detroxryo/.cache/banong-radio/broadcast_manifest.json
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli status
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli stop
 ```
@@ -77,10 +79,12 @@ http://127.0.0.1:8765/
 | Interpreter gate | `/Users/detroxryo/.local/bin/python3.11 --version` returns Python 3.10+ |
 | Syntax gate | `"$BANONG_PY" -m compileall -q src tests` passes |
 | ACE-Step readiness evidence | `preflight-ace` returns `ok=true`; live demo still uses fallback by default |
+| Product broadcast planning | `plan-broadcast` writes `/Users/detroxryo/.cache/banong-radio/broadcast_manifest.json` |
+| Program rendering | `render-program --preset trailer_45s` prepares playable assets from the variable program layer |
 | Documentation boundary | docs do not claim real-source automation, public deployment, mini-program, digital newspaper, video, or verified 1.7B generation |
 | Demo feed planning | `plan-demo-feed` writes `/Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json` |
 | Text output planning | `plan-demo-outputs` writes `/Users/detroxryo/.cache/banong-radio/demo_text_outputs.json` |
-| Runtime fallback | generated demo feed manifest can enter `ensure_playable_assets` and produce fallback-playable segments |
+| Runtime fallback | generated broadcast manifest can enter `ensure_playable_assets` and produce fallback-playable segments |
 | CLI status | `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli status` returns `ok=true` |
 | Manual listening | local playback is audible, understandable, and can be stopped cleanly |
 | Status screen | `serve-status` exposes `/status.json` and the HTML dashboard reads it |
@@ -101,7 +105,7 @@ Manual listening is intentionally separate from automated tests because the fina
 
 Use these exact claim states:
 
-- Implemented: local CLI, demo feed planning, text output pack planning, `BroadcastPlan` manifest handoff, TTS, FFmpeg mix, playback, fallback, status JSON, status dashboard, docs and tests.
+- Implemented: local CLI, variable `BroadcastProgram` presets, OpenAI Agents SDK opt-in workflow, demo feed planning, text output pack planning, `BroadcastPlan` manifest handoff, TTS, FFmpeg mix, playback, fallback, status JSON, status dashboard, docs and tests.
 - Demonstrable: synthetic village feed to playable local radio loop through the fallback-safe runtime.
 - Preserved interface: WeChat group, weather API, government website, voice transcript, and community source adapter boundaries.
 - Roadmap: real private data ingestion, full daily scheduling, public deployment, mini-program, rendered digital village newspaper product, and video output.

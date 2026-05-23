@@ -315,6 +315,52 @@ def test_start_demo_returns_existing_process_without_rebuilding_assets(monkeypat
     assert result["pid"] == 12345
 
 
+def test_start_demo_passes_once_for_one_shot_program(monkeypatch, tmp_path) -> None:
+    from banong_radio import runtime
+
+    manifest = tmp_path / "broadcast_manifest.json"
+    write_json(
+        manifest,
+        {
+            "id": "broadcast:trailer_45s:test",
+            "metadata": {"play_mode": "once"},
+            "segments": [
+                {
+                    "id": "trailer_45s-integrated-program",
+                    "label": "预告融合节目",
+                    "music_prompt": "warm radio bed",
+                    "intro_text": "早上好，伴农电台现在开播。",
+                    "duration": 45,
+                    "fallback_path": str(tmp_path / "fallback.mp3"),
+                }
+            ],
+        },
+    )
+    commands: list[list[str]] = []
+
+    class FakeProcess:
+        pid = 43210
+
+    monkeypatch.setattr(runtime, "read_status", lambda: {"mode": "idle", "pid": None})
+    monkeypatch.setattr(runtime, "is_process_alive", lambda pid: False)
+    monkeypatch.setattr(
+        runtime,
+        "ensure_playable_assets",
+        lambda manifest_path: [{"label": "预告融合节目"}],
+    )
+    monkeypatch.setattr(
+        runtime.subprocess,
+        "Popen",
+        lambda command, **kwargs: commands.append(command) or FakeProcess(),
+    )
+    monkeypatch.setattr(runtime, "write_status", lambda **updates: updates)
+
+    result = runtime.start_demo(manifest)
+
+    assert result["ok"] is True
+    assert "--once" in commands[0]
+
+
 def test_stop_demo_terminates_alive_process_and_writes_idle(monkeypatch) -> None:
     from banong_radio import runtime
 

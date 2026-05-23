@@ -40,7 +40,24 @@ http://127.0.0.1:8765/
 
 Keep this terminal running during the demo. The status server is separate from the player process.
 
-## Terminal 2: Demo Loop
+## Terminal 2: Broadcast Loop
+
+Prepare a product broadcast manifest and playable assets:
+
+```bash
+cd /Users/detroxryo/Dev/Sandbox/banong-radio
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-broadcast --preset trailer_45s
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli render-program --preset trailer_45s
+```
+
+Start the generated broadcast:
+
+```bash
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-broadcast --manifest /Users/detroxryo/.cache/banong-radio/broadcast_manifest.json
+```
+
+The compatibility path below remains available when you need the original generated feed manifest.
 
 Prepare the synthetic village feed as the runtime manifest:
 
@@ -76,22 +93,25 @@ PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli stop
 
 Expected live evidence:
 
+- `plan-broadcast` writes `/Users/detroxryo/.cache/banong-radio/broadcast_manifest.json`
+- `render-program --preset trailer_45s` reports playable segments
 - `plan-demo-feed` writes `/Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json`
 - `plan-demo-outputs` writes `/Users/detroxryo/.cache/banong-radio/demo_text_outputs.json`
-- `start-demo --manifest ...` reports `ok=true`
+- `start-broadcast --manifest ...` reports `ok=true`
 - dashboard changes from idle to playing
-- status shows `playlist_total=5`
+- product broadcast status shows `playlist_total=1`; the compatibility demo feed still has 5 source-derived segments
 - `stop` returns the player to idle
 
 ## Talking Order
 
 1. This is 剪鸭村融媒体, with local radio as the first runnable product line.
 2. The input is a synthetic village feed, not private real chat data.
-3. The code turns feed items into sanitized text, village signals, a context packet, a task brief, and then a `BroadcastPlan`.
+3. The code turns feed items into sanitized text, village signals, a context packet, a task brief, a `BroadcastProgram`, and then a `BroadcastPlan`.
 4. The radio runtime consumes only the final manifest, so upstream text flow stays separate from Mixer and Player.
-5. The live path uses TTS, music, FFmpeg mixing, local playback, and a read-only status screen.
-6. Fallback is intentional reliability, not a failed model path.
-7. Real WeChat group, weather API, government website, voice-source ingestion, public deployment, mini-program, rendered digital newspaper product, video, and full 24-hour scheduling are roadmap items. The source interfaces are preserved so approved sources can be connected later.
+5. `--orchestrator sdk` runs the official OpenAI Agents SDK manager workflow; default local commands remain deterministic and fallback-safe.
+6. The live path uses TTS, music, FFmpeg mixing, local playback, and a read-only status screen.
+7. Fallback is intentional reliability, not a failed model path.
+8. Real WeChat group, weather API, government website, voice-source ingestion, public deployment, mini-program, rendered digital newspaper product, video, and full 24-hour scheduling are roadmap items. The source interfaces are preserved so approved sources can be connected later.
 
 ## Accepted Demo Quality
 

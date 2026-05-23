@@ -56,6 +56,10 @@ def test_fallback_generator_regenerates_empty_cached_file(monkeypatch, tmp_path)
         "banong_radio.music.make_fallback_audio",
         fake_make_fallback_audio,
     )
+    monkeypatch.setattr(
+        "banong_radio.music.make_generated_program_bed",
+        lambda path, duration: False,
+    )
 
     request = music_request_from_segment(
         {

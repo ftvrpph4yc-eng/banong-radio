@@ -44,7 +44,13 @@ The preserved real-source adapter registry is intentionally explicit: `wechat_gr
 
 ## Generate radio plans through a manifest handoff
 
-`RadioPlanner` converts a radio `TaskBrief` into a `BroadcastPlan` with runtime-compatible media segments, then the CLI can write that plan as a manifest. The runtime still enters through `start-demo --manifest`, so Mixer and Player continue to see only local audio segment paths and never upstream text-flow objects.
+`RadioPlanner` converts a radio `TaskBrief` into a `BroadcastPlan` with runtime-compatible media segments, then the CLI can write that plan as a manifest. The product path now enters through `start-broadcast --manifest`, while `start-demo --manifest` remains a compatibility alias. Mixer and Player continue to see only local audio segment paths and never upstream text-flow objects.
+
+## Add BroadcastProgram presets above BroadcastPlan
+
+`BroadcastProgram` is the product-level program plan. `ProgramPreset` makes duration a preset decision, not a fixed system limit. The first presets are `trailer_45s`, `briefing_3m`, and `show_2h`; each can produce a runtime-compatible `BroadcastPlan` without changing Mixer or Player.
+
+The short preview is therefore one program shape, not the maximum length of the station or future schedule. Its exact duration can stretch toward a minute when the music intro, host read, lift, and ending stinger need room.
 
 ## Generate multi-output text packs without touching audio runtime
 
@@ -58,6 +64,8 @@ ACE-Step must remain one music source implementation. Mixer, Player, status scre
 
 The recommended live configuration still points at `acestep-v15-turbo` and `acestep-5Hz-lm-1.7B`, but server logs showed automatic downgrade to `acestep-5Hz-lm-0.6B` on this machine. Submission material must preserve that caveat.
 
-## Use SDK vocabulary only for future agent orchestration
+## Use official Agents SDK for opt-in orchestration
 
-If real external orchestration is added, use the official OpenAI Agents SDK concepts and package. Do not create a parallel local agent framework or new incompatible terminology.
+The repository now includes `openai-agents` as the only external agent framework. Default local commands remain deterministic and do not call external models. The explicit `--orchestrator sdk` path runs a real manager agent, `VillageMediaOrchestrator`, with specialist agents exposed as tools: `VillageSignalCollectorAgent`, `RadioDirectorAgent`, `PromptComposerAgent`, `ScriptwriterAgent`, `TextOutputEditorAgent`, and `WorkflowReviewerAgent`.
+
+Do not create a parallel local agent framework or new incompatible terminology. The SDK path requires `OPENAI_API_KEY`; if it fails, it returns a structured SDK error instead of silently falling back to local output.

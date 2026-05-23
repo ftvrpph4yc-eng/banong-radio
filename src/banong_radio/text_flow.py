@@ -496,7 +496,7 @@ class RadioPlanner:
 
         return BroadcastPlan(
             plan_id=f"radio:{brief.context_packet_id}",
-            title="剪鸭村融媒体 Demo Feed 电台",
+            title="剪鸭村融媒体本地 AI 广播",
             source="task_brief",
             segments=segments,
             metadata={

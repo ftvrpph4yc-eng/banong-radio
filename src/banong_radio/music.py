@@ -50,12 +50,13 @@ class FallbackMusicGenerator:
     def generate(self, request: MusicRequest, index: int = 0) -> MusicResult:
         if not audio_file_ready(request.fallback_path):
             request.fallback_path.parent.mkdir(parents=True, exist_ok=True)
-            frequency = self.frequencies[index % len(self.frequencies)]
-            make_fallback_audio(
-                request.fallback_path,
-                frequency=frequency,
-                duration=request.duration,
-            )
+            if not make_generated_program_bed(request.fallback_path, duration=request.duration):
+                frequency = self.frequencies[index % len(self.frequencies)]
+                make_fallback_audio(
+                    request.fallback_path,
+                    frequency=frequency,
+                    duration=request.duration,
+                )
         if not audio_file_ready(request.fallback_path):
             raise RuntimeError(f"fallback audio is not usable: {request.fallback_path}")
 
@@ -550,12 +551,23 @@ def find_cache_matches(root: Path, terms: list[str], max_results: int = 30) -> l
 
 def make_fallback_audio(path: Path, frequency: int, duration: int) -> None:
     fade_out_start = max(duration - 2, 1)
+    third = int(frequency * 1.25)
+    fifth = int(frequency * 1.5)
+    octave = int(frequency * 2)
     filter_graph = (
-        f"[0:a]volume=0.16,afade=t=in:st=0:d=1,"
-        f"afade=t=out:st={fade_out_start}:d=2[tone];"
-        f"[1:a]volume=0.035[noise];"
-        f"[tone][noise]amix=inputs=2:duration=shortest,"
-        f"alimiter=limit=0.8[aout]"
+        f"[0:a]volume=0.42,lowpass=f=900,afade=t=in:st=0:d=1.2,"
+        f"afade=t=out:st={fade_out_start}:d=2[root];"
+        f"[1:a]volume=0.30,lowpass=f=1200,afade=t=in:st=0.4:d=1.4,"
+        f"afade=t=out:st={fade_out_start}:d=2[third];"
+        f"[2:a]volume=0.27,lowpass=f=1500,afade=t=in:st=0.8:d=1.4,"
+        f"afade=t=out:st={fade_out_start}:d=2[fifth];"
+        f"[3:a]volume=0.10,highpass=f=500,lowpass=f=2500,"
+        f"afade=t=in:st=0:d=1,afade=t=out:st={fade_out_start}:d=2[air];"
+        f"[4:a]volume=0.18,afade=t=in:st=2:d=1,"
+        f"afade=t=out:st={fade_out_start}:d=2[chime];"
+        f"[root][third][fifth][air][chime]amix=inputs=5:duration=shortest:normalize=0,"
+        f"aecho=0.55:0.35:160:0.12,"
+        f"alimiter=limit=0.82[aout]"
     )
     subprocess.run(
         [
@@ -568,7 +580,19 @@ def make_fallback_audio(path: Path, frequency: int, duration: int) -> None:
             "-f",
             "lavfi",
             "-i",
+            f"sine=frequency={third}:duration={duration}",
+            "-f",
+            "lavfi",
+            "-i",
+            f"sine=frequency={fifth}:duration={duration}",
+            "-f",
+            "lavfi",
+            "-i",
             f"anoisesrc=color=pink:duration={duration}:amplitude=0.08",
+            "-f",
+            "lavfi",
+            "-i",
+            f"sine=frequency={octave}:duration={duration}",
             "-filter_complex",
             filter_graph,
             "-map",
@@ -583,3 +607,35 @@ def make_fallback_audio(path: Path, frequency: int, duration: int) -> None:
         capture_output=True,
         text=True,
     )
+
+
+def make_generated_program_bed(path: Path, duration: int) -> bool:
+    """Create a broadcast bed by looping an existing generated music asset."""
+
+    source = Path("/Users/detroxryo/Music/BanongRadio/generated/ace-step/longtan_morning.mp3")
+    if not audio_file_ready(source):
+        return False
+    fade_out_start = max(duration - 3, 1)
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-y",
+            "-stream_loop",
+            "-1",
+            "-i",
+            str(source),
+            "-t",
+            str(duration),
+            "-af",
+            f"volume=0.95,afade=t=in:st=0:d=1.2,afade=t=out:st={fade_out_start}:d=3,alimiter=limit=0.85",
+            "-ar",
+            "44100",
+            "-ac",
+            "2",
+            str(path),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return audio_file_ready(path)
