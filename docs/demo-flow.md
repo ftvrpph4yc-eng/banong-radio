@@ -76,5 +76,6 @@ The presentation should make the product feel complete enough to evaluate while 
 - Locally demonstrable with current assets.
 - Product roadmap, not yet implemented.
 
+Use [Judge Submission Pack](judge-submission.md) as the fast judge-facing entry point.
 Use [Final Acceptance](final-acceptance.md) as the submission checklist before presenting.
 Use [Live Demo Runbook](live-demo-runbook.md) for the exact operator command order.

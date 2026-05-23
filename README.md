@@ -4,6 +4,8 @@
 
 对外项目名是“剪鸭村融媒体”。代码包名和 CLI 暂保留 `banong_radio` / `banong-radio`，避免破坏已经稳定的运行入口。
 
+评委或现场演示请先读 [Judge Submission Pack](docs/judge-submission.md)，再按 [Live Demo Runbook](docs/live-demo-runbook.md) 操作。
+
 ## 1 分钟理解
 
 | 问题 | 当前答案 |
@@ -152,6 +154,7 @@ PY
 
 - [Architecture](docs/architecture.md)
 - [Operation](docs/operation.md)
+- [Judge Submission Pack](docs/judge-submission.md)
 - [Presentation Flow](docs/demo-flow.md)
 - [Final Acceptance](docs/final-acceptance.md)
 - [Live Demo Runbook](docs/live-demo-runbook.md)

@@ -30,7 +30,7 @@ Real-source interfaces are present as boundaries, but real private inputs are no
 
 ## Demo Script
 
-For the exact two-terminal operator flow, use [Live Demo Runbook](live-demo-runbook.md).
+For the judge-facing summary, use [Judge Submission Pack](judge-submission.md). For the exact two-terminal operator flow, use [Live Demo Runbook](live-demo-runbook.md).
 
 Run from the repository root:
 

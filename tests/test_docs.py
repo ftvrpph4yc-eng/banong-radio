@@ -6,6 +6,7 @@ DOC_PATHS = [
     Path("README.md"),
     Path("docs/architecture.md"),
     Path("docs/operation.md"),
+    Path("docs/judge-submission.md"),
     Path("docs/demo-flow.md"),
     Path("docs/final-acceptance.md"),
     Path("docs/live-demo-runbook.md"),
@@ -66,6 +67,7 @@ def test_docs_do_not_claim_unimplemented_capabilities() -> None:
 def test_docs_keep_required_boundary_caveats() -> None:
     readme = Path("README.md").read_text()
     operation = Path("docs/operation.md").read_text()
+    judge_submission = Path("docs/judge-submission.md").read_text()
     demo_flow = Path("docs/demo-flow.md").read_text()
     final_acceptance = Path("docs/final-acceptance.md").read_text()
     live_demo_runbook = Path("docs/live-demo-runbook.md").read_text()
@@ -75,6 +77,8 @@ def test_docs_keep_required_boundary_caveats() -> None:
     assert "不实现完整 24 小时电台调度" in readme
     assert "不包含公网部署、小程序、数字村报或视频生成" in readme
     assert "Do not claim 1.7B real generation" in operation
+    assert "Do not claim:" in judge_submission
+    assert "ACE-Step 1.7B real generation is verified" in judge_submission
     assert "Do not claim ACE-Step 1.7B real generation is verified" in demo_flow
     assert "Do not claim ACE-Step 1.7B real generation is verified" in final_acceptance
     assert "Do not claim real WeChat group, weather API, government website, or voice-source ingestion is connected" in final_acceptance
