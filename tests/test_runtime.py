@@ -229,6 +229,69 @@ def test_generated_demo_feed_manifest_enters_runtime_fallback(monkeypatch, tmp_p
     assert segments[0]["id"] == "radio-public-notice-001"
 
 
+def test_playable_assets_refresh_stale_mixed_cache(monkeypatch, tmp_path) -> None:
+    from banong_radio import runtime
+    from banong_radio.music import FallbackMusicGenerator
+
+    asset_root = tmp_path / "assets"
+    manifest = tmp_path / "demo_manifest.json"
+    fallback_path = tmp_path / "fallback.mp3"
+    fallback_path.write_bytes(b"music")
+    write_json(
+        manifest,
+        {
+            "segments": [
+                {
+                    "id": "field_future",
+                    "label": "田野未来主义",
+                    "music_prompt": "pastoral electronic",
+                    "intro_text": "新的节拍。",
+                    "duration": 18,
+                    "fallback_path": str(fallback_path),
+                }
+            ]
+        },
+    )
+    stale_mixed = asset_root / "mixed" / "field_future.mp3"
+    stale_mixed.parent.mkdir(parents=True)
+    stale_mixed.write_bytes(b"stale mix")
+
+    monkeypatch.setattr(runtime, "ASSET_ROOT", asset_root)
+    monkeypatch.setattr(
+        FallbackMusicGenerator,
+        "generate",
+        lambda self, request, index=0: runtime.MusicResult(
+            song_path=request.fallback_path,
+            prompt=request.prompt,
+            duration=request.duration,
+            metadata={
+                "source": "fallback",
+                "mood": request.mood,
+                "segment_id": request.segment_id,
+            },
+        ),
+    )
+
+    def fake_synthesize(text, output_path):
+        output_path.write_bytes(b"tts")
+        return output_path, "fake-tts"
+
+    def fake_mix(music_path, tts_path, output_path):
+        output_path.write_bytes(b"fresh mix")
+        return output_path
+
+    monkeypatch.setattr(runtime, "synthesize", fake_synthesize)
+    monkeypatch.setattr(runtime, "mix_voice_over_music", fake_mix)
+
+    segments = runtime.ensure_playable_assets(manifest)
+
+    assert stale_mixed.read_bytes() == b"fresh mix"
+    assert (asset_root / "mixed" / "field_future.json").exists()
+    assert segments[0]["playback_path"] == str(stale_mixed)
+    assert segments[0]["playback_source"] == "mixed:fake-tts"
+    assert segments[0]["tts_path"] == str(asset_root / "tts" / "field_future.mp3")
+
+
 def test_start_demo_returns_existing_process_without_rebuilding_assets(monkeypatch) -> None:
     from banong_radio import runtime
 

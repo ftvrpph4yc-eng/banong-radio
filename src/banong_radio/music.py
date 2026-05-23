@@ -48,10 +48,16 @@ class FallbackMusicGenerator:
         self.frequencies = frequencies or [392, 330, 440, 294, 349]
 
     def generate(self, request: MusicRequest, index: int = 0) -> MusicResult:
-        if not request.fallback_path.exists():
+        if not audio_file_ready(request.fallback_path):
             request.fallback_path.parent.mkdir(parents=True, exist_ok=True)
             frequency = self.frequencies[index % len(self.frequencies)]
-            make_fallback_audio(request.fallback_path, frequency=frequency, duration=request.duration)
+            make_fallback_audio(
+                request.fallback_path,
+                frequency=frequency,
+                duration=request.duration,
+            )
+        if not audio_file_ready(request.fallback_path):
+            raise RuntimeError(f"fallback audio is not usable: {request.fallback_path}")
 
         return MusicResult(
             song_path=request.fallback_path,
@@ -209,7 +215,7 @@ class AceStepMusicGenerator:
 
     def generate(self, request: MusicRequest, index: int = 0) -> MusicResult:
         output_path = self.output_root / f"{request.segment_id}.mp3"
-        if output_path.exists() and output_path.stat().st_size > 0:
+        if audio_file_ready(output_path):
             return self._result(request, output_path, {"cached": True})
 
         self.client.health()
@@ -293,6 +299,14 @@ def stable_seed(segment_id: str, index: int = 0) -> int:
     for character in f"{segment_id}:{index}":
         value = (value * 131 + ord(character)) % 2_147_483_647
     return value or 1
+
+
+def audio_file_ready(path: Path) -> bool:
+    """Return true when a cached audio path is present and non-empty."""
+    try:
+        return path.exists() and path.stat().st_size > 0
+    except OSError:
+        return False
 
 
 def ace_step_preflight() -> dict[str, Any]:

@@ -43,6 +43,37 @@ def test_music_result_shape_matches_solid_contract() -> None:
     assert result.metadata["source"] == "fallback"
 
 
+def test_fallback_generator_regenerates_empty_cached_file(monkeypatch, tmp_path) -> None:
+    fallback_path = tmp_path / "field_future.mp3"
+    fallback_path.write_bytes(b"")
+    writes: list[tuple[Path, int, int]] = []
+
+    def fake_make_fallback_audio(path: Path, frequency: int, duration: int) -> None:
+        writes.append((path, frequency, duration))
+        path.write_bytes(b"usable fallback mp3")
+
+    monkeypatch.setattr(
+        "banong_radio.music.make_fallback_audio",
+        fake_make_fallback_audio,
+    )
+
+    request = music_request_from_segment(
+        {
+            "id": "field_future",
+            "label": "田野未来主义",
+            "music_prompt": "pastoral electronic",
+            "duration": 10,
+            "fallback_path": str(fallback_path),
+        }
+    )
+
+    result = FallbackMusicGenerator().generate(request)
+
+    assert result.song_path == fallback_path
+    assert fallback_path.read_bytes() == b"usable fallback mp3"
+    assert writes == [(fallback_path, 392, 10)]
+
+
 def test_ace_step_preflight_is_non_generating_report() -> None:
     report = ace_step_preflight()
 

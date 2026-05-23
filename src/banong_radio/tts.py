@@ -13,8 +13,9 @@ DEFAULT_VOICE = "zh-CN-YunJianNeural"
 def synthesize(text: str, output_path: Path, voice: str = DEFAULT_VOICE) -> tuple[Path | None, str]:
     """Generate speech audio, preferring edge-tts and falling back to macOS say."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    if output_path.exists():
+    if _audio_file_ready(output_path):
         return output_path, "cache"
+    output_path.unlink(missing_ok=True)
 
     if shutil.which("edge-tts"):
         result = subprocess.run(
@@ -65,3 +66,10 @@ def synthesize(text: str, output_path: Path, voice: str = DEFAULT_VOICE) -> tupl
     )
     aiff_path.unlink(missing_ok=True)
     return output_path, "macos-say"
+
+
+def _audio_file_ready(path: Path) -> bool:
+    try:
+        return path.exists() and path.stat().st_size > 0
+    except OSError:
+        return False

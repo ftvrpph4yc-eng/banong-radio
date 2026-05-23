@@ -55,6 +55,13 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
 
 
+def audio_file_ready(path: Path) -> bool:
+    try:
+        return path.exists() and path.stat().st_size > 0
+    except OSError:
+        return False
+
+
 def normalize_status_payload(status: dict[str, Any]) -> dict[str, Any]:
     status = dict(status)
     if status.get("mode") == "idle":
@@ -182,29 +189,116 @@ def ensure_playable_assets(manifest_path: Path) -> list[dict[str, Any]]:
         intro_text = segment.get("intro_text", "")
         tts_path = ASSET_ROOT / "tts" / f"{segment_id}.mp3"
         mixed_path = ASSET_ROOT / "mixed" / f"{segment_id}.mp3"
+        music_source = str(segment.get("music_source", "music"))
 
         if intro_text:
             try:
                 generated_tts, tts_source = synthesize(intro_text, tts_path)
-                if generated_tts and not mixed_path.exists():
+                if (
+                    audio_file_ready(mixed_path)
+                    and not mix_cache_matches(
+                        mixed_path,
+                        music_path=song_path,
+                        tts_path=generated_tts,
+                        intro_text=intro_text,
+                    )
+                ):
+                    mixed_path.unlink(missing_ok=True)
+                    mix_cache_path(mixed_path).unlink(missing_ok=True)
+                if generated_tts and not audio_file_ready(mixed_path):
                     mix_voice_over_music(song_path, generated_tts, mixed_path)
-                if mixed_path.exists():
+                    write_mix_cache(
+                        mixed_path,
+                        music_path=song_path,
+                        tts_path=generated_tts,
+                        intro_text=intro_text,
+                        tts_source=tts_source,
+                    )
+                if audio_file_ready(mixed_path):
                     segment["playback_path"] = str(mixed_path)
                     segment["playback_source"] = f"mixed:{tts_source}"
-                    segment["tts_path"] = str(generated_tts)
+                    segment["tts_path"] = str(generated_tts or "")
                 else:
                     segment["playback_path"] = str(song_path)
-                    segment["playback_source"] = "fallback:no-mix"
+                    segment["playback_source"] = f"{music_source}:no-mix"
             except Exception as exc:
                 segment["playback_path"] = str(song_path)
-                segment["playback_source"] = "fallback:tts-or-mix-error"
+                segment["playback_source"] = f"{music_source}:tts-or-mix-error"
                 segment["asset_error"] = str(exc)
         else:
             segment["playback_path"] = str(song_path)
-            segment["playback_source"] = "fallback:no-script"
+            segment["playback_source"] = f"{music_source}:no-script"
 
         playable_segments.append(segment)
     return playable_segments
+
+
+def mix_cache_path(mixed_path: Path) -> Path:
+    return mixed_path.with_suffix(".json")
+
+
+def mix_cache_matches(
+    mixed_path: Path,
+    *,
+    music_path: Path,
+    tts_path: Path | None,
+    intro_text: str,
+) -> bool:
+    if not audio_file_ready(mixed_path) or tts_path is None:
+        return False
+    try:
+        metadata = read_json(mix_cache_path(mixed_path), {})
+    except Exception:
+        return False
+    return metadata == mix_cache_metadata(
+        music_path=music_path,
+        tts_path=tts_path,
+        intro_text=intro_text,
+        tts_source=str(metadata.get("tts_source", "")),
+    )
+
+
+def write_mix_cache(
+    mixed_path: Path,
+    *,
+    music_path: Path,
+    tts_path: Path,
+    intro_text: str,
+    tts_source: str,
+) -> None:
+    write_json(
+        mix_cache_path(mixed_path),
+        mix_cache_metadata(
+            music_path=music_path,
+            tts_path=tts_path,
+            intro_text=intro_text,
+            tts_source=tts_source,
+        ),
+    )
+
+
+def mix_cache_metadata(
+    *,
+    music_path: Path,
+    tts_path: Path,
+    intro_text: str,
+    tts_source: str,
+) -> dict[str, Any]:
+    return {
+        "music": audio_cache_identity(music_path),
+        "tts": audio_cache_identity(tts_path),
+        "intro_text": intro_text,
+        "tts_source": tts_source,
+    }
+
+
+def audio_cache_identity(path: Path) -> dict[str, Any]:
+    stat = path.stat()
+    return {
+        "path": str(path),
+        "size": stat.st_size,
+        "mtime_ns": stat.st_mtime_ns,
+    }
 
 def start_demo(manifest_path: Path) -> dict[str, Any]:
     status = read_status()
