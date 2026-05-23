@@ -24,14 +24,16 @@ The event asks for AI empowerment of village economies beyond basic informatizat
 2. Medium choice: sound is zero-friction, ambient, emotional, and native to rural culture.
 3. Product: a village AI media workflow whose first demonstrable output is a local radio stream.
 4. Demo loop: synthetic village feed becomes `RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief -> BroadcastPlan`, then enters the existing runtime through a manifest.
-5. Technical proof: local music/TTS/mix/playback, status screen, fallback, ACE-Step preflight, and optional ACE-Step source behind `MusicGenerator`.
-6. Evidence organization: show innovation, rural fit, technical quality, completion, and market fit explicitly.
-7. Boundary: current repository proves the local radio runtime and preserves real-source interfaces; full data source automation and other media outputs are roadmap items.
+5. Multi-output proof: the same `ContextPacket` can also generate a daily report, digital village newspaper draft, and short notices as a local text output pack.
+6. Technical proof: local music/TTS/mix/playback, status screen, fallback, ACE-Step preflight, and optional ACE-Step source behind `MusicGenerator`.
+7. Evidence organization: show innovation, rural fit, technical quality, completion, and market fit explicitly.
+8. Boundary: current repository proves the local radio runtime, local text output pack, and preserved real-source interfaces; real data source automation, public deployment, mini-program, and video are roadmap items.
 
 ## Live Evidence
 
 - Set `BANONG_PY=/Users/detroxryo/.local/bin/python3.11` for final verification and live commands on this machine.
 - Generate the demo feed manifest with `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-feed`.
+- Generate the text output pack with `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-outputs`.
 - Start the local radio loop with `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json`.
 - Show status JSON through the status screen.
 - Show how a mood/source command updates requested fields.
@@ -43,7 +45,7 @@ The event asks for AI empowerment of village economies beyond basic informatizat
 - "We are not building another app for elders to learn. We are using the village's existing sound tradition."
 - "The radio is the first media output. The product boundary is village input data, AI processing, and reusable media output; this repository proves the local radio runtime slice."
 - "The code is intentionally conservative: if model generation fails, the live radio path still works."
-- "The same data loop can later produce a digital village newspaper, but that is not claimed as implemented in this repository."
+- "The same data loop now produces a local digital village newspaper draft JSON, but the rendered product, public deployment, and mini-program are roadmap items."
 - "For the submission evidence: innovation is the voice-first workflow, rural fit is the village information scenario, technical difficulty is the local generation and fallback runtime, completion is the working CLI/status/audio path, and market fit is village governance plus local operations."
 
 ## Evidence Checklist
@@ -62,7 +64,7 @@ Use these dimensions to organize presentation material. Do not present them as o
 
 - Do not claim a complete 24-hour station is implemented.
 - Do not claim all three real data sources are fully automated.
-- Do not claim public deployment, mini-program listening, digital village newspaper, or video output is complete.
+- Do not claim public deployment, mini-program listening, rendered digital village newspaper product, or video output is complete.
 - Do not claim spatial computing or complex-systems simulation is implemented.
 - Do not claim ACE-Step 1.7B real generation is verified on this machine.
 - Do not present original group-chat text as directly broadcastable content.

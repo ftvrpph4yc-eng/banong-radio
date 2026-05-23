@@ -46,6 +46,10 @@ The preserved real-source adapter registry is intentionally explicit: `wechat_gr
 
 `RadioPlanner` converts a radio `TaskBrief` into a `BroadcastPlan` with runtime-compatible media segments, then the CLI can write that plan as a manifest. The runtime still enters through `start-demo --manifest`, so Mixer and Player continue to see only local audio segment paths and never upstream text-flow objects.
 
+## Generate multi-output text packs without touching audio runtime
+
+Daily reports, digital village newspaper drafts, and village notices are generated as a deterministic text output pack from the same `ContextPacket` / `TaskBrief` boundary used by Radio. This proves the multi-output product path without connecting real sources, changing Mixer / Player, or claiming a rendered public newspaper product.
+
 ## Integrate ACE-Step behind `MusicGenerator`
 
 ACE-Step must remain one music source implementation. Mixer, Player, status screen, and Hermes should not depend on ACE-Step details.

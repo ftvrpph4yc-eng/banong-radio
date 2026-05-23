@@ -65,6 +65,90 @@ class TaskBrief:
 
 
 @dataclass(frozen=True)
+class DailyReport:
+    """Daily text report generated from a task brief."""
+
+    report_id: str
+    title: str
+    date: str | None = None
+    place: str | None = None
+    sections: tuple[dict[str, Any], ...] = ()
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+    def to_mapping(self) -> dict[str, Any]:
+        return {
+            "id": self.report_id,
+            "title": self.title,
+            "date": self.date,
+            "place": self.place,
+            "sections": [dict(section) for section in self.sections],
+            "metadata": dict(self.metadata),
+        }
+
+
+@dataclass(frozen=True)
+class VillageNewspaper:
+    """Page-based village newspaper draft generated from a task brief."""
+
+    newspaper_id: str
+    title: str
+    pages: tuple[dict[str, Any], ...] = ()
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+    def to_mapping(self) -> dict[str, Any]:
+        return {
+            "id": self.newspaper_id,
+            "title": self.title,
+            "pages": [dict(page) for page in self.pages],
+            "metadata": dict(self.metadata),
+        }
+
+
+@dataclass(frozen=True)
+class VillageNotice:
+    """Short village notice generated from urgent or public-service signals."""
+
+    notice_id: str
+    title: str
+    body: str
+    urgency: str = "normal"
+    audience: tuple[str, ...] = ()
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+    def to_mapping(self) -> dict[str, Any]:
+        return {
+            "id": self.notice_id,
+            "title": self.title,
+            "body": self.body,
+            "urgency": self.urgency,
+            "audience": list(self.audience),
+            "metadata": dict(self.metadata),
+        }
+
+
+@dataclass(frozen=True)
+class TextOutputPack:
+    """Multi-output text pack derived from one shared context packet."""
+
+    pack_id: str
+    daily_report: DailyReport
+    village_newspaper: VillageNewspaper
+    notices: tuple[VillageNotice, ...] = ()
+    source: str = "task_brief"
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+    def to_mapping(self) -> dict[str, Any]:
+        return {
+            "id": self.pack_id,
+            "source": self.source,
+            "daily_report": self.daily_report.to_mapping(),
+            "village_newspaper": self.village_newspaper.to_mapping(),
+            "notices": [notice.to_mapping() for notice in self.notices],
+            "metadata": dict(self.metadata),
+        }
+
+
+@dataclass(frozen=True)
 class MediaSegment:
     """Reusable media segment for radio, web, or village newspaper outputs."""
 

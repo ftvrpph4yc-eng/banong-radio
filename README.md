@@ -12,8 +12,8 @@
 | --- | --- |
 | 面向谁 | 村两委、村书记、老人、新村民、离乡青年、文旅 / 农产品运营者 |
 | 解决什么 | 把分散的村务通知、社区动态、农忙和在地内容组织成低门槛可听输出 |
-| 当前能演示什么 | 从 `demo/demo_manifest.json` 准备 3 个电台段落，生成或复用音乐，生成中文 TTS，FFmpeg 混音，本地播放，并通过状态大屏观察；`demo/village_feed.json` 可生成 runtime 可消费的 demo feed manifest |
-| 当前不做什么 | 不接入真实微信群、天气 API、政府官网或口播转写；不实现完整 24 小时电台调度；不包含公网部署、小程序、数字村报或视频生成 |
+| 当前能演示什么 | 从 `demo/village_feed.json` 生成 runtime 可消费的电台 manifest，也可生成日报、数字村报草稿和村务通知组成的 text output pack；本地链路支持 TTS、音乐、FFmpeg 混音、播放和状态大屏 |
+| 当前不做什么 | 不接入真实微信群、天气 API、政府官网或口播转写；不实现完整 24 小时电台调度；不包含公网部署、小程序或视频生成 |
 | 技术边界 | Runtime 只消费确认后的播放计划；音乐来源只通过 `MusicGenerator`；Mixer / Player 只处理本地音频路径 |
 
 ## 已实现
@@ -22,6 +22,7 @@
 - 播放计划边界：`demo/demo_manifest.json` 会先转换为 `BroadcastPlan`，再进入本地音频运行时。
 - 文字信息流入口：`SourceAdapter` 协议、`DemoVillageFeedAdapter`、真实输入源 adapter registry 和 adapter stub；stub 默认未配置，不访问外部世界。
 - 文字处理链路：`RawTextItem -> SanitizedTextItem -> VillageSignal -> ContextPacket -> TaskBrief -> BroadcastPlan` 的最小确定性切片，不调用 LLM。
+- 多输出文本包：同一套 demo `ContextPacket` 可生成日报、数字村报草稿和村务通知 JSON，不触碰 Radio Runtime。
 - 音乐来源边界：`MusicRequest` / `MusicResult` / `MusicGenerator`，支持 fallback 与显式 ACE-Step API 来源。
 - fallback 安全链路：ACE-Step 不可用时仍可准备可播放 mp3。
 - 中文 TTS：优先 `edge-tts`，本机不可用时降级到 macOS `say`。
@@ -85,6 +86,14 @@ cd /Users/detroxryo/Dev/Sandbox/banong-radio
 BANONG_PY=/Users/detroxryo/.local/bin/python3.11
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-feed
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json
+```
+
+从同一份 synthetic village feed 生成日报、数字村报草稿和村务通知文本包：
+
+```bash
+cd /Users/detroxryo/Dev/Sandbox/banong-radio
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-outputs
 ```
 
 ## 验证

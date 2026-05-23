@@ -104,6 +104,23 @@ PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-feed
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json
 ```
 
+## Text Output Pack
+
+The same synthetic village feed can also produce text outputs without touching the audio runtime:
+
+```bash
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-outputs
+```
+
+This writes `/Users/detroxryo/.cache/banong-radio/demo_text_outputs.json` with:
+
+- a deterministic daily report
+- a page-based digital village newspaper draft
+- short village notices for urgent or public-service signals
+
+This is still a local text output pack. It is not a public deployment, mini-program, video product, or real-source automation.
+
 ## Verification
 
 The R-11 submission checklist lives in [Final Acceptance](final-acceptance.md). The commands below are the local verification gates behind that checklist.

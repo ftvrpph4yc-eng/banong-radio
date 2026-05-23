@@ -50,6 +50,12 @@ BANONG_PY=/Users/detroxryo/.local/bin/python3.11
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-feed
 ```
 
+Prepare the text output pack from the same context:
+
+```bash
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-outputs
+```
+
 Start the generated demo feed:
 
 ```bash
@@ -71,6 +77,7 @@ PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli stop
 Expected live evidence:
 
 - `plan-demo-feed` writes `/Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json`
+- `plan-demo-outputs` writes `/Users/detroxryo/.cache/banong-radio/demo_text_outputs.json`
 - `start-demo --manifest ...` reports `ok=true`
 - dashboard changes from idle to playing
 - status shows `playlist_total=5`
@@ -84,7 +91,7 @@ Expected live evidence:
 4. The radio runtime consumes only the final manifest, so upstream text flow stays separate from Mixer and Player.
 5. The live path uses TTS, music, FFmpeg mixing, local playback, and a read-only status screen.
 6. Fallback is intentional reliability, not a failed model path.
-7. Real WeChat group, weather API, government website, voice-source ingestion, public deployment, mini-program, digital newspaper, video, and full 24-hour scheduling are roadmap items. The source interfaces are preserved so approved sources can be connected later.
+7. Real WeChat group, weather API, government website, voice-source ingestion, public deployment, mini-program, rendered digital newspaper product, video, and full 24-hour scheduling are roadmap items. The source interfaces are preserved so approved sources can be connected later.
 
 ## Accepted Demo Quality
 

@@ -1,3 +1,6 @@
+import signal
+from pathlib import Path
+
 from banong_radio.runtime import (
     is_process_alive,
     ensure_fallback_assets,
@@ -224,3 +227,47 @@ def test_generated_demo_feed_manifest_enters_runtime_fallback(monkeypatch, tmp_p
     assert len(segments) == 5
     assert sorted({segment["music_source"] for segment in segments}) == ["fallback"]
     assert segments[0]["id"] == "radio-public-notice-001"
+
+
+def test_start_demo_returns_existing_process_without_rebuilding_assets(monkeypatch) -> None:
+    from banong_radio import runtime
+
+    monkeypatch.setattr(
+        runtime,
+        "read_status",
+        lambda: {"mode": "playing", "pid": 12345},
+    )
+    monkeypatch.setattr(runtime, "is_process_alive", lambda pid: pid == 12345)
+    monkeypatch.setattr(
+        runtime,
+        "ensure_playable_assets",
+        lambda manifest_path: (_ for _ in ()).throw(AssertionError("unexpected asset rebuild")),
+    )
+
+    result = runtime.start_demo(Path("demo/demo_manifest.json"))
+
+    assert result["ok"] is True
+    assert result["mode"] == "playing"
+    assert result["message"] == "radio loop already running"
+    assert result["pid"] == 12345
+
+
+def test_stop_demo_terminates_alive_process_and_writes_idle(monkeypatch) -> None:
+    from banong_radio import runtime
+
+    killed: list[tuple[int, int]] = []
+    written: list[dict[str, object]] = []
+
+    monkeypatch.setattr(runtime, "read_status", lambda: {"mode": "playing", "pid": 12345})
+    monkeypatch.setattr(runtime, "is_process_alive", lambda pid: pid == 12345)
+    monkeypatch.setattr(runtime.os, "kill", lambda pid, sig: killed.append((pid, sig)))
+    monkeypatch.setattr(runtime, "write_status", lambda **updates: written.append(updates) or updates)
+
+    result = runtime.stop_demo()
+
+    assert result["ok"] is True
+    assert result["mode"] == "idle"
+    assert result["stopped"] is True
+    assert killed == [(12345, signal.SIGTERM)]
+    assert written[0]["mode"] == "idle"
+    assert written[0]["pid"] is None

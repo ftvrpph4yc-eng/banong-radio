@@ -75,7 +75,7 @@ def test_docs_keep_required_boundary_caveats() -> None:
 
     assert "不接入真实微信群、天气 API、政府官网或口播转写" in readme
     assert "不实现完整 24 小时电台调度" in readme
-    assert "不包含公网部署、小程序、数字村报或视频生成" in readme
+    assert "不包含公网部署、小程序或视频生成" in readme
     assert "Do not claim 1.7B real generation" in operation
     assert "Do not claim:" in judge_submission
     assert "ACE-Step 1.7B real generation is verified" in judge_submission

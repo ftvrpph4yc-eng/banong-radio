@@ -26,6 +26,15 @@ demo/village_feed.json
   -> read-only status screen
 ```
 
+The same synthetic feed can also produce a local text output pack:
+
+```text
+ContextPacket
+  -> DailyReport
+  -> VillageNewspaper draft
+  -> VillageNotice list
+```
+
 Real-source interfaces are present as boundaries, but real private inputs are not connected in this repository.
 
 ## Demo Script
@@ -40,6 +49,7 @@ BANONG_PY=/Users/detroxryo/.local/bin/python3.11
 "$BANONG_PY" -m compileall -q src tests
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli preflight-ace
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-feed
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-outputs
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli status
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli stop
@@ -69,6 +79,7 @@ http://127.0.0.1:8765/
 | ACE-Step readiness evidence | `preflight-ace` returns `ok=true`; live demo still uses fallback by default |
 | Documentation boundary | docs do not claim real-source automation, public deployment, mini-program, digital newspaper, video, or verified 1.7B generation |
 | Demo feed planning | `plan-demo-feed` writes `/Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json` |
+| Text output planning | `plan-demo-outputs` writes `/Users/detroxryo/.cache/banong-radio/demo_text_outputs.json` |
 | Runtime fallback | generated demo feed manifest can enter `ensure_playable_assets` and produce fallback-playable segments |
 | CLI status | `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli status` returns `ok=true` |
 | Manual listening | local playback is audible, understandable, and can be stopped cleanly |
@@ -90,16 +101,16 @@ Manual listening is intentionally separate from automated tests because the fina
 
 Use these exact claim states:
 
-- Implemented: local CLI, demo feed planning, `BroadcastPlan` manifest handoff, TTS, FFmpeg mix, playback, fallback, status JSON, status dashboard, docs and tests.
+- Implemented: local CLI, demo feed planning, text output pack planning, `BroadcastPlan` manifest handoff, TTS, FFmpeg mix, playback, fallback, status JSON, status dashboard, docs and tests.
 - Demonstrable: synthetic village feed to playable local radio loop through the fallback-safe runtime.
 - Preserved interface: WeChat group, weather API, government website, voice transcript, and community source adapter boundaries.
-- Roadmap: real private data ingestion, full daily scheduling, public deployment, mini-program, digital village newspaper, and video output.
+- Roadmap: real private data ingestion, full daily scheduling, public deployment, mini-program, rendered digital village newspaper product, and video output.
 
 ## Do Not Claim
 
 - Do not claim real WeChat group, weather API, government website, or voice-source ingestion is connected.
 - Do not claim a complete 24-hour station is implemented.
-- Do not claim public deployment, mini-program listening, digital village newspaper, or video generation is complete.
+- Do not claim public deployment, mini-program listening, rendered digital village newspaper product, or video generation is complete.
 - Do not claim ACE-Step 1.7B real generation is verified on this machine.
 - Do not present synthetic fixture data as real village data.
 - Do not commit generated audio, model weights, cache, logs, secrets, or private source material.

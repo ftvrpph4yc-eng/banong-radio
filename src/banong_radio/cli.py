@@ -22,6 +22,10 @@ from banong_radio.text_flow import (
     build_demo_feed_broadcast_plan,
     write_broadcast_plan_manifest,
 )
+from banong_radio.text_outputs import (
+    build_demo_feed_text_output_pack,
+    write_text_output_pack,
+)
 
 
 class CliUsageError(Exception):
@@ -75,6 +79,18 @@ def main() -> None:
     plan_feed.add_argument("--date", default="")
     plan_feed.add_argument("--place", default="剪鸭村")
 
+    plan_outputs = sub.add_parser(
+        "plan-demo-outputs",
+        help="Generate daily report, newspaper draft, and notices from the synthetic village feed.",
+    )
+    plan_outputs.add_argument("--feed", default=str(PROJECT_ROOT / "demo/village_feed.json"))
+    plan_outputs.add_argument(
+        "--output",
+        default=str(CACHE_ROOT / "demo_text_outputs.json"),
+    )
+    plan_outputs.add_argument("--date", default="")
+    plan_outputs.add_argument("--place", default="剪鸭村")
+
     try:
         args = parser.parse_args()
         if args.command == "start-demo":
@@ -103,6 +119,22 @@ def main() -> None:
                 "plan_id": plan.plan_id,
                 "source": plan.source,
                 "segments": len(plan.segments),
+            }
+        elif args.command == "plan-demo-outputs":
+            pack = build_demo_feed_text_output_pack(
+                Path(args.feed),
+                date=args.date or None,
+                place=args.place or None,
+            )
+            output_path = write_text_output_pack(pack, Path(args.output))
+            result = {
+                "ok": True,
+                "output_path": str(output_path),
+                "pack_id": pack.pack_id,
+                "source": pack.source,
+                "daily_sections": len(pack.daily_report.sections),
+                "newspaper_pages": len(pack.village_newspaper.pages),
+                "notices": len(pack.notices),
             }
         else:
             parser.error(f"unknown command: {args.command}")

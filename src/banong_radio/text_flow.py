@@ -46,6 +46,7 @@ TASK_INTENTS = {
     "daily": "prepare a daily summary task brief from sanitized village signals",
     "newspaper": "prepare a village newspaper task brief from sanitized village signals",
     "alert": "prepare an alert task brief from sanitized village signals",
+    "governance": "prepare a governance task brief from sanitized village signals",
 }
 DEFAULT_FALLBACK_ROOT = Path("/Users/detroxryo/Music/BanongRadio/fallback")
 DEFAULT_SEGMENT_DURATION = 18

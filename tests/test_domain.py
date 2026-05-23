@@ -3,10 +3,14 @@ from pathlib import Path
 from banong_radio.domain import (
     BroadcastPlan,
     ContextPacket,
+    DailyReport,
     MediaSegment,
     RawTextItem,
     SanitizedTextItem,
     TaskBrief,
+    TextOutputPack,
+    VillageNewspaper,
+    VillageNotice,
     VillageSignal,
 )
 
@@ -116,3 +120,35 @@ def test_text_flow_domain_objects_are_separate_from_radio_runtime() -> None:
     assert sanitized.metadata["privacy"] == "demo"
     assert packet.signals[0].title == "天气提醒"
     assert brief.task == "radio"
+
+
+def test_text_output_domain_objects_map_to_json_shapes() -> None:
+    report = DailyReport(
+        report_id="daily:demo",
+        title="剪鸭村日报",
+        sections=({"title": "村务", "summary": "道路提醒"},),
+    )
+    newspaper = VillageNewspaper(
+        newspaper_id="newspaper:demo",
+        title="剪鸭村数字村报",
+        pages=({"title": "封面", "items": []},),
+    )
+    notice = VillageNotice(
+        notice_id="notice:demo",
+        title="道路提醒",
+        body="请绕行。",
+        urgency="high",
+        audience=("villagers",),
+    )
+    pack = TextOutputPack(
+        pack_id="outputs:demo",
+        daily_report=report,
+        village_newspaper=newspaper,
+        notices=(notice,),
+    )
+
+    payload = pack.to_mapping()
+
+    assert payload["daily_report"]["sections"][0]["title"] == "村务"
+    assert payload["village_newspaper"]["pages"][0]["title"] == "封面"
+    assert payload["notices"][0]["audience"] == ["villagers"]

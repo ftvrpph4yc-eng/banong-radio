@@ -39,6 +39,34 @@ def test_cli_plan_demo_feed_writes_manifest(monkeypatch, capsys, tmp_path) -> No
     assert output.exists()
 
 
+def test_cli_plan_demo_outputs_writes_output_pack(monkeypatch, capsys, tmp_path) -> None:
+    output = tmp_path / "outputs.json"
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "banong-radio",
+            "plan-demo-outputs",
+            "--feed",
+            "demo/village_feed.json",
+            "--output",
+            str(output),
+            "--date",
+            "2026-05-23",
+        ],
+    )
+
+    cli.main()
+
+    parsed = json.loads(capsys.readouterr().out)
+    assert parsed["ok"] is True
+    assert parsed["output_path"] == str(output)
+    assert parsed["source"] == "task_brief"
+    assert parsed["daily_sections"] == 5
+    assert parsed["newspaper_pages"] >= 3
+    assert parsed["notices"] >= 2
+    assert output.exists()
+
+
 def test_cli_missing_required_argument_prints_json(monkeypatch, capsys) -> None:
     monkeypatch.setattr("sys.argv", ["banong-radio", "generate-segment"])
 
