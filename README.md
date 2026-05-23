@@ -41,16 +41,18 @@
 
 ```bash
 cd /Users/detroxryo/Dev/Sandbox/banong-radio
-PYTHONPATH=src python3 -m banong_radio.cli status
-PYTHONPATH=src python3 -m banong_radio.cli start-demo
-PYTHONPATH=src python3 -m banong_radio.cli stop
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli status
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli stop
 ```
 
 启动只读状态大屏：
 
 ```bash
 cd /Users/detroxryo/Dev/Sandbox/banong-radio
-PYTHONPATH=src python3 -m banong_radio.cli serve-status
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli serve-status
 ```
 
 浏览器打开：
@@ -63,51 +65,60 @@ http://127.0.0.1:8765/
 
 ```bash
 cd /Users/detroxryo/Dev/Sandbox/banong-radio
-PYTHONPATH=src /Users/detroxryo/.local/bin/python3.11 -m banong_radio.cli preflight-ace
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli preflight-ace
 ```
 
 显式启用 ACE-Step 音乐来源前，需要先启动官方 API。否则运行时会记录 fallback reason 并继续使用本地音频：
 
 ```bash
-BANONG_MUSIC_SOURCE=ace-step PYTHONPATH=src /Users/detroxryo/.local/bin/python3.11 -m banong_radio.cli start-demo
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+BANONG_MUSIC_SOURCE=ace-step PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo
 ```
 
 从 synthetic village feed 生成 runtime manifest：
 
 ```bash
 cd /Users/detroxryo/Dev/Sandbox/banong-radio
-PYTHONPATH=src python3 -m banong_radio.cli plan-demo-feed
-PYTHONPATH=src python3 -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-feed
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json
 ```
 
 ## 验证
 
-基础语法验证：
+最终提交验收使用 Python 3.10+。本机系统 `python3` 是 3.9，提交前请显式使用 `/Users/detroxryo/.local/bin/python3.11`：
 
 ```bash
 cd /Users/detroxryo/Dev/Sandbox/banong-radio
-python3 -m compileall -q src tests
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+"$BANONG_PY" -m compileall -q src tests
 ```
 
 如果安装了 `pytest`：
 
 ```bash
 cd /Users/detroxryo/Dev/Sandbox/banong-radio
-PYTHONPATH=src python3 -m pytest
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m pytest
 ```
 
-如需补齐完整测试依赖，可在可联网环境安装测试 extra：
+如需补齐完整测试依赖，可在可联网环境创建本地 `.venv` 并安装测试 extra。`.venv/` 已被 `.gitignore` 忽略：
 
 ```bash
 cd /Users/detroxryo/Dev/Sandbox/banong-radio
-python3 -m pip install -e ".[test]"
+/Users/detroxryo/.local/bin/python3.11 -m venv .venv
+. .venv/bin/activate
+python -m pip install -e ".[test]"
+PYTHONPATH=src python -m pytest
 ```
 
 当前提交验收不因本机缺少 `pytest` 阻塞。没有 `pytest` 时，至少运行 `compileall`、文档边界检查和直接断言验证 fallback asset preparation：
 
 ```bash
 cd /Users/detroxryo/Dev/Sandbox/banong-radio
-PYTHONPATH=src python3 - <<'PY'
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" - <<'PY'
 from pathlib import Path
 from banong_radio.runtime import ensure_playable_assets
 segments = ensure_playable_assets(Path('demo/demo_manifest.json'))
@@ -123,7 +134,8 @@ PY
 
 ```bash
 cd /Users/detroxryo/Dev/Sandbox/banong-radio
-python3 - <<'PY'
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+"$BANONG_PY" - <<'PY'
 import runpy
 ns = runpy.run_path('tests/test_docs.py')
 for name in [

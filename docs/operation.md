@@ -18,9 +18,10 @@ This document describes the local runtime path used by the 剪鸭村融媒体 ra
 Run from the repository root:
 
 ```bash
-PYTHONPATH=src python3 -m banong_radio.cli status
-PYTHONPATH=src python3 -m banong_radio.cli start-demo
-PYTHONPATH=src python3 -m banong_radio.cli stop
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli status
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli stop
 ```
 
 `start-demo` is retained as the existing CLI name. In product language it starts the local presentation radio loop.
@@ -28,13 +29,15 @@ PYTHONPATH=src python3 -m banong_radio.cli stop
 Queue a requested segment from Hermes or a local operator:
 
 ```bash
-PYTHONPATH=src python3 -m banong_radio.cli generate-segment --mood "四坪夜晚" --source "群聊吐槽日报"
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli generate-segment --mood "四坪夜晚" --source "群聊吐槽日报"
 ```
 
 Serve the read-only status screen:
 
 ```bash
-PYTHONPATH=src python3 -m banong_radio.cli serve-status
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli serve-status
 ```
 
 Open:
@@ -48,7 +51,8 @@ http://127.0.0.1:8765/
 Use Python 3.10+ for ACE-Step and future Agents SDK work. On this machine, use:
 
 ```bash
-PYTHONPATH=src /Users/detroxryo/.local/bin/python3.11 -m banong_radio.cli preflight-ace
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli preflight-ace
 ```
 
 The preflight command must remain non-generating. It checks Python, CLI launchers, packages, independent checkout state, and model cache evidence. It does not download checkpoints, start model inference, or alter Mixer / Player behavior.
@@ -58,7 +62,8 @@ The preflight command must remain non-generating. It checks Python, CLI launcher
 The default source is fallback. ACE-Step is opt-in:
 
 ```bash
-BANONG_MUSIC_SOURCE=ace-step PYTHONPATH=src /Users/detroxryo/.local/bin/python3.11 -m banong_radio.cli start-demo
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+BANONG_MUSIC_SOURCE=ace-step PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo
 ```
 
 If the official ACE-Step API is unavailable, times out, returns no audio, or downloads an empty file, runtime preparation falls back to local audio and records `fallback_reason=ace-step-error`.
@@ -94,43 +99,53 @@ The deterministic text-flow chain can turn the demo feed into `RawTextItem -> Sa
 `plan-demo-feed` writes the generated `BroadcastPlan` as a manifest so the existing runtime can load it through the same `start-demo --manifest` path:
 
 ```bash
-PYTHONPATH=src python3 -m banong_radio.cli plan-demo-feed
-PYTHONPATH=src python3 -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-feed
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json
 ```
 
 ## Verification
 
 The R-11 submission checklist lives in [Final Acceptance](final-acceptance.md). The commands below are the local verification gates behind that checklist.
 
+Use Python 3.10+ for final readiness checks. On this machine, use:
+
+```bash
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+```
+
 Compile:
 
 ```bash
-python3 -m compileall -q src tests
+"$BANONG_PY" -m compileall -q src tests
 ```
 
 Run tests if available:
 
 ```bash
-PYTHONPATH=src python3 -m pytest
+PYTHONPATH=src "$BANONG_PY" -m pytest
 ```
 
-Install the optional test dependency only when a full local test run is needed:
+Install the optional test dependency only when a full local test run is needed. `.venv/` is ignored by Git:
 
 ```bash
-python3 -m pip install -e ".[test]"
+"$BANONG_PY" -m venv .venv
+. .venv/bin/activate
+python -m pip install -e ".[test]"
+PYTHONPATH=src python -m pytest
 ```
 
 For submission prep on a machine without `pytest`, do not change runtime code just to satisfy the missing tool. The minimum acceptable verification is:
 
-1. `python3 -m compileall -q src tests`
+1. `"$BANONG_PY" -m compileall -q src tests`
 2. the direct documentation-boundary check below
 3. the direct fallback assertion below
-4. `PYTHONPATH=src python3 -m banong_radio.cli status`
+4. `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli status`
 
 Direct documentation-boundary check when `pytest` is unavailable:
 
 ```bash
-python3 - <<'PY'
+"$BANONG_PY" - <<'PY'
 import runpy
 ns = runpy.run_path('tests/test_docs.py')
 for name in [
@@ -146,7 +161,7 @@ PY
 Direct fallback assertion when `pytest` is unavailable:
 
 ```bash
-PYTHONPATH=src python3 - <<'PY'
+PYTHONPATH=src "$BANONG_PY" - <<'PY'
 from pathlib import Path
 from banong_radio.runtime import ensure_playable_assets
 segments = ensure_playable_assets(Path('demo/demo_manifest.json'))
@@ -159,7 +174,7 @@ PY
 Status endpoint smoke test:
 
 ```bash
-PYTHONPATH=src python3 -m banong_radio.cli serve-status
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli serve-status
 curl -fsS http://127.0.0.1:8765/status.json
 ```
 

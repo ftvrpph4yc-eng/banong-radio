@@ -36,18 +36,21 @@ Run from the repository root:
 
 ```bash
 cd /Users/detroxryo/Dev/Sandbox/banong-radio
-python3 -m compileall -q src tests
-PYTHONPATH=src python3 -m banong_radio.cli plan-demo-feed
-PYTHONPATH=src python3 -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json
-PYTHONPATH=src python3 -m banong_radio.cli status
-PYTHONPATH=src python3 -m banong_radio.cli stop
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+"$BANONG_PY" -m compileall -q src tests
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli preflight-ace
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-feed
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli status
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli stop
 ```
 
 For the read-only dashboard:
 
 ```bash
 cd /Users/detroxryo/Dev/Sandbox/banong-radio
-PYTHONPATH=src python3 -m banong_radio.cli serve-status
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli serve-status
 ```
 
 Open:
@@ -61,11 +64,13 @@ http://127.0.0.1:8765/
 | Check | Expected result |
 | --- | --- |
 | Repository baseline | `main` and `origin/main` point to the submitted commit |
-| Syntax gate | `python3 -m compileall -q src tests` passes |
+| Interpreter gate | `/Users/detroxryo/.local/bin/python3.11 --version` returns Python 3.10+ |
+| Syntax gate | `"$BANONG_PY" -m compileall -q src tests` passes |
+| ACE-Step readiness evidence | `preflight-ace` returns `ok=true`; live demo still uses fallback by default |
 | Documentation boundary | docs do not claim real-source automation, public deployment, mini-program, digital newspaper, video, or verified 1.7B generation |
 | Demo feed planning | `plan-demo-feed` writes `/Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json` |
 | Runtime fallback | generated demo feed manifest can enter `ensure_playable_assets` and produce fallback-playable segments |
-| CLI status | `PYTHONPATH=src python3 -m banong_radio.cli status` returns `ok=true` |
+| CLI status | `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli status` returns `ok=true` |
 | Manual listening | local playback is audible, understandable, and can be stopped cleanly |
 | Status screen | `serve-status` exposes `/status.json` and the HTML dashboard reads it |
 

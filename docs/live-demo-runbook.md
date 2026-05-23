@@ -10,7 +10,9 @@ Confirm the repository state:
 cd /Users/detroxryo/Dev/Sandbox/banong-radio
 git status --short --branch
 git log --oneline -3
-python3 -m compileall -q src tests
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+"$BANONG_PY" -m compileall -q src tests
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli preflight-ace
 ```
 
 Expected:
@@ -18,6 +20,7 @@ Expected:
 - working tree is clean
 - `main` is aligned with `origin/main`
 - compile gate passes
+- `preflight-ace` reports `ok=true`; ACE-Step remains evidence only, not the default live source
 
 ## Terminal 1: Status Screen
 
@@ -25,7 +28,8 @@ Start the read-only dashboard:
 
 ```bash
 cd /Users/detroxryo/Dev/Sandbox/banong-radio
-PYTHONPATH=src python3 -m banong_radio.cli serve-status
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli serve-status
 ```
 
 Open:
@@ -42,25 +46,26 @@ Prepare the synthetic village feed as the runtime manifest:
 
 ```bash
 cd /Users/detroxryo/Dev/Sandbox/banong-radio
-PYTHONPATH=src python3 -m banong_radio.cli plan-demo-feed
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-feed
 ```
 
 Start the generated demo feed:
 
 ```bash
-PYTHONPATH=src python3 -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json
 ```
 
 Check state:
 
 ```bash
-PYTHONPATH=src python3 -m banong_radio.cli status
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli status
 ```
 
 Stop playback:
 
 ```bash
-PYTHONPATH=src python3 -m banong_radio.cli stop
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli stop
 ```
 
 Expected live evidence:
@@ -91,19 +96,20 @@ If the generated demo feed path is interrupted, use the static manifest:
 
 ```bash
 cd /Users/detroxryo/Dev/Sandbox/banong-radio
-PYTHONPATH=src python3 -m banong_radio.cli start-demo --manifest demo/demo_manifest.json
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo --manifest demo/demo_manifest.json
 ```
 
 If the dashboard is unavailable, continue with:
 
 ```bash
-PYTHONPATH=src python3 -m banong_radio.cli status
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli status
 ```
 
 If playback must stop immediately:
 
 ```bash
-PYTHONPATH=src python3 -m banong_radio.cli stop
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli stop
 ```
 
 Do not debug real-source adapters, ACE-Step model downloads, public deployment, or new output products during the live demo.

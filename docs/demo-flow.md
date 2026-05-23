@@ -30,8 +30,9 @@ The event asks for AI empowerment of village economies beyond basic informatizat
 
 ## Live Evidence
 
-- Generate the demo feed manifest with `PYTHONPATH=src python3 -m banong_radio.cli plan-demo-feed`.
-- Start the local radio loop with `PYTHONPATH=src python3 -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json`.
+- Set `BANONG_PY=/Users/detroxryo/.local/bin/python3.11` for final verification and live commands on this machine.
+- Generate the demo feed manifest with `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-feed`.
+- Start the local radio loop with `PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-demo --manifest /Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json`.
 - Show status JSON through the status screen.
 - Show how a mood/source command updates requested fields.
 - Mention that audio generation is isolated behind `MusicGenerator`.
