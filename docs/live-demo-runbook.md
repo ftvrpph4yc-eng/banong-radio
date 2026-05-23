@@ -51,6 +51,15 @@ PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-broadcast --preset trailer_
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli render-program --preset trailer_45s
 ```
 
+Optional schedule proof for the 12-hour MVP day:
+
+```bash
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-daily-schedule --date 2026-05-24
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli render-daily-schedule --date 2026-05-24
+```
+
+This proves the `daily_12h` program clock and preview manifest. It does not generate twelve hours of audio.
+
 Start the generated broadcast:
 
 ```bash
@@ -95,6 +104,8 @@ Expected live evidence:
 
 - `plan-broadcast` writes `/Users/detroxryo/.cache/banong-radio/broadcast_manifest.json`
 - `render-program --preset trailer_45s` reports playable segments
+- `plan-daily-schedule` reports 19 slots and total duration 43200 when schedule proof is shown
+- `render-daily-schedule` reports 3 playable preview segments when schedule proof is shown
 - `plan-demo-feed` writes `/Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json`
 - `plan-demo-outputs` writes `/Users/detroxryo/.cache/banong-radio/demo_text_outputs.json`
 - `start-broadcast --manifest ...` reports `ok=true`

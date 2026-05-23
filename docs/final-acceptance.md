@@ -51,6 +51,8 @@ BANONG_PY=/Users/detroxryo/.local/bin/python3.11
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli preflight-ace
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-broadcast --preset trailer_45s
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli render-program --preset trailer_45s
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-daily-schedule --date 2026-05-24
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli render-daily-schedule --date 2026-05-24
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-outputs
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli start-broadcast --manifest /Users/detroxryo/.cache/banong-radio/broadcast_manifest.json
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli status
@@ -81,6 +83,7 @@ http://127.0.0.1:8765/
 | ACE-Step readiness evidence | `preflight-ace` returns `ok=true`; live demo still uses fallback by default |
 | Product broadcast planning | `plan-broadcast` writes `/Users/detroxryo/.cache/banong-radio/broadcast_manifest.json` |
 | Program rendering | `render-program --preset trailer_45s` prepares playable assets from the variable program layer |
+| Daily schedule proof | `plan-daily-schedule` writes a 07:00-19:00, 19-slot `daily_12h` schedule; `render-daily-schedule` prepares only preview assets |
 | Documentation boundary | docs do not claim real-source automation, public deployment, mini-program, digital newspaper, video, or verified 1.7B generation |
 | Demo feed planning | `plan-demo-feed` writes `/Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json` |
 | Text output planning | `plan-demo-outputs` writes `/Users/detroxryo/.cache/banong-radio/demo_text_outputs.json` |
@@ -105,10 +108,10 @@ Manual listening is intentionally separate from automated tests because the fina
 
 Use these exact claim states:
 
-- Implemented: local CLI, variable `BroadcastProgram` presets, OpenAI Agents SDK opt-in workflow, demo feed planning, text output pack planning, `BroadcastPlan` manifest handoff, TTS, FFmpeg mix, playback, fallback, status JSON, status dashboard, docs and tests.
-- Demonstrable: synthetic village feed to playable local radio loop through the fallback-safe runtime.
+- Implemented: local CLI, variable `BroadcastProgram` presets, `daily_12h` schedule preset, OpenAI Agents SDK opt-in workflow, demo feed planning, text output pack planning, `BroadcastPlan` manifest handoff, TTS, FFmpeg mix, playback, fallback, status JSON, status dashboard, docs and tests.
+- Demonstrable: synthetic village feed to playable local radio loop through the fallback-safe runtime; `daily_12h` schedule JSON plus a 3-segment preview manifest.
 - Preserved interface: WeChat group, weather API, government website, voice transcript, and community source adapter boundaries.
-- Roadmap: real private data ingestion, full daily scheduling, public deployment, mini-program, rendered digital village newspaper product, and video output.
+- Roadmap: real private data ingestion, production-grade daily automation, complete 24-hour station scheduling, public deployment, mini-program, rendered digital village newspaper product, and video output.
 
 ## Do Not Claim
 

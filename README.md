@@ -4,7 +4,28 @@
 
 对外项目名是“剪鸭村融媒体”。代码包名和 CLI 暂保留 `banong_radio` / `banong-radio`，避免破坏已经稳定的运行入口。
 
-评委或现场演示请先读 [Judge Submission Pack](docs/judge-submission.md)，再按 [Live Demo Runbook](docs/live-demo-runbook.md) 操作。
+评委或现场演示请先读 [Judge Submission Pack](docs/judge-submission.md)，再按 [Live Demo Runbook](docs/live-demo-runbook.md) 操作。想快速确认工程状态时，先跑 [Verification](#验证) 里的命令。
+
+## 快速评估入口
+
+| 入口 | 用途 |
+| --- | --- |
+| [Judge Submission Pack](docs/judge-submission.md) | 一页看懂参赛主张、演示路径、证据和边界 |
+| [Live Demo Runbook](docs/live-demo-runbook.md) | 两个终端完成状态大屏和本地播放演示 |
+| [Final Acceptance](docs/final-acceptance.md) | 提交前验收清单和不能夸大的说法 |
+| [Architecture](docs/architecture.md) | 数据边界、音频边界、Agents SDK 边界 |
+
+```bash
+cd /Users/detroxryo/Dev/Sandbox/banong-radio
+BANONG_PY=/Users/detroxryo/.local/bin/python3.11
+"$BANONG_PY" -m venv .venv
+. .venv/bin/activate
+python -m pip install -e ".[test]"
+python -m compileall -q src tests
+PYTHONPATH=src python -m pytest
+PYTHONPATH=src python -m banong_radio.cli plan-broadcast --preset trailer_45s
+PYTHONPATH=src python -m banong_radio.cli render-daily-schedule --date 2026-05-24
+```
 
 ## 1 分钟理解
 
@@ -32,6 +53,17 @@
 - FFmpeg 混音：音乐底、中文串词、fade、ducking、amix、limiter。
 - 只读状态大屏：本地 HTTP 页面轮询 `/status.json`。
 - ACE-Step preflight：只检查环境，不下载模型、不生成音频。
+
+## 仓库结构
+
+| 路径 | 内容 |
+| --- | --- |
+| `src/banong_radio/` | CLI、文字信息流、节目编排、日播节目单、TTS、音乐来源、混音、播放器和状态服务 |
+| `demo/` | 可提交的 synthetic village feed 和静态 fallback manifest |
+| `web/status_screen.html` | 只读状态大屏 |
+| `docs/` | 架构、运行、评委提交包、现场 runbook、最终验收和设计决策 |
+| `tests/` | 单元测试、文档边界测试、CLI/运行时/schedule 验证 |
+| `.github/workflows/ci.yml` | GitHub Actions 上的 compile/test gate |
 
 ## 当前边界
 

@@ -4,7 +4,7 @@ This page is the fastest path for a judge or teammate to evaluate 剪鸭村融�
 
 ## One-line Claim
 
-剪鸭村融媒体 turns structured village information into local media outputs. This repository proves the first runnable product line: a fallback-safe local AI broadcast runtime with variable program presets, a synthetic village feed, text-flow boundaries, an opt-in OpenAI Agents SDK manager workflow, Chinese TTS, music, FFmpeg mixing, playback, tests, a read-only status screen, and a deterministic text output pack for daily report, village newspaper draft, and notices.
+剪鸭村融媒体 turns structured village information into local media outputs. This repository proves the first runnable product line: a fallback-safe local AI broadcast runtime with variable program presets, a 07:00-19:00 schedule preset, a synthetic village feed, text-flow boundaries, an opt-in OpenAI Agents SDK manager workflow, Chinese TTS, music, FFmpeg mixing, playback, tests, a read-only status screen, and a deterministic text output pack for daily report, village newspaper draft, and notices.
 
 ## Why It Should Stand Out
 
@@ -13,7 +13,7 @@ This page is the fastest path for a judge or teammate to evaluate 剪鸭村融�
 | Innovation | Voice-first village media workflow, not another app or notice board |
 | Rural fit | Sound matches elders, broadcasts, local opera habits, farming routines, and low-friction village communication |
 | Technical quality | `SourceAdapter -> Sanitizer -> SignalExtractor -> ContextBuilder -> TaskPlanner -> BroadcastProgram -> BroadcastPlan`, plus SDK-style handoff contracts, then TTS/music/mix/playback/status for radio |
-| Completion | Runnable CLI, variable broadcast manifest, generated feed manifest, text output pack, local playback, dashboard, fallback, tests, and documented acceptance commands |
+| Completion | Runnable CLI, variable broadcast manifest, `daily_12h` schedule JSON, generated feed manifest, text output pack, local playback, dashboard, fallback, tests, GitHub Actions compile/test workflow, and documented acceptance commands |
 | Market fit | Useful for village committees, residents, new villagers, returning youth, tourism, agricultural products, and local operations |
 
 These dimensions organize submission material. Do not present them as official scoring weights unless final official rules are available.
@@ -65,6 +65,8 @@ Expected evidence:
 - `plan-demo-feed` writes `/Users/detroxryo/.cache/banong-radio/demo_feed_manifest.json`
 - `plan-broadcast` writes `/Users/detroxryo/.cache/banong-radio/broadcast_manifest.json`
 - `render-program --preset trailer_45s` prepares playable assets from the variable program layer
+- `plan-daily-schedule` writes a 19-slot, 12-hour `daily_12h` schedule
+- `render-daily-schedule` prepares 3 representative preview segments without generating 12 hours of audio
 - `plan-demo-outputs` writes `/Users/detroxryo/.cache/banong-radio/demo_text_outputs.json`
 - playback reports `ok=true`
 - product broadcast status shows `playlist_total=1`; compatibility demo feed still has 5 source-derived segments
@@ -80,6 +82,8 @@ BANONG_PY=/Users/detroxryo/.local/bin/python3.11
 PYTHONPATH=src .venv/bin/python -m pytest
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli preflight-ace
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-broadcast --preset trailer_45s
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-daily-schedule --date 2026-05-24
+PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli render-daily-schedule --date 2026-05-24
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-feed
 PYTHONPATH=src "$BANONG_PY" -m banong_radio.cli plan-demo-outputs
 ```
@@ -108,6 +112,7 @@ Implemented here:
 
 - local CLI
 - variable `BroadcastProgram` presets
+- `daily_12h` 07:00-19:00 schedule preset and 3-segment preview manifest
 - OpenAI Agents SDK manager workflow and role/handoff contracts
 - demo feed planning
 - `BroadcastPlan` manifest handoff

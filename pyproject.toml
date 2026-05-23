@@ -1,7 +1,7 @@
 [project]
 name = "banong-radio"
 version = "0.1.0"
-description = "Local AI radio runtime for Jianya Village Media."
+description = "Fallback-safe local AI radio runtime for village media."
 requires-python = ">=3.10"
 dependencies = ["openai-agents>=0.14.0"]
 
