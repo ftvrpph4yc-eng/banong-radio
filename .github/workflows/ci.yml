@@ -20,6 +20,12 @@ jobs:
       - name: Install system audio tools
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
+      - name: Prepare local runtime directories
+        run: |
+          sudo mkdir -p /Users/detroxryo/Music/BanongRadio
+          sudo mkdir -p /Users/detroxryo/.cache/banong-radio
+          sudo chown -R "$USER:$USER" /Users/detroxryo
+
       - name: Install package and test dependencies
         run: python -m pip install -e ".[test]"
 
