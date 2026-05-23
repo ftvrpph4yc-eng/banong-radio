@@ -31,7 +31,7 @@
 
 - 当前版本用 manifest 代表已确认输入，不读取原始聊天记录、天气 API、政府网页或口播原文。
 - `banong_radio.domain` 已提供 `RawTextItem`、`SanitizedTextItem`、`VillageSignal`、`ContextPacket`、`TaskBrief`、`BroadcastPlan` 等上游文字信息流数据边界；`banong_radio.text_flow` 已实现 demo feed adapter、sanitizer、signal extractor、context builder、task planner 和 radio planner，但真实 SourceAdapter 尚未接入。
-- ACE-Step 单段 smoke 文件已经技术验证为非静音音频，但还需要人工听感确认。
+- 当前 demo 的 TTS 与音乐听感已在 2026-05-23 由用户人工确认通过；ACE-Step 1.7B 真实生成仍不在已验证范围内。
 - 本机官方 API 曾把请求的 `acestep-5Hz-lm-1.7B` 自动降级为 `acestep-5Hz-lm-0.6B`；不要把当前结果宣传为 1.7B 已真实生成验证。
 - 本仓库不保存音频资产、模型权重、cache、日志或密钥。
 
@@ -142,6 +142,7 @@ PY
 - [Operation](docs/operation.md)
 - [Presentation Flow](docs/demo-flow.md)
 - [Final Acceptance](docs/final-acceptance.md)
+- [Live Demo Runbook](docs/live-demo-runbook.md)
 - [Decisions](docs/decisions.md)
 
 内部 Obsidian 项目脑：

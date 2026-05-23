@@ -8,6 +8,7 @@ DOC_PATHS = [
     Path("docs/operation.md"),
     Path("docs/demo-flow.md"),
     Path("docs/final-acceptance.md"),
+    Path("docs/live-demo-runbook.md"),
     Path("docs/decisions.md"),
 ]
 
@@ -67,6 +68,7 @@ def test_docs_keep_required_boundary_caveats() -> None:
     operation = Path("docs/operation.md").read_text()
     demo_flow = Path("docs/demo-flow.md").read_text()
     final_acceptance = Path("docs/final-acceptance.md").read_text()
+    live_demo_runbook = Path("docs/live-demo-runbook.md").read_text()
     decisions = Path("docs/decisions.md").read_text()
 
     assert "不接入真实微信群、天气 API、政府官网或口播转写" in readme
@@ -76,6 +78,7 @@ def test_docs_keep_required_boundary_caveats() -> None:
     assert "Do not claim ACE-Step 1.7B real generation is verified" in demo_flow
     assert "Do not claim ACE-Step 1.7B real generation is verified" in final_acceptance
     assert "Do not claim real WeChat group, weather API, government website, or voice-source ingestion is connected" in final_acceptance
+    assert "This does not verify ACE-Step 1.7B real generation" in live_demo_runbook
     assert "automatic downgrade to `acestep-5Hz-lm-0.6B`" in decisions
 
 

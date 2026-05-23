@@ -30,6 +30,8 @@ Real-source interfaces are present as boundaries, but real private inputs are no
 
 ## Demo Script
 
+For the exact two-terminal operator flow, use [Live Demo Runbook](live-demo-runbook.md).
+
 Run from the repository root:
 
 ```bash
@@ -77,7 +79,7 @@ Before presenting, run one local playback loop and confirm:
 - the dashboard changes match the current runtime state
 - if ACE-Step is disabled or unavailable, fallback still keeps the demo moving
 
-Manual listening is intentionally separate from automated tests because the final acceptance standard includes presentation quality, not only file generation.
+Manual listening is intentionally separate from automated tests because the final acceptance standard includes presentation quality, not only file generation. The current demo TTS and music listening quality was manually accepted on 2026-05-23.
 
 ## Evidence Language
 
