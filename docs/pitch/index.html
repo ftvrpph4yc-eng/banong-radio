@@ -3,62 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>用声音缝合乡村的裂缝</title>
+  <title>剪鸭村融媒体 · Banong Radio 路演</title>
   <meta
     name="description"
-    content="屏南乡建黑客松路演稿，可横屏全屏播放的翻页式演示文稿。"
+    content="剪鸭村融媒体 / Banong Radio 路演网页展示：乡村 AI 电台、村报与融媒体基础设施。"
   />
+  <meta property="og:title" content="剪鸭村融媒体 · Banong Radio 路演" />
+  <meta property="og:description" content="让每个村庄拥有自己的 AI 融媒体电台。" />
+  <meta name="theme-color" content="#10231d" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&amp;family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap"
+    href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&amp;family=Noto+Sans+SC:wght@400;500;600;700;900&amp;display=swap"
     rel="stylesheet"
   />
   <style>
     :root {
-      --bg: #ede5d6;
-      --paper: rgba(248, 242, 232, 0.86);
-      --ink: #1f1a15;
-      --muted: #6d6258;
-      --line: rgba(31, 26, 21, 0.1);
-      --forest: #25372f;
-      --forest-soft: #31453b;
-      --earth: #9a5f3a;
-      --earth-soft: #c7a68b;
-      --sand: #e2d5c3;
-      --mist: rgba(255, 250, 242, 0.6);
-      --glow: rgba(255, 239, 216, 0.55);
-      --dark-bg: #182620;
-      --dark-bg-soft: #24372f;
-      --dark-surface: rgba(14, 22, 18, 0.68);
-      --dark-surface-soft: rgba(20, 31, 26, 0.78);
-      --dark-line: rgba(242, 215, 187, 0.22);
-      --dark-copy: rgba(247, 241, 232, 0.88);
-      --shadow: 0 26px 80px rgba(32, 24, 17, 0.16);
-      --radius: 30px;
-      --deck-height: 100vh;
+      --ink: #161b17;
+      --ink-soft: #3f493f;
+      --paper: #efe5d4;
+      --paper-light: #fbf5ea;
+      --field: #10231d;
+      --field-2: #173b31;
+      --field-3: #21564a;
+      --soil: #8f4f31;
+      --grain: #c59a55;
+      --reed: #d9c79f;
+      --mist: rgba(255, 249, 236, 0.76);
+      --line: rgba(22, 27, 23, 0.14);
+      --line-dark: rgba(217, 199, 159, 0.22);
+      --shadow: 0 24px 68px rgba(14, 30, 24, 0.18);
+      --shadow-soft: 0 16px 44px rgba(75, 55, 31, 0.12);
+      --r: 8px;
+      --r-tight: 4px;
+      --rail: clamp(210px, 18vw, 288px);
     }
 
-    @supports (height: 100dvh) {
-      :root {
-        --deck-height: 100dvh;
-      }
+    * {
+      box-sizing: border-box;
     }
 
-    * { box-sizing: border-box; }
+    html {
+      scroll-behavior: smooth;
+      background: var(--field);
+    }
 
-    html, body {
+    body {
       margin: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      overscroll-behavior: none;
+      min-height: 100dvh;
       color: var(--ink);
       font-family: "Noto Sans SC", system-ui, sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(255,255,255,0.75), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(154,95,58,0.15), transparent 24%),
-        linear-gradient(180deg, #f4eee4 0%, #e8dece 100%);
+        linear-gradient(90deg, rgba(16, 35, 29, 0.96) 0 var(--rail), transparent var(--rail)),
+        linear-gradient(120deg, rgba(33, 86, 74, 0.13), transparent 36%),
+        linear-gradient(180deg, #f5ead9 0%, #e6d7bd 100%);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
@@ -67,1873 +65,1924 @@
       content: "";
       position: fixed;
       inset: 0;
+      z-index: 0;
       pointer-events: none;
       background-image:
-        linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-      background-size: 34px 34px;
-      opacity: 0.55;
-      mix-blend-mode: soft-light;
+        linear-gradient(90deg, rgba(16,35,29,0.07) 1px, transparent 1px),
+        linear-gradient(rgba(16,35,29,0.055) 1px, transparent 1px),
+        repeating-linear-gradient(
+          166deg,
+          rgba(143,79,49,0.055) 0 1px,
+          transparent 1px 18px
+        );
+      background-size: 54px 54px, 54px 54px, auto;
+      opacity: 0.78;
     }
 
-    .deck {
-      position: relative;
-      width: 100vw;
-      height: var(--deck-height);
-      overflow: hidden;
+    a {
+      color: inherit;
+      text-decoration: none;
     }
 
-    .slides {
-      width: 100%;
-      height: 100%;
-      transition: transform 780ms cubic-bezier(.22, 1, .36, 1);
+    button,
+    audio,
+    video {
+      font: inherit;
     }
 
-    .slide {
-      position: relative;
-      width: 100vw;
-      height: var(--deck-height);
-      padding: 4.6vh 4.5vw 5vh;
+    .skip-link {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 20;
+      padding: 10px 12px;
+      border-radius: var(--r-tight);
+      background: var(--paper-light);
+      color: var(--field);
+      transform: translateY(-160%);
+      transition: transform 180ms ease;
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .stage-rail {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 10;
+      width: var(--rail);
+      padding: 28px 24px;
+      color: var(--paper-light);
+      background:
+        linear-gradient(180deg, rgba(16,35,29,0.94), rgba(10,24,20,0.96)),
+        repeating-linear-gradient(
+          180deg,
+          rgba(217,199,159,0.06) 0 1px,
+          transparent 1px 13px
+        );
+      border-right: 1px solid var(--line-dark);
       display: grid;
-      align-items: center;
-      overflow: hidden;
-      isolation: isolate;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
-      background:
-        linear-gradient(135deg, #f7efe3 0%, #eadfcc 100%);
+      grid-template-rows: auto 1fr auto;
+      gap: 28px;
     }
 
-    .slide::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: -3;
-      background:
-        linear-gradient(135deg, rgba(255,248,238,0.82), rgba(255,248,238,0.38)),
-        radial-gradient(circle at top right, rgba(154,95,58,0.14), transparent 34%);
-    }
-
-    .slide.dark {
-      color: #f7f1e8;
-      background:
-        radial-gradient(circle at 18% 10%, rgba(224,181,142,0.16), transparent 30%),
-        linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-bg-soft) 58%, #211d19 100%);
-      text-shadow: 0 1px 18px rgba(0,0,0,0.22);
-    }
-
-    .slide.dark::before {
-      background:
-        radial-gradient(circle at top left, rgba(255,255,255,0.08), transparent 20%),
-        linear-gradient(135deg, rgba(27,39,34,0.96), rgba(39,56,48,0.94) 58%, rgba(31,27,23,0.92));
-    }
-
-    .slide::after {
-      content: "";
-      position: absolute;
-      inset: auto -10vw -10vh auto;
-      width: 46vw;
-      height: 46vw;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,241,219,0.45), transparent 62%);
-      z-index: -2;
-      filter: blur(12px);
-    }
-
-    .slide.dark::after {
-      background: radial-gradient(circle, rgba(220,170,126,0.15), transparent 66%);
-    }
-
-    .content {
-      width: 100%;
-      max-width: 1360px;
-      margin: 0 auto;
+    .station-mark {
       display: grid;
-      gap: 1.6rem;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
       gap: 10px;
-      width: fit-content;
-      padding: 9px 15px;
-      border-radius: 999px;
-      font-size: 12px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
+    }
+
+    .station-mark span {
+      color: rgba(251, 245, 234, 0.66);
+      font-size: 11px;
       font-weight: 800;
-      border: 1px solid rgba(31,26,21,0.1);
-      background: rgba(255,250,242,0.72);
-      backdrop-filter: blur(12px);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
     }
 
-    .dark .eyebrow {
-      background: rgba(14,22,18,0.66);
-      border-color: var(--dark-line);
-    }
-
-    .title {
-      margin: 0;
+    .station-mark strong {
+      max-width: 9ch;
       font-family: "Noto Serif SC", serif;
-      font-size: clamp(42px, 5vw, 80px);
+      font-size: clamp(28px, 3vw, 44px);
       line-height: 1.08;
-      letter-spacing: 0;
-      max-width: 11ch;
+      text-wrap: balance;
     }
 
-    .story-title {
-      width: min(500px, 100%);
+    .rail-nav {
+      display: grid;
+      align-content: center;
+      gap: 8px;
+    }
+
+    .rail-link {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 10px;
+      align-items: center;
+      min-height: 46px;
+      padding: 7px 8px;
+      border-radius: var(--r);
+      color: rgba(251, 245, 234, 0.62);
+      border: 1px solid transparent;
+      transition:
+        color 220ms ease,
+        background 220ms ease,
+        border-color 220ms ease,
+        transform 220ms cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .rail-link:hover,
+    .rail-link:focus-visible,
+    .rail-link.is-current {
+      color: var(--paper-light);
+      background: rgba(217, 199, 159, 0.08);
+      border-color: rgba(217, 199, 159, 0.18);
+      transform: translateX(4px);
+      outline: none;
+    }
+
+    .rail-link code {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: var(--r-tight);
+      background: rgba(217, 199, 159, 0.09);
+      color: var(--reed);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .rail-link span {
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .rail-foot {
+      display: grid;
+      gap: 12px;
+      color: rgba(251, 245, 234, 0.62);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .rail-meter {
+      height: 2px;
+      background: rgba(251, 245, 234, 0.18);
+      overflow: hidden;
+    }
+
+    .rail-meter span {
+      display: block;
+      width: var(--scroll, 0%);
+      height: 100%;
+      background: linear-gradient(90deg, var(--reed), var(--soil));
+      transition: width 140ms linear;
+    }
+
+    .page-shell {
+      position: relative;
+      z-index: 1;
+      margin-left: var(--rail);
+      overflow: clip;
+    }
+
+    .roadshow-section {
+      position: relative;
+      min-height: 100dvh;
+      scroll-margin-top: 0;
+      padding: clamp(64px, 8vw, 108px) clamp(34px, 6vw, 88px);
+      display: grid;
+      align-items: center;
+      border-bottom: 1px solid rgba(22, 27, 23, 0.09);
+    }
+
+    .roadshow-section.dark {
+      color: var(--paper-light);
+      background:
+        linear-gradient(90deg, rgba(217,199,159,0.055) 1px, transparent 1px),
+        linear-gradient(135deg, var(--field) 0%, var(--field-2) 58%, #3e2b20 100%);
+      background-size: 58px 100%, auto;
+      border-color: rgba(217, 199, 159, 0.13);
+    }
+
+    #graph {
+      align-items: start;
+    }
+
+    .roadshow-section::after {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 8px;
+      background: linear-gradient(90deg, var(--field), var(--field-3), var(--soil), var(--grain));
+      opacity: 0.9;
+    }
+
+    .section-inner {
+      width: min(100%, 1420px);
+      display: grid;
+      gap: 26px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition:
+        opacity 620ms ease,
+        transform 760ms cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .kicker {
+      width: fit-content;
+      padding: 8px 10px;
+      border-radius: var(--r-tight);
+      border: 1px solid currentColor;
+      color: var(--field-3);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.17em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .dark .kicker {
+      color: var(--reed);
+    }
+
+    .display {
+      margin: 0;
+      max-width: 13ch;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(42px, 6vw, 92px);
+      font-weight: 900;
+      letter-spacing: 0;
+      line-height: 1.03;
+      text-wrap: balance;
+    }
+
+    .section-title {
+      margin: 0;
+      max-width: 15ch;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 4.1vw, 64px);
+      line-height: 1.08;
+      text-wrap: balance;
     }
 
     .lead {
       margin: 0;
       max-width: 38rem;
-      font-size: clamp(18px, 1.55vw, 25px);
-      line-height: 1.75;
-      color: inherit;
-      opacity: 0.92;
+      color: var(--ink-soft);
+      font-size: clamp(18px, 1.45vw, 23px);
+      line-height: 1.78;
+      text-wrap: pretty;
     }
 
-    .hero {
-      display: grid;
-      grid-template-columns: 1.12fr 0.88fr;
-      gap: 28px;
-      align-items: stretch;
+    .dark .lead,
+    .dark .body-copy {
+      color: rgba(251, 245, 234, 0.82);
     }
 
-    .stack {
+    .body-copy {
+      margin: 0;
+      max-width: 62ch;
+      color: var(--ink-soft);
+      font-size: 16px;
+      line-height: 1.78;
+      text-wrap: pretty;
+    }
+
+    .hero-layout {
       display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(360px, 0.78fr);
+      gap: clamp(34px, 5vw, 72px);
+      align-items: end;
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 22px;
+      align-content: end;
+      min-height: 72dvh;
+      padding-top: 36px;
+    }
+
+    .hero-copy .lead {
+      margin-left: clamp(0px, 8vw, 112px);
+    }
+
+    .hero-note {
+      display: grid;
+      grid-template-columns: 68px minmax(0, 1fr);
       gap: 18px;
+      max-width: 620px;
+      margin-top: 14px;
+      padding: 18px;
+      border-radius: var(--r);
+      background: rgba(255, 249, 236, 0.72);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-soft);
     }
 
-    .panel,
-    .glass-card,
-    .metric-card,
-    .timeline-card,
-    .wave-card,
-    .vision-card {
-      border-radius: var(--radius);
+    .hero-note code {
+      color: var(--soil);
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hero-note p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 15px;
+      line-height: 1.72;
+    }
+
+    .radio-console {
+      position: relative;
+      min-height: 640px;
+      padding: 20px;
+      border-radius: var(--r);
+      color: var(--paper-light);
+      background:
+        linear-gradient(180deg, rgba(217,199,159,0.08), rgba(217,199,159,0)),
+        #142d26;
+      border: 1px solid rgba(217, 199, 159, 0.28);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .radio-console::before {
+      content: "";
+      position: absolute;
+      inset: 16px;
+      border: 1px solid rgba(217, 199, 159, 0.12);
+      pointer-events: none;
+    }
+
+    .console-top {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      color: rgba(251, 245, 234, 0.68);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .dial-stage {
+      position: relative;
+      min-height: 360px;
+      margin: 46px 0 30px;
+      display: grid;
+      place-items: center;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          transparent 0 18px,
+          rgba(217,199,159,0.06) 18px 19px,
+          transparent 19px 38px
+        );
+    }
+
+    .dial {
+      position: relative;
+      width: min(76%, 360px);
+      aspect-ratio: 1;
+      border: 1px solid rgba(217, 199, 159, 0.26);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        repeating-radial-gradient(circle, rgba(217,199,159,0.18) 0 1px, transparent 1px 28px),
+        linear-gradient(135deg, rgba(217,199,159,0.14), rgba(33,86,74,0.12));
+    }
+
+    .dial::before,
+    .dial::after {
+      content: "";
+      position: absolute;
+      inset: 18%;
+      border-radius: 50%;
+      border: 1px solid rgba(217, 199, 159, 0.24);
+    }
+
+    .dial::after {
+      inset: 40%;
+      background: linear-gradient(135deg, var(--reed), var(--soil));
+      box-shadow: inset 0 0 0 14px rgba(16, 35, 29, 0.22);
+    }
+
+    .dial-label {
+      position: absolute;
+      right: -12px;
+      bottom: 38px;
+      width: 178px;
+      padding: 14px;
+      border-radius: var(--r-tight);
+      background: rgba(10, 24, 20, 0.88);
+      border: 1px solid rgba(217, 199, 159, 0.22);
       box-shadow: var(--shadow);
     }
 
-    .panel {
-      padding: 28px;
-      background: var(--paper);
-      border: 1px solid var(--line);
-      backdrop-filter: blur(18px);
-    }
-
-    .dark .panel {
-      background: var(--dark-surface);
-      border-color: var(--dark-line);
-    }
-
-    .section-kicker {
+    .dial-label span {
       display: block;
-      margin-bottom: 12px;
-      font-size: 13px;
+      color: var(--reed);
+      font-size: 11px;
+      font-weight: 900;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--earth);
-      font-weight: 800;
     }
 
-    .dark .section-kicker {
-      color: #dfb28d;
-    }
-
-    .section-title {
-      margin: 0 0 14px;
-      font-family: "Noto Serif SC", serif;
-      font-size: clamp(28px, 2.7vw, 42px);
-      line-height: 1.15;
-    }
-
-    .section-title.section-title-small {
-      font-size: clamp(21px, 2vw, 30px);
-      line-height: 1.2;
-    }
-
-    .section-copy {
-      margin: 0;
-      color: var(--muted);
-      font-size: 17px;
-      line-height: 1.7;
-    }
-
-    .dark .section-copy {
-      color: var(--dark-copy);
-    }
-
-    .problem-grid,
-    .layer-grid,
-    .vision-grid {
-      display: grid;
-      gap: 18px;
-    }
-
-    .problem-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .layer-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    .layer-grid.compact {
-      margin-top: 10px;
-    }
-
-    .vision-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    .glass-card,
-    .metric-card,
-    .timeline-card,
-    .vision-card {
-      padding: 22px 22px 24px;
-      background: rgba(255,250,242,0.76);
-      border: 1px solid rgba(31,26,21,0.08);
-      backdrop-filter: blur(14px);
-    }
-
-    .dark .glass-card,
-    .dark .metric-card,
-    .dark .timeline-card,
-    .dark .vision-card {
-      background: var(--dark-surface-soft);
-      border-color: var(--dark-line);
-    }
-
-    .glass-card h3,
-    .metric-card h3,
-    .timeline-card h3,
-    .vision-card h3 {
-      margin: 0 0 12px;
-      font-size: 14px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--earth);
-    }
-
-    .dark .glass-card h3,
-    .dark .metric-card h3,
-    .dark .timeline-card h3,
-    .dark .vision-card h3 {
-      color: #e0b58e;
-    }
-
-    .glass-card strong,
-    .metric-card strong,
-    .timeline-card strong,
-    .vision-card strong {
+    .dial-label strong {
       display: block;
-      margin-bottom: 10px;
+      margin-top: 8px;
       font-family: "Noto Serif SC", serif;
-      font-size: clamp(22px, 2vw, 32px);
-      line-height: 1.2;
+      font-size: 24px;
+      line-height: 1.18;
     }
 
-    .glass-card p,
-    .metric-card p,
-    .timeline-card p,
-    .vision-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.8;
-    }
-
-    .dark .glass-card p,
-    .dark .metric-card p,
-    .dark .timeline-card p,
-    .dark .vision-card p {
-      color: rgba(247,241,232,0.86);
-    }
-
-    .bullet-list {
+    .program-strip {
+      position: relative;
       display: grid;
+      gap: 10px;
+    }
+
+    .program-row {
+      display: grid;
+      grid-template-columns: 74px 1fr auto;
       gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border-radius: var(--r-tight);
+      background: rgba(251, 245, 234, 0.06);
+      border: 1px solid rgba(217, 199, 159, 0.12);
+    }
+
+    .program-row time {
+      color: var(--reed);
+      font-size: 12px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .program-row strong {
+      font-size: 15px;
+    }
+
+    .program-row span {
+      color: rgba(251, 245, 234, 0.52);
+      font-size: 12px;
+    }
+
+    .story-grid {
+      display: grid;
+      grid-template-columns: minmax(320px, 0.76fr) minmax(0, 1fr);
+      gap: clamp(32px, 5vw, 76px);
+      align-items: start;
+    }
+
+    .story-card {
+      position: sticky;
+      top: 42px;
+      display: grid;
+      gap: 22px;
+      padding: 26px;
+      border-radius: var(--r);
+      background: var(--mist);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .story-list {
+      display: grid;
+      gap: 16px;
       margin: 0;
       padding: 0;
       list-style: none;
     }
 
-    .bullet-list li {
-      display: flex;
-      gap: 12px;
-      align-items: baseline;
-      font-size: clamp(18px, 1.4vw, 24px);
-      line-height: 1.7;
-    }
-
-    .bullet-list li::before {
-      content: "·";
-      font-size: 1.2em;
-      color: var(--earth);
-      font-weight: 900;
-    }
-
-    .dark .bullet-list li::before {
-      color: #dfb28d;
-    }
-
-    .duo {
+    .story-list li {
       display: grid;
-      grid-template-columns: 0.92fr 1.08fr;
-      gap: 24px;
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+      padding: 18px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .story-list code,
+    .number-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: var(--r-tight);
+      color: var(--soil);
+      background: rgba(143, 79, 49, 0.1);
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .story-list strong {
+      display: block;
+      margin-bottom: 6px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(21px, 2.1vw, 32px);
+      line-height: 1.2;
+    }
+
+    .story-list p {
+      margin: 0;
+      color: var(--ink-soft);
+      line-height: 1.72;
+    }
+
+    .signal-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 0.62fr);
+      gap: clamp(30px, 5vw, 70px);
+      align-items: center;
+    }
+
+    .signal-copy {
+      display: grid;
+      gap: 22px;
+    }
+
+    .signal-panel {
+      padding: 24px;
+      border-radius: var(--r);
+      background: rgba(10, 24, 20, 0.42);
+      border: 1px solid var(--line-dark);
+      box-shadow: var(--shadow);
+    }
+
+    .signal-panel ul {
+      display: grid;
+      gap: 14px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .signal-panel li {
+      padding-left: 18px;
+      color: rgba(251, 245, 234, 0.84);
+      line-height: 1.72;
+      border-left: 2px solid rgba(217, 199, 159, 0.34);
+    }
+
+    .agent-map {
+      display: grid;
+      grid-template-columns: 1.05fr 0.84fr 1.2fr;
+      grid-template-areas:
+        "title collect synth"
+        "title generate schedule";
+      gap: 14px;
       align-items: stretch;
     }
 
-    .timeline {
+    .agent-intro {
+      grid-area: title;
+      min-height: 420px;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .time-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      width: fit-content;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: rgba(37,55,47,0.08);
-      color: var(--forest);
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .dark .time-badge {
-      background: rgba(14,22,18,0.66);
-      color: #f7f1e8;
-    }
-
-    .wave-card {
-      position: relative;
-      min-height: 100%;
+      align-content: end;
+      gap: 20px;
       padding: 28px;
+      border-radius: var(--r);
       background:
-        linear-gradient(160deg, rgba(36,53,45,0.98), rgba(49,69,59,0.95)),
-        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
-      color: #f7f1e8;
-      overflow: hidden;
+        linear-gradient(180deg, rgba(251,245,234,0.86), rgba(251,245,234,0.64)),
+        repeating-linear-gradient(0deg, rgba(16,35,29,0.05) 0 1px, transparent 1px 16px);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-soft);
     }
 
-    .wave-card::before,
-    .wave-card::after {
-      content: "";
-      position: absolute;
-      left: -8%;
-      right: -8%;
-      height: 120px;
-      border-radius: 999px;
-      opacity: 0.38;
-      background:
-        repeating-linear-gradient(
-          90deg,
-          transparent 0 20px,
-          rgba(255,255,255,0.16) 20px 24px,
-          transparent 24px 44px
-        );
-    }
-
-    .wave-card::before {
-      bottom: 74px;
-      transform: rotate(-4deg);
-    }
-
-    .wave-card::after {
-      bottom: 20px;
-      transform: rotate(3deg);
-    }
-
-    .wave-card h2 {
-      margin: 0 0 12px;
-      font-family: "Noto Serif SC", serif;
-      font-size: clamp(30px, 3vw, 46px);
-      line-height: 1.18;
-      max-width: 10ch;
-    }
-
-    .wave-card p {
-      margin: 0 0 22px;
-      max-width: 28rem;
-      color: rgba(247,241,232,0.84);
-      font-size: 17px;
-      line-height: 1.85;
-    }
-
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .chip {
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.12);
-      font-size: 14px;
-      letter-spacing: 0.03em;
-    }
-
-    .flow {
+    .agent-card {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 14px;
-      align-items: center;
-    }
-
-    .flow-card {
-      padding: 22px 18px;
-      min-height: 180px;
-      border-radius: 24px;
-      background: rgba(255,250,242,0.78);
-      border: 1px solid rgba(31,26,21,0.08);
-      box-shadow: var(--shadow);
-      display: grid;
       align-content: start;
-      gap: 12px;
+      min-height: 204px;
+      padding: 22px;
+      border-radius: var(--r);
+      background: rgba(255, 249, 236, 0.62);
+      border: 1px solid var(--line);
     }
 
-    .flow-card span {
-      font-size: 13px;
+    .agent-card:nth-child(2) { grid-area: collect; }
+    .agent-card:nth-child(3) { grid-area: synth; }
+    .agent-card:nth-child(4) { grid-area: generate; }
+    .agent-card:nth-child(5) { grid-area: schedule; }
+
+    .agent-card span {
+      color: var(--field-3);
+      font-size: 12px;
+      font-weight: 900;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--earth);
-      font-weight: 800;
     }
 
-    .flow-card strong {
+    .agent-card strong {
       font-family: "Noto Serif SC", serif;
-      font-size: 28px;
-      line-height: 1.18;
+      font-size: clamp(23px, 2.2vw, 34px);
+      line-height: 1.16;
     }
 
-    .flow-card p {
+    .agent-card p {
       margin: 0;
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.8;
+      color: var(--ink-soft);
+      line-height: 1.72;
     }
 
-    .callout {
-      padding: 24px 26px;
-      border-radius: 26px;
-      background: linear-gradient(135deg, rgba(255,244,227,0.92), rgba(250,235,219,0.84));
-      border: 1px solid rgba(154,95,58,0.16);
-      box-shadow: var(--shadow);
-    }
-
-    .callout strong {
-      display: block;
-      margin-bottom: 10px;
-      font-family: "Noto Serif SC", serif;
-      font-size: clamp(24px, 2.1vw, 34px);
-      line-height: 1.2;
-      color: var(--forest);
-    }
-
-    .callout p {
-      margin: 0;
-      color: #54493f;
-      font-size: 16px;
-      line-height: 1.85;
-    }
-
-    .demo-shell {
+    .demo-layout {
       display: grid;
-      grid-template-columns: 0.88fr 1.12fr;
-      gap: 24px;
-      align-items: stretch;
-    }
-
-    .demo-player {
-      padding: 28px;
-      border-radius: 30px;
-      background: var(--dark-surface-soft);
-      border: 1px solid var(--dark-line);
-      box-shadow: var(--shadow);
-      display: grid;
-      align-content: space-between;
-      gap: 26px;
-    }
-
-    .demo-player .ring {
-      width: min(19vw, 280px);
-      aspect-ratio: 1;
-      margin: 0 auto;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle, rgba(255,255,255,0.2) 0 24%, transparent 24%),
-        radial-gradient(circle, rgba(255,255,255,0.15) 0 43%, transparent 43%),
-        radial-gradient(circle, rgba(255,255,255,0.1) 0 64%, transparent 64%),
-        linear-gradient(135deg, #e0b58e, #b6774d);
-      box-shadow:
-        inset 0 0 0 18px rgba(24,20,18,0.2),
-        0 18px 50px rgba(0,0,0,0.22);
-    }
-
-    .demo-player strong {
-      display: block;
-      font-family: "Noto Serif SC", serif;
-      font-size: clamp(28px, 2.7vw, 40px);
-      line-height: 1.2;
-      text-align: center;
-    }
-
-    .demo-player p {
-      margin: 0;
-      text-align: center;
-      color: var(--dark-copy);
-      font-size: 16px;
-      line-height: 1.8;
-    }
-
-    .demo-meter {
-      display: flex;
-      gap: 8px;
-      align-items: end;
-      justify-content: center;
-      height: 66px;
-    }
-
-    .demo-meter span {
-      width: 10px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, #f2d9be, #b97747);
-      animation: pulse 1.2s ease-in-out infinite;
-      transform-origin: bottom;
-    }
-
-    .demo-meter span:nth-child(2) { animation-delay: 0.1s; }
-    .demo-meter span:nth-child(3) { animation-delay: 0.2s; }
-    .demo-meter span:nth-child(4) { animation-delay: 0.3s; }
-    .demo-meter span:nth-child(5) { animation-delay: 0.4s; }
-    .demo-meter span:nth-child(6) { animation-delay: 0.5s; }
-    .demo-meter span:nth-child(7) { animation-delay: 0.6s; }
-
-    @keyframes pulse {
-      0%, 100% { height: 18px; opacity: 0.5; }
-      50% { height: 64px; opacity: 1; }
-    }
-
-    .note-list {
-      display: grid;
-      gap: 16px;
-    }
-
-    .note-item {
-      padding: 18px 20px;
-      border-radius: 22px;
-      background: var(--dark-surface-soft);
-      border: 1px solid var(--dark-line);
-    }
-
-    .note-item strong {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 16px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #e0b58e;
-    }
-
-    .note-item p {
-      margin: 0;
-      color: var(--dark-copy);
-      font-size: 16px;
-      line-height: 1.8;
-    }
-
-    .final-quote {
-      margin: 10px 0 0;
-      font-family: "Noto Serif SC", serif;
-      font-size: clamp(30px, 3vw, 46px);
-      line-height: 1.3;
-      max-width: 13ch;
-    }
-
-    .evidence-shell {
-      display: grid;
-      grid-template-columns: minmax(0, 1.08fr) minmax(340px, 0.72fr);
-      gap: 20px;
-      align-items: stretch;
-    }
-
-    .evidence-slide {
-      padding: 3vh 3vw 4vh;
-    }
-
-    .evidence-slide .content {
-      max-width: 1480px;
-    }
-
-    .evidence-slide .stack {
-      gap: 12px;
-    }
-
-    .evidence-head {
-      display: grid;
-      gap: 8px;
-      max-width: 820px;
-    }
-
-    .evidence-route {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 2px;
-    }
-
-    .route-chip {
-      display: inline-flex;
+      grid-template-columns: minmax(360px, 0.82fr) minmax(0, 1fr);
+      gap: clamp(34px, 5vw, 76px);
       align-items: center;
-      width: fit-content;
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: rgba(14,22,18,0.64);
-      border: 1px solid var(--dark-line);
-      color: rgba(247,241,232,0.84);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
+    }
+
+    .demo-copy {
+      display: grid;
+      gap: 22px;
+      align-content: center;
+    }
+
+    .demo-checks {
+      display: grid;
+      gap: 10px;
+      margin: 8px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .demo-checks li {
+      padding: 14px;
+      border-radius: var(--r-tight);
+      background: rgba(251, 245, 234, 0.07);
+      border: 1px solid var(--line-dark);
+      color: rgba(251, 245, 234, 0.84);
+      line-height: 1.58;
+    }
+
+    .live-board {
+      position: relative;
+      padding: 18px;
+      border-radius: var(--r);
+      background: rgba(10, 24, 20, 0.52);
+      border: 1px solid var(--line-dark);
+      box-shadow: var(--shadow);
+    }
+
+    .live-board::before {
+      content: "On air";
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      padding: 7px 9px;
+      border-radius: var(--r-tight);
+      color: var(--field);
+      background: var(--reed);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
     }
 
-    .evidence-ledger {
+    .wave-window {
+      min-height: 360px;
+      padding: 26px;
+      border-radius: var(--r-tight);
+      background:
+        linear-gradient(180deg, rgba(217,199,159,0.08), transparent),
+        repeating-linear-gradient(
+          90deg,
+          transparent 0 17px,
+          rgba(217,199,159,0.1) 17px 18px,
+          transparent 18px 36px
+        );
+      display: grid;
+      align-content: end;
+      gap: 22px;
+    }
+
+    .wave-bars {
+      height: 120px;
+      display: flex;
+      align-items: end;
+      gap: 7px;
+    }
+
+    .wave-bars i {
+      display: block;
+      width: 10px;
+      height: calc(22px + var(--h) * 1px);
+      background: linear-gradient(180deg, var(--reed), var(--soil));
+      opacity: 0.86;
+      transform-origin: bottom;
+      animation: breathe 1.8s ease-in-out infinite;
+      animation-delay: calc(var(--d) * 110ms);
+    }
+
+    .wave-bars i:nth-child(1) { --h: 34; --d: 0; }
+    .wave-bars i:nth-child(2) { --h: 78; --d: 1; }
+    .wave-bars i:nth-child(3) { --h: 44; --d: 2; }
+    .wave-bars i:nth-child(4) { --h: 96; --d: 3; }
+    .wave-bars i:nth-child(5) { --h: 58; --d: 4; }
+    .wave-bars i:nth-child(6) { --h: 88; --d: 5; }
+    .wave-bars i:nth-child(7) { --h: 42; --d: 6; }
+    .wave-bars i:nth-child(8) { --h: 112; --d: 7; }
+    .wave-bars i:nth-child(9) { --h: 66; --d: 8; }
+    .wave-bars i:nth-child(10) { --h: 84; --d: 9; }
+    .wave-bars i:nth-child(11) { --h: 52; --d: 10; }
+    .wave-bars i:nth-child(12) { --h: 102; --d: 11; }
+    .wave-bars i:nth-child(13) { --h: 38; --d: 12; }
+    .wave-bars i:nth-child(14) { --h: 74; --d: 13; }
+    .wave-bars i:nth-child(15) { --h: 60; --d: 14; }
+
+    @keyframes breathe {
+      0%, 100% { transform: scaleY(0.58); opacity: 0.54; }
+      50% { transform: scaleY(1); opacity: 0.96; }
+    }
+
+    .wave-window strong {
+      max-width: 12ch;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(31px, 3.4vw, 54px);
+      line-height: 1.08;
+    }
+
+    .evidence-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(380px, 0.74fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .evidence-copy {
+      display: grid;
+      gap: 20px;
+    }
+
+    .proof-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
     }
 
-    .evidence-row {
+    .proof-row {
       display: grid;
-      grid-template-columns: 46px minmax(0, 1fr);
-      gap: 10px;
-      min-height: 78px;
-      padding: 10px 12px;
-      border-radius: 20px;
-      background: var(--dark-surface-soft);
-      border: 1px solid var(--dark-line);
-      box-shadow: 0 16px 48px rgba(0,0,0,0.14);
-    }
-
-    .evidence-row .page-no {
-      display: grid;
-      place-items: center;
-      width: 42px;
-      height: 42px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, rgba(224,181,142,0.28), rgba(255,255,255,0.08));
-      color: #f4d7bb;
-      font-weight: 900;
-      font-size: 15px;
-      letter-spacing: 0.08em;
-    }
-
-    .evidence-row h3 {
-      margin: 0 0 4px;
-      color: #e0b58e;
-      font-size: 12px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .evidence-row p {
-      margin: 0;
-      color: var(--dark-copy);
-      font-size: 12.8px;
-      line-height: 1.45;
-    }
-
-    .media-stack {
-      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
       gap: 12px;
-      align-content: stretch;
+      min-height: 104px;
+      padding: 14px;
+      border-radius: var(--r);
+      background:
+        linear-gradient(90deg, rgba(217,199,159,0.08), transparent 52%),
+        rgba(10, 24, 20, 0.42);
+      border: 1px solid var(--line-dark);
     }
 
-    .media-card {
-      display: grid;
-      gap: 8px;
-      padding: 12px;
-      border-radius: 24px;
-      background: var(--dark-surface-soft);
-      border: 1px solid var(--dark-line);
-      box-shadow: var(--shadow);
+    .proof-row:nth-child(4),
+    .proof-row:nth-child(6) {
+      background:
+        linear-gradient(90deg, rgba(33,86,74,0.28), transparent 54%),
+        rgba(10, 24, 20, 0.52);
+      border-color: rgba(217, 199, 159, 0.34);
     }
 
-    .media-card h3 {
-      margin: 0;
-      color: #e0b58e;
+    .proof-row:last-child {
+      grid-column: 1 / -1;
+      min-height: 82px;
+    }
+
+    .proof-row h3 {
+      margin: 0 0 6px;
+      color: var(--reed);
       font-size: 12px;
       letter-spacing: 0.14em;
       text-transform: uppercase;
     }
 
-    .media-card strong {
-      display: block;
+    .proof-row p {
       margin: 0;
+      color: rgba(251, 245, 234, 0.8);
+      font-size: 13px;
+      line-height: 1.52;
+    }
+
+    .media-stack {
+      position: sticky;
+      top: 24px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .media-card {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border-radius: var(--r);
+      background: rgba(255, 249, 236, 0.07);
+      border: 1px solid var(--line-dark);
+      box-shadow: var(--shadow);
+    }
+
+    .media-card.featured {
+      background:
+        linear-gradient(180deg, rgba(217,199,159,0.1), rgba(217,199,159,0.02)),
+        rgba(255, 249, 236, 0.07);
+    }
+
+    .media-card h3 {
+      margin: 0;
+      color: var(--reed);
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .media-card strong {
       font-family: "Noto Serif SC", serif;
-      font-size: clamp(17px, 1.35vw, 22px);
-      line-height: 1.2;
+      font-size: clamp(20px, 1.7vw, 28px);
+      line-height: 1.18;
     }
 
     .media-card p {
       margin: 0;
-      color: rgba(247,241,232,0.84);
-      font-size: 12.5px;
-      line-height: 1.45;
+      color: rgba(251, 245, 234, 0.76);
+      font-size: 13px;
+      line-height: 1.52;
     }
 
     .media-card video {
       width: 100%;
-      height: min(25vh, 238px);
-      border-radius: 18px;
-      background: rgba(0,0,0,0.28);
+      max-height: 230px;
+      border-radius: var(--r-tight);
+      background: rgba(0, 0, 0, 0.24);
       object-fit: cover;
     }
 
     .media-card audio {
       width: 100%;
-      min-height: 36px;
+      min-height: 38px;
+    }
+
+    .visual-layout {
+      display: grid;
+      grid-template-columns: minmax(300px, 0.52fr) minmax(0, 1fr);
+      gap: clamp(28px, 5vw, 76px);
+      align-items: center;
+    }
+
+    .visual-copy {
+      display: grid;
+      gap: 22px;
+      align-content: center;
+    }
+
+    .visual-notes {
+      display: grid;
+      gap: 10px;
+      margin: 8px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .visual-notes li {
+      padding: 14px;
+      border-radius: var(--r-tight);
+      color: rgba(251, 245, 234, 0.82);
+      background: rgba(251, 245, 234, 0.07);
+      border: 1px solid var(--line-dark);
+      line-height: 1.62;
+    }
+
+    .newspaper-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      align-items: end;
+    }
+
+    .newspaper-card,
+    .graph-card {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 12px;
+      border-radius: var(--r);
+      background: rgba(255, 249, 236, 0.08);
+      border: 1px solid var(--line-dark);
+      box-shadow: var(--shadow);
+    }
+
+    .newspaper-card:nth-child(2) {
+      transform: translateY(34px);
+    }
+
+    .newspaper-card img,
+    .graph-card img {
+      width: 100%;
+      border-radius: var(--r-tight);
+      object-fit: cover;
+      display: block;
+      background: rgba(10, 24, 20, 0.32);
+    }
+
+    .newspaper-card img {
+      max-height: 72dvh;
+      object-fit: contain;
+    }
+
+    .image-caption {
+      display: grid;
+      gap: 4px;
+      color: rgba(251, 245, 234, 0.72);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .image-caption strong {
+      color: var(--reed);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .graph-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(340px, 0.72fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .graph-feature {
+      min-height: 62dvh;
+    }
+
+    .graph-feature img {
+      height: min(62dvh, 600px);
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .graph-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .graph-card.compact img {
+      height: min(25dvh, 230px);
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .graph-title {
+      max-width: 12ch;
+      font-size: clamp(30px, 3.25vw, 52px);
+    }
+
+    .source-layout,
+    .channel-layout {
+      display: grid;
+      grid-template-columns: minmax(300px, 0.54fr) minmax(0, 1fr);
+      gap: clamp(28px, 5vw, 72px);
+      align-items: center;
+    }
+
+    .source-gallery {
+      display: grid;
+      gap: 16px;
+    }
+
+    .source-card,
+    .channel-card {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 12px;
+      border-radius: var(--r);
+      background: rgba(255, 249, 236, 0.08);
+      border: 1px solid var(--line-dark);
+      box-shadow: var(--shadow);
+    }
+
+    .source-card.hero-source img {
+      height: min(46dvh, 430px);
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .source-card.compact-source {
+      grid-template-columns: minmax(0, 0.92fr) minmax(210px, 0.56fr);
+      align-items: stretch;
+    }
+
+    .source-card.compact-source img {
+      height: min(30dvh, 250px);
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .source-card img,
+    .channel-card img {
+      display: block;
+      width: 100%;
+      border-radius: var(--r-tight);
+      background: rgba(10, 24, 20, 0.32);
+    }
+
+    .channel-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      align-items: end;
+    }
+
+    .channel-card:nth-child(2) {
+      transform: translateY(34px);
+    }
+
+    .channel-card img {
+      max-height: 72dvh;
+      object-fit: contain;
     }
 
     .media-toggle {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
       width: fit-content;
       min-height: 38px;
-      padding: 9px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(242,215,187,0.28);
-      background: rgba(20,31,26,0.82);
-      color: #f7f1e8;
-      font: inherit;
+      padding: 9px 13px;
+      border-radius: var(--r-tight);
+      border: 1px solid rgba(217, 199, 159, 0.28);
+      color: var(--paper-light);
+      background: rgba(10, 24, 20, 0.62);
       font-size: 13px;
       font-weight: 800;
       letter-spacing: 0.06em;
       cursor: pointer;
-      touch-action: manipulation;
+      transition:
+        transform 180ms ease,
+        background 180ms ease,
+        border-color 180ms ease;
     }
 
+    .media-toggle:hover,
     .media-toggle:focus-visible {
-      outline: 2px solid #f2d7bb;
-      outline-offset: 3px;
+      background: rgba(217, 199, 159, 0.12);
+      border-color: rgba(217, 199, 159, 0.44);
+      outline: none;
+    }
+
+    .media-toggle:active {
+      transform: translateY(1px) scale(0.985);
     }
 
     .asset-meta {
       display: flex;
       flex-wrap: wrap;
       gap: 7px;
-      color: rgba(247,241,232,0.78);
+      color: rgba(251, 245, 234, 0.64);
       font-size: 11px;
       line-height: 1.4;
     }
 
     .asset-meta span {
-      padding: 5px 8px;
-      border-radius: 999px;
-      background: rgba(0,0,0,0.24);
-      border: 1px solid rgba(242,215,187,0.16);
+      padding: 5px 7px;
+      border-radius: var(--r-tight);
+      border: 1px solid rgba(217, 199, 159, 0.16);
+      background: rgba(10, 24, 20, 0.3);
     }
 
-    .closing-slide {
-      padding: 7vh 4.2vw 6vh;
-    }
-
-    .closing-slide::before {
-      background:
-        linear-gradient(135deg, rgba(24,38,32,0.98), rgba(39,56,48,0.96) 52%, rgba(89,63,43,0.9)),
-        radial-gradient(circle at 18% 18%, rgba(224,181,142,0.18), transparent 28%);
-    }
-
-    .closing-slide {
-      background:
-        radial-gradient(circle at 18% 18%, rgba(224,181,142,0.18), transparent 30%),
-        linear-gradient(135deg, #182620 0%, #273830 52%, #593f2b 100%);
-    }
-
-    .closing-shell {
+    .closing-layout {
       display: grid;
-      grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
-      gap: 34px;
-      align-items: stretch;
-    }
-
-    .closing-mark {
-      position: relative;
-      min-height: 100%;
-      padding: 26px;
-      border-radius: 30px;
-      background:
-        radial-gradient(circle at 50% 46%, rgba(224,181,142,0.34) 0 12%, transparent 13%),
-        radial-gradient(circle at 50% 46%, transparent 0 26%, rgba(224,181,142,0.2) 27% 28%, transparent 29%),
-        radial-gradient(circle at 50% 46%, transparent 0 42%, rgba(255,255,255,0.12) 43% 44%, transparent 45%),
-        linear-gradient(150deg, rgba(14,22,18,0.72), rgba(20,31,26,0.82));
-      border: 1px solid var(--dark-line);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      display: grid;
-      align-content: end;
-      gap: 18px;
-    }
-
-    .closing-mark::before {
-      content: "";
-      position: absolute;
-      inset: 16% 12% auto;
-      height: 42%;
-      border-radius: 50%;
-      background:
-        repeating-radial-gradient(circle, rgba(247,241,232,0.18) 0 2px, transparent 2px 18px);
-      opacity: 0.6;
-      mask-image: radial-gradient(circle, black 42%, transparent 72%);
-    }
-
-    .closing-mark strong {
-      position: relative;
-      display: block;
-      font-family: "Noto Serif SC", serif;
-      font-size: clamp(30px, 3vw, 46px);
-      line-height: 1.18;
-      max-width: 9ch;
-    }
-
-    .closing-mark p {
-      position: relative;
-      margin: 0;
-      max-width: 26rem;
-      color: rgba(247,241,232,0.86);
-      font-size: 16px;
-      line-height: 1.75;
+      grid-template-columns: minmax(0, 0.72fr) minmax(380px, 0.9fr);
+      gap: clamp(34px, 5vw, 78px);
+      align-items: end;
     }
 
     .closing-copy {
       display: grid;
-      gap: 16px;
-      align-content: center;
+      gap: 22px;
     }
 
-    .closing-title {
-      margin: 0;
-      font-family: "Noto Serif SC", serif;
-      font-size: clamp(40px, 4.9vw, 76px);
-      line-height: 1.08;
-      max-width: 12ch;
-    }
-
-    .closing-lead {
-      margin: 0;
-      max-width: 42rem;
-      color: rgba(247,241,232,0.92);
-      font-size: clamp(18px, 1.55vw, 25px);
-      line-height: 1.8;
-    }
-
-    .closing-statement {
+    .landing-steps {
       display: grid;
-      gap: 8px;
-      padding: 20px 24px;
-      border-radius: 28px;
-      background: var(--dark-surface-soft);
-      border: 1px solid var(--dark-line);
-      box-shadow: var(--shadow);
+      gap: 10px;
     }
 
-    .closing-statement p {
-      margin: 0;
-      font-family: "Noto Serif SC", serif;
-      font-size: clamp(23px, 2.2vw, 34px);
-      line-height: 1.38;
+    .landing-step {
+      padding: 16px;
+      border-radius: var(--r);
+      background: rgba(251, 245, 234, 0.07);
+      border: 1px solid var(--line-dark);
     }
 
-    .closing-points {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .closing-point {
-      padding: 14px;
-      border-radius: 22px;
-      background: var(--dark-surface-soft);
-      border: 1px solid var(--dark-line);
-    }
-
-    .closing-point span {
+    .landing-step span {
       display: block;
       margin-bottom: 8px;
-      color: #e0b58e;
+      color: var(--reed);
       font-size: 12px;
       font-weight: 900;
       letter-spacing: 0.14em;
       text-transform: uppercase;
     }
 
-    .closing-point strong {
+    .landing-step strong {
       display: block;
       margin-bottom: 8px;
       font-family: "Noto Serif SC", serif;
-      font-size: 22px;
+      font-size: 24px;
       line-height: 1.22;
     }
 
-    .closing-point p {
+    .landing-step p {
       margin: 0;
-      color: rgba(247,241,232,0.84);
-      font-size: 14px;
-      line-height: 1.65;
+      color: rgba(251, 245, 234, 0.78);
+      line-height: 1.62;
     }
 
-    .closing-signoff {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      color: rgba(247,241,232,0.78);
-      font-size: 14px;
-    }
-
-    .hud,
-    .slide-counter,
-    .dots {
-      position: fixed;
-      z-index: 20;
-    }
-
-    .hud {
-      left: 26px;
-      bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(31,26,21,0.22);
-      border: 1px solid rgba(255,255,255,0.12);
-      backdrop-filter: blur(16px);
-      color: #f7f1e8;
-      font-size: 14px;
-    }
-
-    .progress-bar {
-      width: 124px;
-      height: 2px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.22);
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      width: 0%;
-      height: 100%;
-      background: #f2d7bb;
-      transition: width 320ms ease;
-    }
-
-    .slide-counter {
-      right: 26px;
-      top: 24px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      border-radius: 999px;
-      background: rgba(255,250,242,0.74);
-      border: 1px solid rgba(31,26,21,0.08);
-      backdrop-filter: blur(16px);
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .slide-counter strong {
-      color: var(--ink);
-      font-size: 18px;
-    }
-
-    .dots {
-      right: 28px;
-      top: 50%;
-      transform: translateY(-50%);
+    .closing-mark {
+      min-height: 580px;
+      padding: 28px;
+      border-radius: var(--r);
+      background:
+        repeating-radial-gradient(circle at 50% 36%, rgba(217,199,159,0.2) 0 1px, transparent 1px 23px),
+        linear-gradient(180deg, rgba(217,199,159,0.12), rgba(217,199,159,0.02));
+      border: 1px solid var(--line-dark);
       display: grid;
-      gap: 10px;
-    }
-
-    .dot {
-      width: 11px;
-      height: 11px;
-      border: none;
-      border-radius: 50%;
-      background: rgba(255,250,242,0.42);
-      box-shadow: inset 0 0 0 1px rgba(31,26,21,0.12);
-      cursor: pointer;
-      transition: transform 200ms ease, background 200ms ease;
-    }
-
-    .dot.active {
-      transform: scale(1.28);
-      background: var(--earth);
-    }
-
-    .footer-tag {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      align-content: end;
       gap: 18px;
-      font-size: 14px;
-      color: rgba(247,241,232,0.72);
     }
 
-    @media (max-width: 1100px) {
-      .hero,
-      .duo,
-      .demo-shell,
-      .timeline,
-      .problem-grid,
-      .layer-grid,
-      .vision-grid,
-      .evidence-shell,
-      .closing-shell,
-      .closing-points,
-      .evidence-ledger,
-      .flow {
+    .closing-mark strong {
+      max-width: 9ch;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(40px, 5vw, 80px);
+      line-height: 1.05;
+    }
+
+    .closing-mark p {
+      margin: 0;
+      max-width: 28rem;
+      color: rgba(251, 245, 234, 0.78);
+      line-height: 1.76;
+    }
+
+    @media (max-width: 1180px) {
+      :root {
+        --rail: 0px;
+      }
+
+      body {
+        background:
+          linear-gradient(120deg, rgba(33,86,74,0.13), transparent 36%),
+          linear-gradient(180deg, #f5ead9 0%, #e6d7bd 100%);
+      }
+
+      .stage-rail {
+        position: sticky;
+        top: 0;
+        width: 100%;
+        min-height: auto;
+        grid-template-rows: auto;
+        grid-template-columns: minmax(150px, 0.45fr) minmax(0, 1fr) auto;
+        align-items: center;
+        padding: 12px 14px;
+      }
+
+      .station-mark {
+        gap: 4px;
+      }
+
+      .station-mark strong {
+        max-width: none;
+        font-size: 20px;
+      }
+
+      .rail-nav {
+        display: flex;
+        overflow-x: auto;
+        align-content: stretch;
+        justify-content: start;
+        gap: 6px;
+        scrollbar-width: none;
+      }
+
+      .rail-nav::-webkit-scrollbar {
+        display: none;
+      }
+
+      .rail-link {
+        flex: 0 0 auto;
+        grid-template-columns: auto;
+        min-height: 38px;
+      }
+
+      .rail-link code {
+        display: none;
+      }
+
+      .rail-link span {
+        white-space: nowrap;
+        font-size: 12px;
+      }
+
+      .rail-foot {
+        min-width: 86px;
+      }
+
+      .rail-foot p {
+        display: none;
+      }
+
+      .page-shell {
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .roadshow-section {
+        min-height: auto;
+        scroll-margin-top: 112px;
+        padding: 64px 18px 76px;
+      }
+
+      .hero-layout,
+      .story-grid,
+      .signal-layout,
+      .demo-layout,
+      .evidence-layout,
+      .source-layout,
+      .channel-layout,
+      .visual-layout,
+      .graph-layout,
+      .closing-layout,
+      .agent-map {
+        grid-template-columns: 1fr;
+        grid-template-areas: none;
+      }
+
+      .hero-copy {
+        min-height: auto;
+      }
+
+      .hero-copy .lead {
+        margin-left: 0;
+      }
+
+      .radio-console {
+        min-height: 520px;
+      }
+
+      .story-card,
+      .media-stack {
+        position: static;
+      }
+
+      .newspaper-card:nth-child(2) {
+        transform: none;
+      }
+
+      .graph-feature,
+      .graph-feature img,
+      .graph-card.compact img,
+      .source-card.hero-source img,
+      .source-card.compact-source img {
+        min-height: auto;
+        height: auto;
+      }
+
+      .source-card.compact-source {
         grid-template-columns: 1fr;
       }
 
-      .slide {
-        overflow-y: auto;
-        overflow-x: hidden;
-        align-items: start;
-        padding-bottom: 96px;
+      .agent-intro,
+      .agent-card {
+        grid-area: auto !important;
       }
 
-      .dots {
-        display: none;
-      }
-    }
-
-    @media (max-width: 700px) {
-      html,
-      body {
-        background:
-          radial-gradient(circle at 20% 0%, rgba(255,255,255,0.68), transparent 32%),
-          linear-gradient(180deg, #f2eadc 0%, #e3d7c5 100%);
-      }
-
-      body::before {
-        background-size: 26px 26px;
-        opacity: 0.38;
-      }
-
-      .deck {
-        width: 100%;
-      }
-
-      .slides {
-        transition-duration: 520ms;
-      }
-
-      .slide {
-        width: 100vw;
-        padding:
-          max(72px, calc(env(safe-area-inset-top) + 56px))
-          16px
-          max(104px, calc(env(safe-area-inset-bottom) + 86px));
-      }
-
-      .slide::after {
-        display: none;
-      }
-
-      .content {
-        gap: 16px;
-        max-width: 100%;
-      }
-
-      .stack {
-        gap: 14px;
-      }
-
-      .eyebrow {
-        max-width: 100%;
-        padding: 8px 12px;
-        border-radius: 22px;
-        font-size: 10px;
-        letter-spacing: 0.1em;
-        line-height: 1.35;
-      }
-
-      .title {
-        font-size: clamp(36px, 12vw, 54px);
-        line-height: 1.12;
-        max-width: 100%;
-      }
-
-      .story-title {
-        width: 100%;
-      }
-
-      .lead,
-      .section-copy {
-        max-width: 100%;
-        font-size: 16px;
-        line-height: 1.72;
-      }
-
-      .section-title {
-        font-size: clamp(26px, 8.6vw, 38px);
-        line-height: 1.18;
-      }
-
-      .section-title.section-title-small {
-        font-size: clamp(22px, 6.8vw, 30px);
-      }
-
-      .panel,
-      .glass-card,
-      .metric-card,
-      .timeline-card,
-      .vision-card,
-      .wave-card {
-        border-radius: 22px;
-      }
-
-      .panel,
-      .glass-card,
-      .metric-card,
-      .timeline-card,
-      .vision-card {
-        padding: 18px;
-      }
-
-      .wave-card {
-        padding: 20px;
-        min-height: 360px;
-      }
-
-      .wave-card::before,
-      .wave-card::after {
-        left: 0;
-        right: 0;
-      }
-
-      .wave-card h2 {
-        font-size: clamp(28px, 9vw, 42px);
-        max-width: 100%;
-      }
-
-      .wave-card p,
-      .glass-card p,
-      .metric-card p,
-      .timeline-card p,
-      .vision-card p,
-      .note-item p {
-        font-size: 14px;
-        line-height: 1.68;
-      }
-
-      .bullet-list {
-        gap: 10px;
-      }
-
-      .bullet-list li {
-        gap: 10px;
-        font-size: 16px;
-        line-height: 1.62;
-      }
-
-      .flow-card {
+      .agent-intro {
         min-height: auto;
       }
 
-      .demo-player {
-        padding: 20px;
-        border-radius: 24px;
+      .proof-grid {
+        grid-template-columns: 1fr;
       }
 
-      .demo-player .ring {
-        width: min(58vw, 220px);
+      .newspaper-gallery {
+        grid-template-columns: 1fr;
       }
 
-      .demo-meter {
-        height: 52px;
+      .channel-gallery {
+        grid-template-columns: 1fr;
       }
 
-      @keyframes pulse {
-        0%, 100% { height: 14px; opacity: 0.5; }
-        50% { height: 50px; opacity: 1; }
+      .channel-card:nth-child(2) {
+        transform: none;
       }
 
-      .footer-tag,
-      .closing-signoff {
-        display: grid;
-        justify-content: start;
-      }
-
-      .slide-counter {
-        top: max(10px, env(safe-area-inset-top));
-        right: 12px;
-        gap: 7px;
-        padding: 9px 12px;
-        font-size: 12px;
-      }
-
-      .slide-counter strong {
-        font-size: 17px;
-      }
-
-      .hud {
-        left: 12px;
-        right: 12px;
-        bottom: max(12px, env(safe-area-inset-bottom));
-        justify-content: space-between;
-        padding: 10px 12px;
-        font-size: 13px;
-      }
-
-      .progress-bar {
-        width: min(42vw, 170px);
-      }
-
-      .evidence-slide,
-      .closing-slide {
-        padding:
-          max(72px, calc(env(safe-area-inset-top) + 56px))
-          16px
-          max(108px, calc(env(safe-area-inset-bottom) + 90px));
-      }
-
-      .evidence-head {
-        gap: 10px;
-      }
-
-      .evidence-ledger {
-        gap: 9px;
-      }
-
-      .evidence-row {
-        grid-template-columns: 40px minmax(0, 1fr);
-        min-height: auto;
-        padding: 11px;
-        border-radius: 18px;
-      }
-
-      .evidence-row .page-no {
-        width: 36px;
-        height: 36px;
-        border-radius: 14px;
-        font-size: 13px;
-      }
-
-      .evidence-row p {
-        font-size: 12.5px;
-        line-height: 1.5;
-      }
-
-      .media-stack {
-        gap: 10px;
-      }
-
-      .media-card {
-        padding: 12px;
-        border-radius: 20px;
-      }
-
-      .media-card video {
-        height: auto;
-        aspect-ratio: 16 / 9;
-        border-radius: 16px;
-      }
-
-      .media-card audio {
-        min-height: 44px;
-      }
-
-      .media-toggle {
-        width: 100%;
-        min-height: 44px;
-        justify-content: center;
-        font-size: 14px;
-      }
-
-      .asset-meta span {
-        padding: 5px 7px;
-      }
-
-      .closing-shell {
-        gap: 16px;
+      .proof-row:last-child {
+        grid-column: auto;
       }
 
       .closing-mark {
-        min-height: 280px;
-        padding: 20px;
-        border-radius: 24px;
-      }
-
-      .closing-mark strong {
-        max-width: 12ch;
-        font-size: clamp(28px, 9vw, 42px);
-      }
-
-      .closing-copy {
-        gap: 14px;
-      }
-
-      .closing-title {
-        max-width: 100%;
-        font-size: clamp(40px, 13vw, 58px);
-      }
-
-      .closing-lead {
-        font-size: 16px;
-        line-height: 1.72;
-      }
-
-      .closing-statement {
-        padding: 18px;
-        border-radius: 22px;
-      }
-
-      .closing-statement p {
-        font-size: clamp(24px, 7.6vw, 34px);
-        line-height: 1.34;
-      }
-
-      .closing-point {
-        padding: 16px;
+        min-height: 420px;
       }
     }
 
-    @media (max-width: 390px) {
-      .slide,
-      .evidence-slide,
-      .closing-slide {
-        padding-left: 14px;
-        padding-right: 14px;
+    @media (max-width: 560px) {
+      .stage-rail {
+        grid-template-columns: 1fr;
+        gap: 10px;
       }
 
-      .title,
-      .closing-title {
-        font-size: clamp(34px, 12vw, 50px);
+      .rail-foot {
+        display: none;
       }
 
-      .hud {
-        font-size: 12px;
+      .display {
+        font-size: clamp(38px, 12vw, 58px);
+      }
+
+      .section-title {
+        font-size: clamp(30px, 9vw, 44px);
+      }
+
+      .hero-note,
+      .story-list li,
+      .proof-row {
+        grid-template-columns: 1fr;
+      }
+
+      .program-row {
+        grid-template-columns: 1fr;
+      }
+
+      .dial-label {
+        right: 6px;
+        bottom: 16px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .reveal,
+      .rail-link,
+      .media-toggle,
+      .rail-meter span {
+        transition: none;
+      }
+
+      .wave-bars i {
+        animation: none;
       }
     }
   </style>
 </head>
 <body>
-  <div class="deck">
-    <div class="slides" id="slides">
-      <section class="slide" data-duration="30s">
-        <div class="content">
-          <div class="hero">
-            <div class="stack">
-              <div class="eyebrow">屏南乡建黑客松 / 3 min pitch</div>
-              <h1 class="title story-title">奶奶屋里的那台收音机，很多年都没有关过</h1>
-              <p class="lead" style="max-width: 42rem;">
-                阿恺小时候住在村里。奶奶屋里有一台旧收音机，不是什么好机器，
-                但从早到晚一直亮着。她有时听秦腔，有时听天气预报，有时什么都不听，
-                只是让那个沙沙的声音陪着自己。
-              </p>
-              <p class="lead" style="max-width: 40rem; opacity: 0.82;">
-                后来阿恺去了城市，奶奶的收音机还在响。
-              </p>
-              <div class="time-badge">Opening</div>
+  <a class="skip-link" href="#main">跳到正文</a>
+
+  <aside class="stage-rail" aria-label="路演章节">
+    <div class="station-mark">
+      <span>Banong Radio</span>
+      <strong>剪鸭村融媒体</strong>
+    </div>
+    <nav class="rail-nav" aria-label="页面导航">
+      <a class="rail-link is-current" href="#hero"><code>01</code><span>开场</span></a>
+      <a class="rail-link" href="#fracture"><code>02</code><span>乡村割裂</span></a>
+      <a class="rail-link" href="#resolution"><code>03</code><span>产品方案</span></a>
+      <a class="rail-link" href="#agents"><code>04</code><span>Agent 编排</span></a>
+      <a class="rail-link" href="#demo"><code>05</code><span>电台听感</span></a>
+      <a class="rail-link" href="#evidence"><code>06</code><span>证据素材</span></a>
+      <a class="rail-link" href="#sources"><code>07</code><span>数据来源</span></a>
+      <a class="rail-link" href="#channels"><code>08</code><span>触达入口</span></a>
+      <a class="rail-link" href="#newspaper"><code>09</code><span>村报样张</span></a>
+      <a class="rail-link" href="#graph"><code>10</code><span>关系图谱</span></a>
+      <a class="rail-link" href="#closing"><code>11</code><span>落地愿景</span></a>
+    </nav>
+    <div class="rail-foot">
+      <div class="rail-meter" aria-hidden="true"><span id="scrollMeter"></span></div>
+      <p>屏南乡建黑客松 · 3 min pitch · 现场路演网页</p>
+    </div>
+  </aside>
+
+  <main class="page-shell" id="main">
+    <section class="roadshow-section" id="hero" data-section="开场">
+      <div class="section-inner hero-layout">
+        <div class="hero-copy reveal">
+          <div class="kicker">Jianya media / pitch opening</div>
+          <h1 class="display">奶奶屋里的那台收音机，很多年都没有关过</h1>
+          <p class="lead">
+            阿恺小时候住在村里。奶奶屋里有一台旧收音机，不是什么好机器，
+            但从早到晚一直亮着。她有时听秦腔，有时听天气预报，有时什么都不听，
+            只是让那个沙沙的声音陪着自己。
+          </p>
+          <div class="hero-note">
+            <code>FM 10:26</code>
+            <p>从一段熟悉的声音开始，把评委带进村庄现场：左边是人和记忆，右边是正在播出的村庄频道。</p>
+          </div>
+        </div>
+
+        <div class="radio-console reveal" aria-label="电台视觉控制台">
+          <div class="console-top">
+            <span>Jianya village signal</span>
+            <span>live / fallback ready</span>
+          </div>
+          <div class="dial-stage">
+            <div class="dial" aria-hidden="true"></div>
+            <div class="dial-label">
+              <span>Now tuning</span>
+              <strong>今日三件事</strong>
             </div>
-            <div class="panel">
-              <span class="section-kicker">后来我们才慢慢明白</span>
-              <h2 class="section-title">对许多农村老人来说，声音不是陪衬，而是他们和世界之间最后那条不断掉的线</h2>
-              <ul class="bullet-list">
-                <li>他们不会刷短视频，看不懂公众号长文，群里也常常只会发语音。</li>
-                <li>村里的很多事，他们不是“看到”的，而是“听到”的。</li>
-                <li>听邻里说，听大喇叭喊，听收音机讲。</li>
-                <li>而在另一端，离开家乡的年轻人，常常和故乡只剩下一句轻轻的“都好”。</li>
-              </ul>
+          </div>
+          <div class="program-strip">
+            <div class="program-row">
+              <time>07:00</time>
+              <strong>天气、农时、村务提醒</strong>
+              <span>老人不用打开手机</span>
+            </div>
+            <div class="program-row">
+              <time>12:30</time>
+              <strong>新村民与原住民的共同频道</strong>
+              <span>把信息写成人话</span>
+            </div>
+            <div class="program-row">
+              <time>22:40</time>
+              <strong>深夜群聊日常</strong>
+              <span>把争执化成可被听见的日常</span>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="slide dark" data-duration="20s">
-        <div class="content">
-          <div class="duo">
-            <div class="wave-card">
-              <div class="eyebrow">一个产品创意，是这样长出来的</div>
-              <h2>我们想，如果声音依然是乡村最自然的连接方式，能不能让每个村庄都拥有自己的融媒体平台？</h2>
-              <p>
-                过去这几乎不可想象。一个村庄不可能养得起采编、播音、运营和技术系统。
-                但今天，AI 正在把这件事第一次变成现实。
-              </p>
+    <section class="roadshow-section" id="fracture" data-section="乡村割裂">
+      <div class="section-inner story-grid">
+        <div class="story-card reveal">
+          <div class="kicker">Core problem</div>
+          <h2 class="section-title">乡村真正缺的不是更多信息</h2>
+          <p class="body-copy">
+            当城市化与局部逆城市化同时发生，村庄需要一个让不同人群重新听见彼此的共同媒介。
+            声音不是陪衬，而是老人、新村民、离乡年轻人和村庄治理之间仍然能共用的接口。
+          </p>
+        </div>
+
+        <ol class="story-list reveal">
+          <li>
+            <code>01</code>
+            <div>
+              <strong>新村民与原住民住在一起，却没有共同频道</strong>
+              <p>数字游民、新村民与在地村民之间，缺少稳定且低门槛的融合入口。</p>
             </div>
-            <div class="stack">
-              <div class="panel">
-                <span class="section-kicker">为什么是现在</span>
-                <ul class="bullet-list">
-                  <li>AI 可以把碎片化信息自动采集、整理、编译。</li>
-                  <li>AI 可以把文字变成音乐、语音和连续播出的内容。</li>
-                  <li>过去属于城市媒体机构的能力，现在可以下沉到一个具体村庄。</li>
-                  <li>于是我们萌生了这个想法：为乡村搭一套属于自己的融媒体基础设施。</li>
-                </ul>
-              </div>
-              <div class="time-badge">00:20 · Idea to product</div>
+          </li>
+          <li>
+            <code>02</code>
+            <div>
+              <strong>异乡人与家乡之间，只剩一句“都好”</strong>
+              <p>外出务工的年轻人知道故乡还在，却很难持续感知它每天的变化。</p>
             </div>
+          </li>
+          <li>
+            <code>03</code>
+            <div>
+              <strong>信息在线上，老人在线下</strong>
+              <p>微信群与小程序越发重要，但老人常被数字门槛挡在信息网络之外。</p>
+            </div>
+          </li>
+          <li>
+            <code>04</code>
+            <div>
+              <strong>冲突在群里放大，却少了柔性化解</strong>
+              <p>群聊争执、邻里纠纷需要被疏导，而不是被二次传播和持续激化。</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="roadshow-section dark" id="resolution" data-section="产品方案">
+      <div class="section-inner signal-layout">
+        <div class="signal-copy reveal">
+          <div class="kicker">Resolution</div>
+          <h2 class="section-title">以多环节 AI 编排为核心的乡村融媒体平台</h2>
+          <p class="lead">
+            从老人收音机、村口广播、群聊家常这些最原生的乡村场景出发，
+            把碎片化信息编织成一个 24 小时有人情味的乡村电台。
+          </p>
+        </div>
+
+        <div class="signal-panel reveal">
+          <ul>
+            <li>已经实现：AI 电台，验证“低门槛触达 + 日常陪伴”的核心场景。</li>
+            <li>已经产出：AI 村报样张，把声音内容沉淀为适合传播和回看的图文载体。</li>
+            <li>后续方向：视频化，让村庄故事进入短视频和公共屏幕场景。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="roadshow-section" id="agents" data-section="Agent 编排">
+      <div class="section-inner agent-map">
+        <div class="agent-intro reveal">
+          <div class="kicker">Design logic</div>
+          <h2 class="section-title">四层 Agent，各自解决一种“听见彼此”的难题</h2>
+          <p class="body-copy">不是把 AI 功能堆成列表，而是把村庄信息从采集、改写、生成到播出连成一条可验证的广播工作流。</p>
+        </div>
+        <article class="agent-card reveal">
+          <span>感知层</span>
+          <strong>把村庄采进来</strong>
+          <p>政务 API、天气农时、微信群聊、村书记口播，先变成可处理的村庄信号。</p>
+        </article>
+        <article class="agent-card reveal">
+          <span>合成层</span>
+          <strong>把信息写成人话</strong>
+          <p>通知、故事、闲聊分风格改写，让严肃信息与日常叙事自然衔接。</p>
+        </article>
+        <article class="agent-card reveal">
+          <span>生成层</span>
+          <strong>把文字变成有情绪的声音</strong>
+          <p>本地 AI 音乐生成 + TTS，自适应匹配紧急、温情、日常等内容氛围。</p>
+        </article>
+        <article class="agent-card reveal">
+          <span>调度层</span>
+          <strong>把播出做专业</strong>
+          <p>旁链压缩、音乐闪避、台呼和转场统一调度，形成广播级听感。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="roadshow-section dark" id="demo" data-section="电台听感">
+      <div class="section-inner demo-layout">
+        <div class="live-board reveal" aria-label="电台播放状态示意">
+          <div class="wave-window">
+            <div class="wave-bars" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <strong>24 小时有人情味的乡村电台</strong>
           </div>
         </div>
-      </section>
 
-      <section class="slide" data-duration="30s">
-        <div class="content">
-          <div class="hero">
-            <div class="stack">
-              <div class="eyebrow">屏南乡建黑客松 / 3 min pitch</div>
-              <h1 class="title">用声音缝合乡村的裂缝</h1>
-              <p class="lead">
-                当城市化与局部逆城市化同时发生，乡村真正缺的不是更多信息，
-                而是一个让不同人群重新听见彼此的共同媒介。
-              </p>
-              <div class="time-badge">Situation &amp; complication</div>
-            </div>
-            <div class="panel">
-              <span class="section-kicker">Core Problem</span>
-              <h2 class="section-title">今天的乡村，正在经历四种割裂</h2>
-              <div class="problem-grid">
-                <article class="glass-card">
-                  <h3>新村民与原住民</h3>
-                  <strong>住在一起<br />却没有共同频道</strong>
-                  <p>数字游民、新村民与在地村民之间，缺少稳定且低门槛的融合入口。</p>
-                </article>
-                <article class="glass-card">
-                  <h3>异乡人与家乡</h3>
-                  <strong>人离开了<br />情感也断线了</strong>
-                  <p>外出务工的年轻人知道故乡还在，却很难持续感知它每天的变化。</p>
-                </article>
-                <article class="glass-card">
-                  <h3>人与信息</h3>
-                  <strong>信息在线上<br />老人在线下</strong>
-                  <p>微信群与小程序越发重要，但老人常被数字门槛挡在信息网络之外。</p>
-                </article>
-                <article class="glass-card">
-                  <h3>村庄治理</h3>
-                  <strong>冲突在群里放大<br />却少了柔性化解</strong>
-                  <p>群聊争执、邻里纠纷需要被疏导，而不是被二次传播和持续激化。</p>
-                </article>
-              </div>
-            </div>
-          </div>
+        <div class="demo-copy reveal">
+          <div class="kicker">Audio demo</div>
+          <h2 class="section-title">请观众把注意力让给声音本身</h2>
+          <p class="lead">
+            电台 Demo 不需要被包装成炫技界面。现场重点听三件事：信息是否自然，
+            音乐情绪是否跟内容变化，播报和背景音是否具有专业电台感。
+          </p>
+          <ul class="demo-checks">
+            <li>输入：新老村民群聊碎片、村两委通知、村庄故事。</li>
+            <li>输出：连续播出的村庄声音，既服务治理，也经营情感连接。</li>
+            <li>边界：fallback 优先，真实源接口保留但不默认接入。</li>
+          </ul>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="slide dark" data-duration="30s">
-        <div class="content">
-          <div class="duo">
-            <div class="wave-card">
-              <div class="eyebrow">Resolution</div>
-              <h2>以 AI Agent 编排为核心的乡村融媒体平台</h2>
-              <p>
-                从老人收音机、村口广播、群聊家常这些最原生的乡村场景出发，
-                把碎片化信息编织成一个 24 小时有人情味的乡村电台。
-              </p>
-              <div class="chips">
-                <span class="chip">通过声音弥合城乡割裂</span>
-                <span class="chip">构建信息共同体</span>
-                <span class="chip">成为治理与经营的智能纽带</span>
-              </div>
-            </div>
-            <div class="stack">
-              <div class="panel">
-                <span class="section-kicker">One-line Positioning</span>
-                <h2 class="section-title section-title-small">已经实现：AI 电台、AI 村报，后续走向 AI 电视台</h2>
-                <ul class="bullet-list">
-                  <li>多源信息采集：政务 API、微信群聊、村内口播</li>
-                  <li>多 Agent 整理：清洗、编译、改写为结构化内容</li>
-                  <li>多模态播出：音乐生成、TTS、广播级音频调度</li>
-                </ul>
-              </div>
-              <div class="timeline">
-                <article class="timeline-card">
-                  <h3>Step 1</h3>
-                  <strong>AI 电台</strong>
-                  <p>已完成。验证了“低门槛触达 + 日常陪伴”的核心场景。</p>
-                </article>
-                <article class="timeline-card">
-                  <h3>Step 2</h3>
-                  <strong>AI 村报</strong>
-                  <p>开发中。把音频内容沉淀为更适合传播、回看的图文载体。</p>
-                </article>
-                <article class="timeline-card">
-                  <h3>Step 3</h3>
-                  <strong>视频化</strong>
-                  <p>下一步。让村庄故事进入更强传播力的短视频与屏幕场景。</p>
-                </article>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+    <section class="roadshow-section dark" id="evidence" data-section="证据素材">
+      <div class="section-inner evidence-layout">
+        <div class="evidence-copy reveal">
+          <div class="kicker">Evidence board</div>
+          <h2 class="section-title">把路演叙事落到可播放素材</h2>
+          <p class="lead">
+            叙事不是抽象怀旧。本页用真实音频与界面视频承接每一个论点，
+            让评委可以现场验证“乡村电台感”是否成立。
+          </p>
 
-      <section class="slide" data-duration="45s">
-        <div class="content">
-          <div class="stack">
-            <div class="eyebrow">Design logic / 1 min</div>
-            <h2 class="section-title" style="font-size:clamp(34px,3.6vw,56px);">四层 Agent，各自解决一种“听见彼此”的难题</h2>
-            <div class="layer-grid compact">
-              <article class="metric-card">
-                <h3>感知层</h3>
-                <strong>把村庄采进来</strong>
-                <p>政务 API：天气、农时、政策<br />微信群聊：日常、新村民动态、村书记口播</p>
-              </article>
-              <article class="metric-card">
-                <h3>合成层</h3>
-                <strong>把信息写成人话</strong>
-                <p>通知、故事、闲聊分风格改写，让严肃信息与日常叙事自然衔接。</p>
-              </article>
-              <article class="metric-card">
-                <h3>生成层</h3>
-                <strong>把文字变成有情绪的声音</strong>
-                <p>本地 AI 音乐生成 + TTS，自适应匹配紧急、温情、日常等内容氛围。</p>
-              </article>
-              <article class="metric-card">
-                <h3>调度层</h3>
-                <strong>把播出做专业</strong>
-                <p>旁链压缩、音乐闪避、台呼、转场统一调度，形成广播级听感。</p>
-              </article>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide dark" data-duration="30s">
-        <div class="content">
-          <div class="demo-shell">
-            <div class="demo-player">
+          <div class="proof-grid">
+            <article class="proof-row">
+              <span class="number-mark">01</span>
               <div>
-                <div class="eyebrow">Audio demo</div>
-                <strong>24 小时有人情味的乡村电台</strong>
+                <h3>Opening</h3>
+                <p>旧收音机与秦腔记忆，对应《秦托邦播客测试 · 电台版》。</p>
               </div>
-              <div class="ring" aria-hidden="true"></div>
-              <div class="demo-meter" aria-hidden="true">
-                <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            </article>
+            <article class="proof-row">
+              <span class="number-mark">02</span>
+              <div>
+                <h3>Idea to product</h3>
+                <p>两条音频样本覆盖戏曲电台口味和群聊日常口味。</p>
               </div>
-              <p>这里可直接切入你们已完成的 AI 电台 Demo，画面保持安静，把注意力让给声音本身。</p>
-            </div>
-            <div class="stack">
-              <div class="panel">
-                <span class="section-kicker">Demo focus</span>
-                <h2 class="section-title">请观众重点听三件事</h2>
-                <ul class="bullet-list">
-                  <li>信息是否足够自然，不像机器拼接</li>
-                  <li>音乐情绪是否会随着内容自动变化</li>
-                  <li>播报和背景音之间是否具备“专业电台感”</li>
-                </ul>
+            </article>
+            <article class="proof-row">
+              <span class="number-mark">03</span>
+              <div>
+                <h3>Fractures</h3>
+                <p>《深夜电台之群聊日常》对应“信息在线上、老人在线下”的问题面。</p>
               </div>
-              <div class="note-list">
-                <article class="note-item">
-                  <strong>输入</strong>
-                  <p>新老村民群聊碎片、村两委通知、村庄故事</p>
-                </article>
-                <article class="note-item">
-                  <strong>输出</strong>
-                  <p>连续播出的村庄声音，既能服务治理，也能经营情感连接</p>
-                </article>
+            </article>
+            <article class="proof-row">
+              <span class="number-mark">04</span>
+              <div>
+                <h3>Resolution</h3>
+                <p>15 秒界面视频把 AI 电台、村报样张和视频化方向变成可见交互。</p>
               </div>
-            </div>
+            </article>
+            <article class="proof-row">
+              <span class="number-mark">05</span>
+              <div>
+                <h3>Agent layers</h3>
+                <p>三段素材分别落在生成层、调度层、播出层。</p>
+              </div>
+            </article>
+            <article class="proof-row">
+              <span class="number-mark">06</span>
+              <div>
+                <h3>Audio demo</h3>
+                <p>64 秒电台版与 150 秒群聊日常，可验证播报、音乐和电台质感。</p>
+              </div>
+            </article>
+            <article class="proof-row">
+              <span class="number-mark">07</span>
+              <div>
+                <h3>Vision</h3>
+                <p>早晚陪伴、离乡连接、新村民理解和柔性治理，形成闭环证据。</p>
+              </div>
+            </article>
           </div>
         </div>
-      </section>
 
-      <section class="slide dark" data-duration="30s">
-        <div class="content">
-          <div class="stack">
-            <div class="eyebrow">Vision / 24 小时带状节目</div>
-            <h2 class="title" style="max-width:13ch;">让声音成为村庄的纽带</h2>
-            <div class="vision-grid">
-              <article class="vision-card">
-                <h3>早晨</h3>
-                <strong>老人不用打开手机</strong>
-                <p>天气、村务、秦腔和新鲜事，通过收音机自己流进来。</p>
-              </article>
-              <article class="vision-card">
-                <h3>上午</h3>
-                <strong>离乡年轻人重新被家乡击中</strong>
-                <p>一段熟悉的声音，就足以让他重新拨通家里的电话。</p>
-              </article>
-              <article class="vision-card">
-                <h3>中午</h3>
-                <strong>新村民不再只是“住在这里”</strong>
-                <p>他开始理解村庄历史，也开始觉得自己属于这里。</p>
-              </article>
-              <article class="vision-card">
-                <h3>晚上</h3>
-                <strong>矛盾不被放大，而被柔性化解</strong>
-                <p>故事代替冲突，开导代替评判，社区氛围被慢慢修复。</p>
-              </article>
+        <div class="media-stack reveal" aria-label="可播放证据素材">
+          <article class="media-card featured">
+            <h3>Interface video</h3>
+            <strong>九鸭村电台交互样片</strong>
+            <video id="radioUiVideo" controls playsinline webkit-playsinline preload="metadata" aria-label="九鸭村电台界面交互视频">
+              <source src="assets/radio-ui-interaction.mp4" type="video/mp4" />
+            </video>
+            <button class="media-toggle" type="button" data-media-toggle="radioUiVideo">播放视频</button>
+            <div class="asset-meta">
+              <span>15s</span>
+              <span>1920x1080</span>
+              <span>H.264 + AAC</span>
             </div>
-            <p class="final-quote">连接人与信息，连接人与土地，连接人与人。</p>
-            <div class="footer-tag">
-              <span>先听见，再抵达；先陪伴，再连接。</span>
-              <span>Thank you</span>
+          </article>
+
+          <article class="media-card">
+            <h3>Radio sample A</h3>
+            <strong>秦托邦播客测试 · 电台版</strong>
+            <audio id="qintobangAudio" controls preload="metadata" aria-label="秦托邦播客测试电台版音频">
+              <source src="assets/qintobang-radio.m4a" type="audio/mp4" />
+              <source src="assets/qintobang-radio.wav" type="audio/wav" />
+            </audio>
+            <button class="media-toggle" type="button" data-media-toggle="qintobangAudio">播放音频</button>
+            <p>戏曲/电台语气样本，承接开场的旧收音机和老人听觉入口。</p>
+            <div class="asset-meta">
+              <span>64s</span>
+              <span>AAC / WAV</span>
+              <span>24 kHz</span>
             </div>
+          </article>
+
+          <article class="media-card">
+            <h3>Radio sample B</h3>
+            <strong>深夜电台之群聊日常</strong>
+            <audio id="midnightAudio" controls preload="metadata" aria-label="深夜电台之群聊日常音频">
+              <source src="assets/midnight-chat-radio.m4a" type="audio/mp4" />
+              <source src="assets/midnight-chat-radio.mp3" type="audio/mpeg" />
+            </audio>
+            <button class="media-toggle" type="button" data-media-toggle="midnightAudio">播放音频</button>
+            <p>群聊碎片被改写成夜间陪伴内容，承接问题页与 Demo 页的自然度验证。</p>
+            <div class="asset-meta">
+              <span>150s</span>
+              <span>AAC / MP3</span>
+              <span>44.1 kHz</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="roadshow-section dark" id="sources" data-section="数据来源">
+      <div class="section-inner source-layout">
+        <div class="visual-copy reveal">
+          <div class="kicker">Source evidence</div>
+          <h2 class="section-title">电台不是凭空生成，它从村庄真实信号里组织节目</h2>
+          <p class="lead">
+            这页用演示图说明两类来源：一类是系统内部的多环节自动化编排，
+            一类是村口大喇叭这类最传统、也最容易触达老人的公共入口。
+          </p>
+          <ul class="visual-notes">
+            <li>多 Agent 图用于解释“采集、清洗、改写、调度、播出”的处理链条。</li>
+            <li>村口大喇叭图用于解释为什么电台适合乡村：它能回到老人熟悉的听觉场景。</li>
+            <li>图片为演示说明图，不代表已接入全部真实数据源；正式落地仍遵循 fallback 优先和人工审核。</li>
+          </ul>
+        </div>
+
+        <div class="source-gallery reveal" aria-label="数据来源演示图">
+          <figure class="source-card hero-source">
+            <img
+              src="assets/source-agent-orchestration.png"
+              alt="多 Agent 自动化编排演示图，从天气、村务、微信群和口播素材采集，到清洗、改写、规划、调度，再输出 AI 电台、村报、小程序和视频化内容"
+            />
+            <figcaption class="image-caption">
+              <strong>Agent orchestration</strong>
+              <span>把多源信息转成可播出的村庄节目单。</span>
+            </figcaption>
+          </figure>
+          <figure class="source-card compact-source">
+            <img
+              src="assets/source-village-speaker.png"
+              alt="村口大喇叭演示图，村务公开栏旁的广播喇叭正在播放村庄电台，村民在现场收听"
+            />
+            <figcaption class="image-caption">
+              <strong>Village speaker</strong>
+              <span>村口广播把电台带回老人熟悉的公共听觉空间。</span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="roadshow-section dark" id="channels" data-section="触达入口">
+      <div class="section-inner channel-layout">
+        <div class="visual-copy reveal">
+          <div class="kicker">Access channels</div>
+          <h2 class="section-title">同一条电台内容，可以进入小程序，也可以进入微信群</h2>
+          <p class="lead">
+            后续产品不会只停留在网页 Demo。小程序承担节目回听、村报和活动入口；
+            微信群里的播放卡片则展示了“村民正在讨论的地方，就是电台可以抵达的地方”。
+          </p>
+          <ul class="visual-notes">
+            <li>小程序图是后续入口样张：今日电台、村报、活动接龙、天气农时集中在同一界面。</li>
+            <li>微信群图是群内播放样张：电台卡片可以嵌入日常聊天，让信息跟随真实讨论流动。</li>
+            <li>这两张图用于说明触达方式，不作为当前已上线小程序或真实群聊截图。</li>
+          </ul>
+        </div>
+
+        <div class="channel-gallery reveal" aria-label="小程序和微信群触达样张">
+          <figure class="channel-card">
+            <img
+              src="assets/channel-miniprogram.png"
+              alt="剪鸭村电台小程序界面样张，包含正在播放、村务通知、今日电台、村报、活动接龙、天气和农时提醒"
+            />
+            <figcaption class="image-caption">
+              <strong>Mini program</strong>
+              <span>后续小程序入口：节目回听、村报、活动和农时提醒。</span>
+            </figcaption>
+          </figure>
+          <figure class="channel-card">
+            <img
+              src="assets/channel-wechat-radio.png"
+              alt="剪鸭村今日互助群演示截图，群聊中嵌入剪鸭村电台今日三件事播放卡片"
+            />
+            <figcaption class="image-caption">
+              <strong>Group playback</strong>
+              <span>电台内容进入群聊现场，承接通知、讨论和活动接龙。</span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="roadshow-section dark" id="newspaper" data-section="村报样张">
+      <div class="section-inner visual-layout">
+        <div class="visual-copy reveal">
+          <div class="kicker">Visual output</div>
+          <h2 class="section-title">声音之外，村庄还需要能被转发和张贴的图文出口</h2>
+          <p class="lead">
+            电台负责“正在发生”，村报负责“留下来”。这些样张展示的是同一套信息流在图文端的可能形态：
+            既可以服务村务通知，也可以包装在地商业、活动和社区记忆。
+          </p>
+          <ul class="visual-notes">
+            <li>《剪鸭村日报》偏公共事务与在地商业，适合张贴在村口、游客中心和民宿前台。</li>
+            <li>《秦托邦日报》偏社区运营与活动传播，适合承接数字游民社区和活动报名。</li>
+            <li>图像是视觉样张，用来说明 AI 村报的呈现方向；正式落地时仍以真实采集信息和人工审核为准。</li>
+          </ul>
+        </div>
+
+        <div class="newspaper-gallery reveal" aria-label="AI 村报视觉样张">
+          <figure class="newspaper-card">
+            <img
+              src="assets/village-daily-jianya.png"
+              alt="剪鸭村日报样张，包含烤肠摊投资人发言、多元招商、停车治理和村务通知"
+            />
+            <figcaption class="image-caption">
+              <strong>Jianya daily</strong>
+              <span>村务、商业与游客体验的混合版面。</span>
+            </figcaption>
+          </figure>
+          <figure class="newspaper-card">
+            <img
+              src="assets/village-daily-qintobang.png"
+              alt="秦托邦日报样张，包含冠军宇宙进入第二阶段、晨跑活动、枸杞签名款和社区人物栏目"
+            />
+            <figcaption class="image-caption">
+              <strong>Qintobang daily</strong>
+              <span>社区活动、人物栏目与轻松资讯的日报样式。</span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="roadshow-section dark" id="graph" data-section="关系图谱">
+      <div class="section-inner graph-layout">
+        <figure class="graph-card graph-feature reveal">
+          <img
+            src="assets/community-graph-wide.png"
+            alt="秦托邦数字游民社区关系图谱总览，中心节点连接多条社区活动与人物关系"
+          />
+          <figcaption class="image-caption">
+            <strong>Community graph</strong>
+            <span>把群聊、活动、人物和事件组织成可检索的社区关系网络。</span>
+          </figcaption>
+        </figure>
+
+        <div class="graph-stack reveal">
+          <div class="visual-copy">
+            <div class="kicker">Source intelligence</div>
+            <h2 class="section-title graph-title">关系图谱解释电台从哪里“听见”村庄</h2>
+            <p class="lead">
+              如果电台只会念稿，它很快会变成另一个通知栏。关系图谱让系统知道哪些人、活动和话题正在形成连接，
+              再把这些连接转成广播、村报和后续视频素材。
+            </p>
+          </div>
+          <figure class="graph-card compact">
+            <img
+              src="assets/community-graph-detail.png"
+              alt="社区活动接龙节点的关系图谱细节，展示活动、人物和日期之间的连接"
+            />
+            <figcaption class="image-caption">
+              <strong>Activity cluster</strong>
+              <span>围绕活动接龙形成的话题、人物和时间线。</span>
+            </figcaption>
+          </figure>
+          <figure class="graph-card compact">
+            <img
+              src="assets/community-graph-panel.png"
+              alt="秦托邦人物宇宙节点详情面板，展示最近活跃人物和节点属性"
+            />
+            <figcaption class="image-caption">
+              <strong>Node panel</strong>
+              <span>节点详情可以成为节目脚本和村报栏目的来源。</span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="roadshow-section dark" id="closing" data-section="落地愿景">
+      <div class="section-inner closing-layout">
+        <div class="closing-copy reveal">
+          <div class="kicker">From demo to on-air</div>
+          <h2 class="section-title">这不只是一个比赛型项目</h2>
+          <p class="lead">
+            它同时也是我们正在尝试、正在探索的方向：未来形成一个真正 24 小时带状节目的电台，
+            以及围绕村庄日常持续生长的融媒体项目。
+          </p>
+          <div class="landing-steps">
+            <article class="landing-step">
+              <span>Now</span>
+              <strong>正在尝试</strong>
+              <p>用 AI 把村庄里的碎片信息，整理成可以被听见、被理解的日常节目。</p>
+            </article>
+            <article class="landing-step">
+              <span>Next</span>
+              <strong>正在探索</strong>
+              <p>从电台延展到村报、视频与公共屏幕，形成连续的乡村融媒体网络。</p>
+            </article>
+            <article class="landing-step">
+              <span>Future</span>
+              <strong>真正落地</strong>
+              <p>让声音服务治理、陪伴老人、连接离乡的人，也让新村民更自然地进入村庄。</p>
+            </article>
           </div>
         </div>
-      </section>
 
-      <section class="slide dark evidence-slide" data-duration="35s">
-        <div class="content">
-          <div class="evidence-shell">
-            <div class="stack">
-              <div class="evidence-head">
-                <div class="eyebrow">Evidence appendix / 证据链</div>
-                <h2 class="section-title" style="font-size:clamp(30px,3.2vw,48px);">把 7 页叙事落到三段可播放素材</h2>
-                <p class="section-copy">
-                  原有页面保持叙事节奏不插入新内容；证据补充统一放到本页，用真实音频与界面视频承接每一页的论点。
-                </p>
-                <div
-                  class="evidence-route"
-                  aria-label="证据材料类型"
-                  data-prompt-route="gpt-image-2 skill: Infographics & Field Guides + UI/UX Mockups; no local gpt-image CLI generation"
-                >
-                  <span class="route-chip">证据板</span>
-                  <span class="route-chip">交互样片</span>
-                  <span class="route-chip">音频样本</span>
-                </div>
-              </div>
-
-              <div class="evidence-ledger">
-                <article class="evidence-row">
-                  <span class="page-no">01</span>
-                  <div>
-                    <h3>Opening</h3>
-                    <p>旧收音机与秦腔记忆，对应《秦托邦播客测试 · 电台版》，证明开场不是抽象怀旧，而是可听见的声音原型。</p>
-                  </div>
-                </article>
-                <article class="evidence-row">
-                  <span class="page-no">02</span>
-                  <div>
-                    <h3>Idea to product</h3>
-                    <p>“声音是乡村连接方式”对应两条音频样本：一条戏曲电台口味，一条群聊日常口味，覆盖陪伴与生活信息。</p>
-                  </div>
-                </article>
-                <article class="evidence-row">
-                  <span class="page-no">03</span>
-                  <div>
-                    <h3>Fractures</h3>
-                    <p>《深夜电台之群聊日常》把微信群碎片、邻里语气和夜间陪伴感串起来，对应“信息在线上、老人在线下”的问题面。</p>
-                  </div>
-                </article>
-                <article class="evidence-row">
-                  <span class="page-no">04</span>
-                  <div>
-                    <h3>Resolution</h3>
-                    <p>15 秒界面视频把 AI 电台、AI 村报、视频化方向变成可见交互，支撑“乡村融媒体平台”而不只是声音 Demo。</p>
-                  </div>
-                </article>
-                <article class="evidence-row">
-                  <span class="page-no">05</span>
-                  <div>
-                    <h3>Agent layers</h3>
-                    <p>三段素材分别落在生成层、调度层、播出层：脚本到声音、声音到电台感、界面到连续播出入口。</p>
-                  </div>
-                </article>
-                <article class="evidence-row">
-                  <span class="page-no">06</span>
-                  <div>
-                    <h3>Audio demo</h3>
-                    <p>本页直接挂载播放器：64 秒电台版 WAV 与 150 秒群聊日常 MP3，可现场验证播报质感、音乐情绪和专业电台感。</p>
-                  </div>
-                </article>
-                <article class="evidence-row">
-                  <span class="page-no">07</span>
-                  <div>
-                    <h3>Vision</h3>
-                    <p>早晚陪伴、离乡连接、新村民理解和柔性治理，分别由戏曲陪伴、群聊日常与界面入口形成闭环证据。</p>
-                  </div>
-                </article>
-              </div>
-            </div>
-
-            <div class="media-stack" aria-label="local media evidence">
-              <article class="media-card">
-                <h3>Interface video</h3>
-                <strong>九鸭村电台交互样片</strong>
-                <video id="radioUiVideo" controls playsinline webkit-playsinline preload="metadata" aria-label="九鸭村电台界面交互视频">
-                  <source src="assets/radio-ui-interaction.mp4" type="video/mp4" />
-                </video>
-                <button class="media-toggle" type="button" data-media-toggle="radioUiVideo">播放视频</button>
-                <div class="asset-meta">
-                  <span>15s</span>
-                  <span>1920x1080</span>
-                  <span>H.264 + AAC</span>
-                </div>
-              </article>
-
-              <article class="media-card">
-                <h3>Radio sample A</h3>
-                <strong>秦托邦播客测试 · 电台版</strong>
-                <audio id="qintobangAudio" controls preload="metadata" aria-label="秦托邦播客测试电台版音频">
-                  <source src="assets/qintobang-radio.m4a" type="audio/mp4" />
-                  <source src="assets/qintobang-radio.wav" type="audio/wav" />
-                </audio>
-                <button class="media-toggle" type="button" data-media-toggle="qintobangAudio">播放音频</button>
-                <p>戏曲/电台语气样本，承接开场的旧收音机和老人听觉入口。</p>
-                <div class="asset-meta">
-                  <span>64s</span>
-                  <span>AAC / WAV</span>
-                  <span>24 kHz</span>
-                </div>
-              </article>
-
-              <article class="media-card">
-                <h3>Radio sample B</h3>
-                <strong>深夜电台之群聊日常</strong>
-                <audio id="midnightAudio" controls preload="metadata" aria-label="深夜电台之群聊日常音频">
-                  <source src="assets/midnight-chat-radio.m4a" type="audio/mp4" />
-                  <source src="assets/midnight-chat-radio.mp3" type="audio/mpeg" />
-                </audio>
-                <button class="media-toggle" type="button" data-media-toggle="midnightAudio">播放音频</button>
-                <p>群聊碎片被改写成夜间陪伴内容，承接问题页与 Demo 页的自然度验证。</p>
-                <div class="asset-meta">
-                  <span>150s</span>
-                  <span>AAC / MP3</span>
-                  <span>44.1 kHz</span>
-                </div>
-              </article>
-            </div>
-          </div>
+        <div class="closing-mark reveal" aria-label="结尾陈述">
+          <strong>先听见，再抵达</strong>
+          <p>希望老师们喜欢。也希望在三个月内，能够让这个电台真正落地。</p>
         </div>
-      </section>
-
-      <section class="slide dark closing-slide" data-duration="35s">
-        <div class="content">
-          <div class="closing-shell">
-            <div class="closing-mark" aria-hidden="true">
-              <strong>24 小时，属于村庄的声音带</strong>
-              <p>从一段 Demo 开始，走向可以持续播出、持续更新、持续连接人的乡村融媒体基础设施。</p>
-            </div>
-            <div class="closing-copy">
-              <div class="eyebrow">Closing / From demo to on-air</div>
-              <h2 class="closing-title">这不只是一个比赛型项目</h2>
-              <p class="closing-lead">
-                它同时也是我们正在尝试、正在探索的方向：未来形成一个真正 24 小时带状节目的电台，以及围绕村庄日常持续生长的融媒体项目。
-              </p>
-              <div class="closing-statement">
-                <p>希望老师们喜欢。</p>
-                <p>也希望在三个月内，能够让这个电台真正落地。</p>
-              </div>
-              <div class="closing-points">
-                <article class="closing-point">
-                  <span>Now</span>
-                  <strong>正在尝试</strong>
-                  <p>用 AI 把村庄里的碎片信息，整理成可以被听见、被理解的日常节目。</p>
-                </article>
-                <article class="closing-point">
-                  <span>Next</span>
-                  <strong>正在探索</strong>
-                  <p>从电台延展到村报、视频与公共屏幕，形成连续的乡村融媒体网络。</p>
-                </article>
-                <article class="closing-point">
-                  <span>Future</span>
-                  <strong>真正落地</strong>
-                  <p>让声音服务治理、陪伴老人、连接离乡的人，也让新村民更自然地进入村庄。</p>
-                </article>
-              </div>
-              <div class="closing-signoff">
-                <span>剪鸭村融媒体 / Banong Radio</span>
-                <span>谢谢各位老师</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <div class="slide-counter">
-      <strong id="currentSlide">01</strong>
-      <span id="totalSlides">/ 09</span>
-      <span id="currentDuration">30s</span>
-    </div>
-
-    <div class="dots" id="dots"></div>
-
-    <div class="hud">
-      <span>↑ ↓ / Space</span>
-      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-    </div>
-  </div>
+      </div>
+    </section>
+  </main>
 
   <script>
-    const slides = Array.from(document.querySelectorAll(".slide"));
-    const track = document.getElementById("slides");
-    const dots = document.getElementById("dots");
-    const currentSlide = document.getElementById("currentSlide");
-    const totalSlides = document.getElementById("totalSlides");
-    const currentDuration = document.getElementById("currentDuration");
-    const progressFill = document.getElementById("progressFill");
-    let index = 0;
-    let locked = false;
-    let touchStartY = 0;
-    let touchStartX = 0;
-    let touchStartScrollTop = 0;
+    const sectionLinks = Array.from(document.querySelectorAll(".rail-link"));
+    const sections = Array.from(document.querySelectorAll(".roadshow-section"));
+    const revealItems = Array.from(document.querySelectorAll(".reveal"));
+    const scrollMeter = document.getElementById("scrollMeter");
 
-    function activeSlide() {
-      return slides[index];
-    }
-
-    function syncViewportHeight() {
-      const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-      document.documentElement.style.setProperty("--deck-height", `${viewportHeight}px`);
-      render();
-    }
-
-    function buildDots() {
-      slides.forEach((_, i) => {
-        const button = document.createElement("button");
-        button.className = "dot";
-        button.type = "button";
-        button.setAttribute("aria-label", `Go to slide ${i + 1}`);
-        button.addEventListener("click", () => goTo(i));
-        dots.appendChild(button);
+    function setActiveSection(id) {
+      sectionLinks.forEach((link) => {
+        link.classList.toggle("is-current", link.getAttribute("href") === `#${id}`);
       });
     }
 
-    function render() {
-      track.style.transform = `translate3d(0, calc(-${index} * var(--deck-height)), 0)`;
-      currentSlide.textContent = String(index + 1).padStart(2, "0");
-      totalSlides.textContent = `/ ${String(slides.length).padStart(2, "0")}`;
-      currentDuration.textContent = slides[index].dataset.duration || "";
-      progressFill.style.width = `${((index + 1) / slides.length) * 100}%`;
-      Array.from(dots.children).forEach((dot, i) => {
-        dot.classList.toggle("active", i === index);
-      });
-      slides.forEach((slide, i) => {
-        if (i === index) return;
-        slide.querySelectorAll("audio, video").forEach((media) => media.pause());
-      });
-    }
+    const sectionObserver = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible) setActiveSection(visible.target.id);
+    }, { threshold: [0.36, 0.58, 0.72] });
 
-    function goTo(next) {
-      if (locked || next < 0 || next >= slides.length || next === index) return;
-      locked = true;
-      index = next;
-      render();
-      window.setTimeout(() => {
-        locked = false;
-      }, 780);
-    }
+    sections.forEach((section) => sectionObserver.observe(section));
 
-    function step(delta) {
-      goTo(index + delta);
-    }
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.18 });
+
+    revealItems.forEach((item, index) => {
+      item.style.transitionDelay = `${Math.min(index % 5, 4) * 70}ms`;
+      revealObserver.observe(item);
+    });
 
     function updateMediaButton(media, button) {
       const noun = media.tagName.toLowerCase() === "video" ? "视频" : "音频";
@@ -1941,23 +1990,9 @@
     }
 
     function bindMediaControls() {
-      document.querySelectorAll("audio, video").forEach((media) => {
-        ["click", "touchstart", "touchend", "pointerdown", "pointerup"].forEach((eventName) => {
-          media.addEventListener(eventName, (event) => {
-            event.stopPropagation();
-          });
-        });
-      });
-
       document.querySelectorAll("[data-media-toggle]").forEach((button) => {
         const media = document.getElementById(button.dataset.mediaToggle);
         if (!media) return;
-
-        ["click", "touchstart", "touchend", "pointerdown", "pointerup"].forEach((eventName) => {
-          button.addEventListener(eventName, (event) => {
-            event.stopPropagation();
-          });
-        });
 
         button.addEventListener("click", async () => {
           try {
@@ -1978,80 +2013,16 @@
       });
     }
 
-    buildDots();
-    bindMediaControls();
-    render();
-
-    window.addEventListener("keydown", (event) => {
-      if (event.target.closest && event.target.closest("audio, video, button, input, textarea, select")) {
-        return;
-      }
-      if (["ArrowDown", "PageDown", " ", "ArrowRight"].includes(event.key)) {
-        event.preventDefault();
-        step(1);
-      }
-      if (["ArrowUp", "PageUp", "ArrowLeft"].includes(event.key)) {
-        event.preventDefault();
-        step(-1);
-      }
-      if (event.key === "Home") {
-        event.preventDefault();
-        goTo(0);
-      }
-      if (event.key === "End") {
-        event.preventDefault();
-        goTo(slides.length - 1);
-      }
-    }, { passive: false });
-
-    let wheelTimer = null;
-    window.addEventListener("wheel", (event) => {
-      if (wheelTimer) return;
-      if (Math.abs(event.deltaY) < 18) return;
-      step(event.deltaY > 0 ? 1 : -1);
-      wheelTimer = window.setTimeout(() => {
-        wheelTimer = null;
-      }, 860);
-    }, { passive: true });
-
-    window.addEventListener("touchstart", (event) => {
-      const slide = activeSlide();
-      touchStartX = event.changedTouches[0].clientX;
-      touchStartY = event.changedTouches[0].clientY;
-      touchStartScrollTop = slide ? slide.scrollTop : 0;
-    }, { passive: true });
-
-    window.addEventListener("touchend", (event) => {
-      if (event.target.closest && event.target.closest("audio, video, button, input, textarea, select")) {
-        return;
-      }
-      const deltaX = event.changedTouches[0].clientX - touchStartX;
-      const deltaY = event.changedTouches[0].clientY - touchStartY;
-      if (Math.abs(deltaY) < 58 || Math.abs(deltaY) < Math.abs(deltaX) * 1.25) return;
-
-      const slide = activeSlide();
-      const maxScroll = slide ? slide.scrollHeight - slide.clientHeight : 0;
-      if (maxScroll > 4) {
-        const atTop = touchStartScrollTop <= 2 && slide.scrollTop <= 2;
-        const atBottom = touchStartScrollTop >= maxScroll - 2 || slide.scrollTop >= maxScroll - 2;
-        if (deltaY > 0 && !atTop) return;
-        if (deltaY < 0 && !atBottom) return;
-      }
-
-      step(deltaY < 0 ? 1 : -1);
-    }, { passive: true });
-
-    window.addEventListener("resize", syncViewportHeight, { passive: true });
-    window.addEventListener("orientationchange", () => {
-      window.setTimeout(syncViewportHeight, 180);
-    }, { passive: true });
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener("resize", syncViewportHeight, { passive: true });
-      window.visualViewport.addEventListener("scroll", syncViewportHeight, { passive: true });
+    function updateScrollMeter() {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = max > 0 ? (window.scrollY / max) * 100 : 0;
+      scrollMeter.style.setProperty("--scroll", `${Math.max(0, Math.min(100, progress))}%`);
     }
 
-    syncViewportHeight();
+    bindMediaControls();
+    updateScrollMeter();
+    window.addEventListener("scroll", updateScrollMeter, { passive: true });
+    window.addEventListener("resize", updateScrollMeter, { passive: true });
   </script>
 </body>
 </html>
