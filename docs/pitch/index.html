@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>用声音缝合乡村的裂缝</title>
   <meta
     name="description"
@@ -30,6 +30,13 @@
       --glow: rgba(255, 239, 216, 0.55);
       --shadow: 0 26px 80px rgba(32, 24, 17, 0.16);
       --radius: 30px;
+      --deck-height: 100vh;
+    }
+
+    @supports (height: 100dvh) {
+      :root {
+        --deck-height: 100dvh;
+      }
     }
 
     * { box-sizing: border-box; }
@@ -39,6 +46,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
+      overscroll-behavior: none;
       color: var(--ink);
       font-family: "Noto Sans SC", system-ui, sans-serif;
       background:
@@ -65,7 +73,7 @@
     .deck {
       position: relative;
       width: 100vw;
-      height: 100vh;
+      height: var(--deck-height);
       overflow: hidden;
     }
 
@@ -78,12 +86,14 @@
     .slide {
       position: relative;
       width: 100vw;
-      height: 100vh;
+      height: var(--deck-height);
       padding: 4.6vh 4.5vw 5vh;
       display: grid;
       align-items: center;
       overflow: hidden;
       isolation: isolate;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
 
     .slide::before {
@@ -156,7 +166,7 @@
       font-family: "Noto Serif SC", serif;
       font-size: clamp(42px, 5vw, 80px);
       line-height: 1.08;
-      letter-spacing: -0.04em;
+      letter-spacing: 0;
       max-width: 11ch;
     }
 
@@ -1059,11 +1069,316 @@
 
       .slide {
         overflow-y: auto;
+        overflow-x: hidden;
+        align-items: start;
         padding-bottom: 96px;
       }
 
       .dots {
         display: none;
+      }
+    }
+
+    @media (max-width: 700px) {
+      html,
+      body {
+        background:
+          radial-gradient(circle at 20% 0%, rgba(255,255,255,0.68), transparent 32%),
+          linear-gradient(180deg, #f2eadc 0%, #e3d7c5 100%);
+      }
+
+      body::before {
+        background-size: 26px 26px;
+        opacity: 0.38;
+      }
+
+      .deck {
+        width: 100%;
+      }
+
+      .slides {
+        transition-duration: 520ms;
+      }
+
+      .slide {
+        width: 100vw;
+        padding:
+          max(72px, calc(env(safe-area-inset-top) + 56px))
+          16px
+          max(104px, calc(env(safe-area-inset-bottom) + 86px));
+      }
+
+      .slide::after {
+        display: none;
+      }
+
+      .content {
+        gap: 16px;
+        max-width: 100%;
+      }
+
+      .stack {
+        gap: 14px;
+      }
+
+      .eyebrow {
+        max-width: 100%;
+        padding: 8px 12px;
+        border-radius: 22px;
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        line-height: 1.35;
+      }
+
+      .title {
+        font-size: clamp(36px, 12vw, 54px);
+        line-height: 1.12;
+        max-width: 100%;
+      }
+
+      .story-title {
+        width: 100%;
+      }
+
+      .lead,
+      .section-copy {
+        max-width: 100%;
+        font-size: 16px;
+        line-height: 1.72;
+      }
+
+      .section-title {
+        font-size: clamp(26px, 8.6vw, 38px);
+        line-height: 1.18;
+      }
+
+      .section-title.section-title-small {
+        font-size: clamp(22px, 6.8vw, 30px);
+      }
+
+      .panel,
+      .glass-card,
+      .metric-card,
+      .timeline-card,
+      .vision-card,
+      .wave-card {
+        border-radius: 22px;
+      }
+
+      .panel,
+      .glass-card,
+      .metric-card,
+      .timeline-card,
+      .vision-card {
+        padding: 18px;
+      }
+
+      .wave-card {
+        padding: 20px;
+        min-height: 360px;
+      }
+
+      .wave-card::before,
+      .wave-card::after {
+        left: 0;
+        right: 0;
+      }
+
+      .wave-card h2 {
+        font-size: clamp(28px, 9vw, 42px);
+        max-width: 100%;
+      }
+
+      .wave-card p,
+      .glass-card p,
+      .metric-card p,
+      .timeline-card p,
+      .vision-card p,
+      .note-item p {
+        font-size: 14px;
+        line-height: 1.68;
+      }
+
+      .bullet-list {
+        gap: 10px;
+      }
+
+      .bullet-list li {
+        gap: 10px;
+        font-size: 16px;
+        line-height: 1.62;
+      }
+
+      .flow-card {
+        min-height: auto;
+      }
+
+      .demo-player {
+        padding: 20px;
+        border-radius: 24px;
+      }
+
+      .demo-player .ring {
+        width: min(58vw, 220px);
+      }
+
+      .demo-meter {
+        height: 52px;
+      }
+
+      @keyframes pulse {
+        0%, 100% { height: 14px; opacity: 0.5; }
+        50% { height: 50px; opacity: 1; }
+      }
+
+      .footer-tag,
+      .closing-signoff {
+        display: grid;
+        justify-content: start;
+      }
+
+      .slide-counter {
+        top: max(10px, env(safe-area-inset-top));
+        right: 12px;
+        gap: 7px;
+        padding: 9px 12px;
+        font-size: 12px;
+      }
+
+      .slide-counter strong {
+        font-size: 17px;
+      }
+
+      .hud {
+        left: 12px;
+        right: 12px;
+        bottom: max(12px, env(safe-area-inset-bottom));
+        justify-content: space-between;
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+
+      .progress-bar {
+        width: min(42vw, 170px);
+      }
+
+      .evidence-slide,
+      .closing-slide {
+        padding:
+          max(72px, calc(env(safe-area-inset-top) + 56px))
+          16px
+          max(108px, calc(env(safe-area-inset-bottom) + 90px));
+      }
+
+      .evidence-head {
+        gap: 10px;
+      }
+
+      .evidence-ledger {
+        gap: 9px;
+      }
+
+      .evidence-row {
+        grid-template-columns: 40px minmax(0, 1fr);
+        min-height: auto;
+        padding: 11px;
+        border-radius: 18px;
+      }
+
+      .evidence-row .page-no {
+        width: 36px;
+        height: 36px;
+        border-radius: 14px;
+        font-size: 13px;
+      }
+
+      .evidence-row p {
+        font-size: 12.5px;
+        line-height: 1.5;
+      }
+
+      .media-stack {
+        gap: 10px;
+      }
+
+      .media-card {
+        padding: 12px;
+        border-radius: 20px;
+      }
+
+      .media-card video {
+        height: auto;
+        aspect-ratio: 16 / 9;
+        border-radius: 16px;
+      }
+
+      .media-card audio {
+        min-height: 44px;
+      }
+
+      .asset-meta span {
+        padding: 5px 7px;
+      }
+
+      .closing-shell {
+        gap: 16px;
+      }
+
+      .closing-mark {
+        min-height: 280px;
+        padding: 20px;
+        border-radius: 24px;
+      }
+
+      .closing-mark strong {
+        max-width: 12ch;
+        font-size: clamp(28px, 9vw, 42px);
+      }
+
+      .closing-copy {
+        gap: 14px;
+      }
+
+      .closing-title {
+        max-width: 100%;
+        font-size: clamp(40px, 13vw, 58px);
+      }
+
+      .closing-lead {
+        font-size: 16px;
+        line-height: 1.72;
+      }
+
+      .closing-statement {
+        padding: 18px;
+        border-radius: 22px;
+      }
+
+      .closing-statement p {
+        font-size: clamp(24px, 7.6vw, 34px);
+        line-height: 1.34;
+      }
+
+      .closing-point {
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .slide,
+      .evidence-slide,
+      .closing-slide {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .title,
+      .closing-title {
+        font-size: clamp(34px, 12vw, 50px);
+      }
+
+      .hud {
+        font-size: 12px;
       }
     }
   </style>
@@ -1512,6 +1827,19 @@
     const progressFill = document.getElementById("progressFill");
     let index = 0;
     let locked = false;
+    let touchStartY = 0;
+    let touchStartX = 0;
+    let touchStartScrollTop = 0;
+
+    function activeSlide() {
+      return slides[index];
+    }
+
+    function syncViewportHeight() {
+      const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      document.documentElement.style.setProperty("--deck-height", `${viewportHeight}px`);
+      render();
+    }
 
     function buildDots() {
       slides.forEach((_, i) => {
@@ -1525,7 +1853,7 @@
     }
 
     function render() {
-      track.style.transform = `translateY(-${index * 100}vh)`;
+      track.style.transform = `translate3d(0, calc(-${index} * var(--deck-height)), 0)`;
       currentSlide.textContent = String(index + 1).padStart(2, "0");
       totalSlides.textContent = `/ ${String(slides.length).padStart(2, "0")}`;
       currentDuration.textContent = slides[index].dataset.duration || "";
@@ -1588,16 +1916,44 @@
       }, 860);
     }, { passive: true });
 
-    let touchStartY = 0;
     window.addEventListener("touchstart", (event) => {
+      const slide = activeSlide();
+      touchStartX = event.changedTouches[0].clientX;
       touchStartY = event.changedTouches[0].clientY;
+      touchStartScrollTop = slide ? slide.scrollTop : 0;
     }, { passive: true });
 
     window.addEventListener("touchend", (event) => {
+      if (event.target.closest && event.target.closest("audio, video, button, input, textarea, select")) {
+        return;
+      }
+      const deltaX = event.changedTouches[0].clientX - touchStartX;
       const deltaY = event.changedTouches[0].clientY - touchStartY;
-      if (Math.abs(deltaY) < 50) return;
+      if (Math.abs(deltaY) < 58 || Math.abs(deltaY) < Math.abs(deltaX) * 1.25) return;
+
+      const slide = activeSlide();
+      const maxScroll = slide ? slide.scrollHeight - slide.clientHeight : 0;
+      if (maxScroll > 4) {
+        const atTop = touchStartScrollTop <= 2 && slide.scrollTop <= 2;
+        const atBottom = touchStartScrollTop >= maxScroll - 2 || slide.scrollTop >= maxScroll - 2;
+        if (deltaY > 0 && !atTop) return;
+        if (deltaY < 0 && !atBottom) return;
+      }
+
       step(deltaY < 0 ? 1 : -1);
     }, { passive: true });
+
+    window.addEventListener("resize", syncViewportHeight, { passive: true });
+    window.addEventListener("orientationchange", () => {
+      window.setTimeout(syncViewportHeight, 180);
+    }, { passive: true });
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", syncViewportHeight, { passive: true });
+      window.visualViewport.addEventListener("scroll", syncViewportHeight, { passive: true });
+    }
+
+    syncViewportHeight();
   </script>
 </body>
 </html>
