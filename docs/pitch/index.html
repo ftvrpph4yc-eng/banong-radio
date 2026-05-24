@@ -793,6 +793,30 @@
       min-height: 36px;
     }
 
+    .media-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      min-height: 38px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(242,215,187,0.14);
+      color: #f7f1e8;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .media-toggle:focus-visible {
+      outline: 2px solid #f2d7bb;
+      outline-offset: 3px;
+    }
+
     .asset-meta {
       display: flex;
       flex-wrap: wrap;
@@ -1316,6 +1340,13 @@
         min-height: 44px;
       }
 
+      .media-toggle {
+        width: 100%;
+        min-height: 44px;
+        justify-content: center;
+        font-size: 14px;
+      }
+
       .asset-meta span {
         padding: 5px 7px;
       }
@@ -1717,9 +1748,10 @@
               <article class="media-card">
                 <h3>Interface video</h3>
                 <strong>九鸭村电台交互样片</strong>
-                <video controls playsinline preload="metadata" aria-label="九鸭村电台界面交互视频">
+                <video id="radioUiVideo" controls playsinline webkit-playsinline preload="metadata" aria-label="九鸭村电台界面交互视频">
                   <source src="assets/radio-ui-interaction.mp4" type="video/mp4" />
                 </video>
+                <button class="media-toggle" type="button" data-media-toggle="radioUiVideo">播放视频</button>
                 <div class="asset-meta">
                   <span>15s</span>
                   <span>1920x1080</span>
@@ -1730,13 +1762,15 @@
               <article class="media-card">
                 <h3>Radio sample A</h3>
                 <strong>秦托邦播客测试 · 电台版</strong>
-                <audio controls preload="metadata" aria-label="秦托邦播客测试电台版音频">
+                <audio id="qintobangAudio" controls preload="metadata" aria-label="秦托邦播客测试电台版音频">
+                  <source src="assets/qintobang-radio.m4a" type="audio/mp4" />
                   <source src="assets/qintobang-radio.wav" type="audio/wav" />
                 </audio>
+                <button class="media-toggle" type="button" data-media-toggle="qintobangAudio">播放音频</button>
                 <p>戏曲/电台语气样本，承接开场的旧收音机和老人听觉入口。</p>
                 <div class="asset-meta">
                   <span>64s</span>
-                  <span>PCM mono</span>
+                  <span>AAC / WAV</span>
                   <span>24 kHz</span>
                 </div>
               </article>
@@ -1744,13 +1778,15 @@
               <article class="media-card">
                 <h3>Radio sample B</h3>
                 <strong>深夜电台之群聊日常</strong>
-                <audio controls preload="metadata" aria-label="深夜电台之群聊日常音频">
+                <audio id="midnightAudio" controls preload="metadata" aria-label="深夜电台之群聊日常音频">
+                  <source src="assets/midnight-chat-radio.m4a" type="audio/mp4" />
                   <source src="assets/midnight-chat-radio.mp3" type="audio/mpeg" />
                 </audio>
+                <button class="media-toggle" type="button" data-media-toggle="midnightAudio">播放音频</button>
                 <p>群聊碎片被改写成夜间陪伴内容，承接问题页与 Demo 页的自然度验证。</p>
                 <div class="asset-meta">
                   <span>150s</span>
-                  <span>MP3 stereo</span>
+                  <span>AAC / MP3</span>
                   <span>44.1 kHz</span>
                 </div>
               </article>
@@ -1881,7 +1917,51 @@
       goTo(index + delta);
     }
 
+    function updateMediaButton(media, button) {
+      const noun = media.tagName.toLowerCase() === "video" ? "视频" : "音频";
+      button.textContent = media.paused ? `播放${noun}` : `暂停${noun}`;
+    }
+
+    function bindMediaControls() {
+      document.querySelectorAll("audio, video").forEach((media) => {
+        ["click", "touchstart", "touchend", "pointerdown", "pointerup"].forEach((eventName) => {
+          media.addEventListener(eventName, (event) => {
+            event.stopPropagation();
+          });
+        });
+      });
+
+      document.querySelectorAll("[data-media-toggle]").forEach((button) => {
+        const media = document.getElementById(button.dataset.mediaToggle);
+        if (!media) return;
+
+        ["click", "touchstart", "touchend", "pointerdown", "pointerup"].forEach((eventName) => {
+          button.addEventListener(eventName, (event) => {
+            event.stopPropagation();
+          });
+        });
+
+        button.addEventListener("click", async () => {
+          try {
+            if (media.paused) {
+              await media.play();
+            } else {
+              media.pause();
+            }
+          } catch (error) {
+            button.textContent = "请点系统播放键";
+          }
+        });
+
+        media.addEventListener("play", () => updateMediaButton(media, button));
+        media.addEventListener("pause", () => updateMediaButton(media, button));
+        media.addEventListener("ended", () => updateMediaButton(media, button));
+        updateMediaButton(media, button);
+      });
+    }
+
     buildDots();
+    bindMediaControls();
     render();
 
     window.addEventListener("keydown", (event) => {
